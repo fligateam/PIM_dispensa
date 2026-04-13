@@ -4,7 +4,87 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestão de PIMs - Farmácia da Liga</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+    header {
+      background: #006699;
+      color: white;
+      padding: 16px 20px;
+      text-align: center;
+    }
+    nav {
+      background: #333;
+      padding: 8px 20px;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      gap: 16px;
+    }
+    nav a, nav button {
+      color: white;
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    nav a:hover, nav button:hover {
+      background: #006699;
+    }
+    .nav-only-logged {
+      display: none;
+    }
+    .nav-only-logged.visible {
+      display: inline-block;
+    }
+
+    main {
+      padding: 20px;
+    }
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .hidden {
+      display: none;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      box-sizing: border-box;
+    }
+    input, select, textarea {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background: #006699;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #005580;
+    }
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -12,24 +92,26 @@
   </header>
 
   <nav>
-    <ul>
+    <ul id="navLinks">
       <li><a href="#" onclick="showSection('login')">Login</a></li>
-      <li><a href="#" onclick="showSection('dashboard')" class="nav-only-logged">Dashboard</a></li>
-      <li><a href="#" onclick="showSection('createUser')" class="nav-only-logged nav-admin">Criar Colaborador</a></li>
-      <li><a href="#" onclick="showSection('registerPim')" class="nav-only-logged">Registar PIM</a></li>
-      <li><a href="#" onclick="showSection('searchPim')" class="nav-only-logged">Consultar PIM</a></li>
-      <li><a href="#" onclick="showSection('dispensePim')" class="nav-only-logged">Dispensar PIM</a></li>
-      <li><a href="#" onclick="showSection('managePims')" class="nav-only-logged">Gestão de PIMs</a></li>
-      <li><a href="#" onclick="logout()" class="nav-only-logged">Sair</a></li>
+      <li><a href="#" onclick="showSection('dashboard')"><span id="navUsername"></span></a></li>
+      <li><a href="#" onclick="showSection('registerPim')">Registar PIM</a></li>
+      <li><a href="#" onclick="showSection('searchPim')">Consultar PIM</a></li>
+      <li><a href="#" onclick="showSection('dispensePim')">Dispensar PIM</a></li>
+      <li><a href="#" onclick="showSection('managePims')">Gestão de PIMs</a></li>
+      <li><a href="#" onclick="logout()">Sair</a></li>
+      <li id="adminTools" class="nav-only-logged">
+        <a href="#" onclick="showSection('createUser')">Criar Colaborador</a>
+      </li>
     </ul>
   </nav>
 
   <main>
     <!-- 1. LOGIN -->
     <section id="login" class="section">
-      <h2>Login</h2>
+      <h2>Login Farmácia da Liga</h2>
       <p>Utilize o seu código de utilizador e password</p>
-      <input type="text" id="userCode" placeholder="Código (ex: 001)" />
+      <input type="text" id="userCode" placeholder="Código de utilizador (ex: 001)" />
       <input type="password" id="userPassword" placeholder="Password" />
       <button onclick="loginByCode()">Entrar</button>
       <div id="loginFeedback"></div>
@@ -38,7 +120,7 @@
     <!-- 2. DASHBOARD -->
     <section id="dashboard" class="section hidden">
       <h2>Dashboard</h2>
-      <p>Utilizador: <span id="username"></span></p>
+      <p>Utilizador: <span id="displayName"></span></p>
       <p>Função: <span id="userRole"></span></p>
       <div id="dashboardStats"></div>
     </section>
@@ -85,7 +167,7 @@
         <input type="text" id="pimCodeInput" required />
 
         <label>Observações internas</label>
-        <textarea id="pimInternalNotes"></textarea>
+        <textarea id="pimInternalNotes" rows="3"></textarea>
 
         <button type="submit">Registar PIM</button>
       </form>
@@ -105,7 +187,7 @@
       <h2>Dispensar PIM</h2>
       <input type="text" id="pimCodeDispense" placeholder="Código PIM (ex: 73MCC26.001)" required />
       <input type="text" id="pickupNameDispense" placeholder="Nome de quem levantou" />
-      <textarea id="deliveryNotesDispense" placeholder="Observações da entrega"></textarea>
+      <textarea id="deliveryNotesDispense" placeholder="Observações da entrega" rows="3"></textarea>
       <button onclick="dispensePim()">Dispensar</button>
       <div id="dispenseFeedback"></div>
     </section>
@@ -119,15 +201,270 @@
   </main>
 
   <footer>
-    <p>&copy; 2026 Farmácia da Liga</p>
+    <p>© 2026 Farmácia da Liga</p>
   </footer>
 
-  <script type="module">
-    import { auth, db } from "./firebase-config.js";
-    import { app } from "./app.js";
-    window.app = app;
+  <!-- FIREBASE via CDN (compat mode) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+  <!-- CONFIGURAÇÃO DO FIREBASE -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBa6pjv7czSYaQ2ecShefFeLXAsxsd4Dnc",
+      authDomain: "pims-84362.firebaseapp.com",
+      projectId: "pims-84362",
+      storageBucket: "pims-84362.firebasestorage.app",
+      messagingSenderId: "21232070010",
+      appId: "1:21232070010:web:330d2f68be460632753ac3"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Services
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Expor globalmente para usar no código abaixo
     window.auth = auth;
     window.db = db;
   </script>
-</body>
-</html>
+
+  <!-- LÓGICA DA APP -->
+  <script>
+    const userMap = new Map(); // código -> email
+
+    // Função utilitária para gerar email a partir do código
+    function generateEmailFromCode(userCode) {
+      return `user_${userCode}@farmacialiga.pt`;
+    }
+
+    // Troca de seção
+    function showSection(id) {
+      document.querySelectorAll(".section").forEach(s => s.classList.add("hidden"));
+      const el = document.getElementById(id);
+      if (el) el.classList.remove("hidden");
+
+      // Atualiza menu visível
+      const isAdmin = currentUser?.token?.role === "admin" || "pharmacist";
+      document.getElementById("adminTools").style.display = isAdmin ? "inline" : "none";
+
+      const userLinks = document.querySelectorAll(".nav-only-logged");
+      userLinks.forEach(el => el.classList.toggle("visible", !!currentUser));
+      const usernameEl = document.getElementById("navUsername");
+      if (usernameEl && currentUser) {
+        usernameEl.innerText = currentUser.token?.name || "";
+      }
+    }
+
+    // Monitor de login/logout
+    auth.onAuthStateChanged(async (user) => {
+      const userFeedback = document.getElementById("loginFeedback");
+      if (user) {
+        try {
+          const userDoc = await db.collection("users").doc(user.uid).get();
+          const data = userDoc.data();
+          user.token = { role: data.role, name: data.name };
+          currentUser = user;
+
+          showSection("dashboard");
+          document.getElementById("displayName").innerText = data.name;
+          document.getElementById("userRole").innerText = data.role;
+          if (userFeedback) userFeedback.innerHTML = "";
+
+        } catch (error) {
+          userFeedback.innerHTML = "<p>Erro ao carregar o seu perfil.</p>";
+        }
+      } else {
+        currentUser = null;
+        showSection("login");
+      }
+    });
+
+    // 1. LOGIN pelo código
+    async function loginByCode() {
+      const userCode = document.getElementById("userCode").value.trim();
+      const password = document.getElementById("userPassword").value;
+      const feedback = document.getElementById("loginFeedback");
+
+      const email = userMap.get(userCode);
+      if (!email) {
+        feedback.innerHTML = "<p>Código de utilizador inválido.</p>";
+        return;
+      }
+
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        // O onAuthStateChanged já faz o resto.
+      } catch (error) {
+        if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+          feedback.innerHTML = "<p>Código ou password inválidos.</p>";
+        } else {
+          feedback.innerHTML = `<p>Erro: ${error.message}</p>`;
+        }
+      }
+    }
+
+    // 2. CARREGAR o mapa código -> email (no início)
+    async function loadUserMap() {
+      try {
+        const snapshot = await db.collection("users").get();
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          userMap.set(data.userCode, data.email);
+        });
+      } catch (error) {
+        console.warn("Não foi possível carregar users para userMap:", error);
+      }
+    }
+    loadUserMap();
+
+    // 3. CRIAR COLABORADOR
+    document.getElementById("formCreateUser").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const userCode = document.getElementById("newUserCode").value.trim();
+      const name = document.getElementById("newUserName").value.trim();
+      const role = document.getElementById("newUserRole").value;
+      const password = document.getElementById("newUserPassword").value;
+      const passwordConfirm = document.getElementById("newUserPasswordConfirm").value;
+      const feedback = document.getElementById("userCreationFeedback");
+
+      if (password !== passwordConfirm) {
+        feedback.innerHTML = "<p>As passwords não coincidem.</p>";
+        return;
+      }
+      if (password.length < 6) {
+        feedback.innerHTML = "<p>A password deve ter pelo menos 6 caracteres.</p>";
+        return;
+      }
+
+      const email = generateEmailFromCode(userCode);
+      feedback.innerHTML = `<p>A criar colaborador com código <strong>${userCode}</strong>...</p>`;
+
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        await db.collection("users").doc(user.uid).set({
+          userCode: userCode,
+          name: name,
+          role: role,
+          email: email,
+          createdAt: new Date().toISOString()
+        });
+
+        await user.updateProfile({ displayName: name });
+        userMap.set(userCode, email);
+
+        feedback.innerHTML =
+          `<p>Colaborador <strong>${name}</strong> criado com sucesso (código: ${userCode}).</p>`;
+        document.getElementById("formCreateUser").reset();
+
+      } catch (error) {
+        feedback.innerHTML = `<p>Erro: ${error.message}</p>`;
+      }
+    });
+
+    // 4. REGISTAR PIM
+    document.getElementById("formPim").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!currentUser || !currentUser.token?.role) {
+        alert("É necessário fazer login.");
+        return;
+      }
+
+      const patientName = document.getElementById("patientName").value.trim();
+      const patientCode = document.getElementById("patientCode").value.trim();
+      const pimCodeBase = document.getElementById("pimCodeInput").value.trim();
+      const internalNotes = document.getElementById("pimInternalNotes").value;
+
+      const pharmacistName = currentUser.token.name;
+
+      const pimDocRef = db.collection("pims").doc();
+      const pimId = pimDocRef.id;
+
+      const pim = {
+        pimId: pimId,
+        pimCode: pimCodeBase,
+        patientName: patientName,
+        patientCode: patientCode,
+        pharmacistId: currentUser.uid,
+        pharmacistName: pharmacistName,
+        status: "Registada",
+        statusHistory: [
+          {
+            status: "Registada",
+            date: new Date().toISOString(),
+            by: pharmacistName
+          }
+        ],
+        preparationNumber: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        internalNotes: internalNotes,
+        autoRenew: false
+      };
+
+      await pimDocRef.set(pim);
+
+      document.getElementById("pimFeedback").innerHTML =
+        `<p>PIM registada com sucesso: <strong>${pimCodeBase}</strong>.</p>`;
+      document.getElementById("formPim").reset();
+
+      await db.collection(`pims/${pimId}/pimEvents`).add({
+        type: "created",
+        status: "Registada",
+        date: new Date().toISOString(),
+        user: pharmacistName,
+        notes: internalNotes
+      });
+    });
+
+    // 5. CONSULTAR PIM
+    async function searchPims() {
+      const queryText = document.getElementById("searchQuery").value.trim().toLowerCase();
+      const resultsDiv = document.getElementById("pimResults");
+      resultsDiv.innerHTML = "<p>Pesquisando...</p>";
+
+      let q;
+      if (queryText) {
+        q = db.collection("pims").where("pimCode", "==", queryText.toUpperCase());
+      } else {
+        q = db.collection("pims");
+      }
+
+      try {
+        const snapshot = await q.get();
+        let content = "<ul>";
+        snapshot.forEach((doc) => {
+          const pim = doc.data();
+          const pimId = pim.pimId;
+          const pimCode = pim.pimCode;
+          const patientName = pim.patientName;
+          const status = pim.status;
+          const updatedAt = new Date(pim.updatedAt).toLocaleString();
+
+          content += `
+            <li>
+              <strong>PIM: ${pimCode}</strong><br>
+              Utente: ${patientName}<br>
+              Estado: ${status}<br>
+              Última alteração: ${updatedAt}<br>
+              <button onclick="viewPimDetails('${pimId}')">Ver detalhes</button>
+            </li>
+          `;
+        });
+        content += "</ul>";
+        resultsDiv.innerHTML = content;
+      } catch (error) {
+        resultsDiv.innerHTML = `<p>Erro ao consultar PIMs: ${error.message}</p>`;
+      }
+    }
+
+    // 6. DETALHES DA PIM
+    async function viewPimDetails(pimId) {
+      const pimDocRef = db.collection("p
