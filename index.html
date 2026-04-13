@@ -1,289 +1,192 @@
-<!DOCTYPE html>
+html = """<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestão de PIMs - Farmácia da Liga</title>
+  <title>PIMs - Farmacia da Liga</title>
   <link rel="icon" href="data:,">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f4f8;
-      color: #333;
-    }
-    header {
-      background: linear-gradient(135deg, #004d80, #006699);
-      color: white;
-      padding: 18px 24px;
-      text-align: center;
-      font-size: 1.2em;
-      letter-spacing: 1px;
-    }
-    header p {
-      font-size: 0.85em;
-      opacity: 0.8;
-      margin-top: 4px;
-    }
-    nav {
-      background: #1a1a2e;
-      padding: 0 16px;
-      display: flex;
-      overflow-x: auto;
-    }
-    nav a {
-      color: #ccc;
-      text-decoration: none;
-      padding: 14px 16px;
-      display: inline-block;
-      font-size: 0.88em;
-      white-space: nowrap;
-      transition: background 0.2s;
-    }
-    nav a:hover { background: #006699; color: white; }
-    nav a.active { background: #006699; color: white; }
-    .nav-logged { display: none; }
-    .nav-logged.visible { display: inline-block; }
-
-    main { padding: 24px; max-width: 900px; margin: 0 auto; }
-    .section { background: white; border-radius: 10px; padding: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .hidden { display: none !important; }
-
-    h2 { color: #004d80; margin-bottom: 20px; border-bottom: 2px solid #006699; padding-bottom: 8px; }
-    h3 { color: #004d80; margin: 16px 0 10px 0; }
-
-    label { display: block; font-size: 0.85em; color: #555; margin-top: 14px; margin-bottom: 4px; font-weight: 600; }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 0.95em;
-      background: #fafafa;
-    }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #006699;
-      background: white;
-    }
-    textarea { resize: vertical; min-height: 80px; }
-
-    .btn {
-      display: inline-block;
-      width: auto;
-      padding: 10px 24px;
-      background: #006699;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.95em;
-      margin-top: 18px;
-    }
-    .btn:hover { background: #004d80; }
-    .btn-block { width: 100%; display: block; }
-    .btn-red { background: #c0392b; }
-    .btn-red:hover { background: #a93226; }
-    .btn-green { background: #27ae60; }
-    .btn-green:hover { background: #229954; }
-    .btn-small { padding: 6px 14px; font-size: 0.82em; margin-top: 6px; }
-
-    .feedback { margin-top: 14px; font-size: 0.9em; }
-    .feedback.ok { color: #27ae60; }
-    .feedback.err { color: #c0392b; }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.88em; }
-    th { background: #006699; color: white; padding: 10px 8px; text-align: left; }
-    td { padding: 8px; border-bottom: 1px solid #eee; vertical-align: top; }
-    tr:hover td { background: #f0f4f8; }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 0.78em;
-      font-weight: 600;
-    }
-    .badge-blue { background: #d0e8f5; color: #004d80; }
-    .badge-yellow { background: #fff3cd; color: #856404; }
-    .badge-green { background: #d4edda; color: #155724; }
-    .badge-red { background: #f8d7da; color: #721c24; }
-    .badge-grey { background: #e2e3e5; color: #383d41; }
-
-    .pim-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 14px 18px;
-      margin-bottom: 12px;
-      background: #fafafa;
-    }
-    .pim-card strong { color: #004d80; }
-
-    .obs-box {
-      background: #fff8e1;
-      border-left: 4px solid #f39c12;
-      padding: 10px 14px;
-      border-radius: 4px;
-      margin: 10px 0;
-      font-size: 0.9em;
-    }
-
-    .confirm-checkbox { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0; }
-    .confirm-checkbox input[type="checkbox"] { width: auto; margin-top: 2px; }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 0.82em;
-      color: #999;
-      margin-top: 32px;
-    }
-
-    @media (max-width: 600px) {
-      main { padding: 12px; }
-      .section { padding: 16px; }
-    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#333;}
+    header{background:linear-gradient(135deg,#004d80,#006699);color:white;padding:18px 24px;text-align:center;}
+    header p{font-size:.85em;opacity:.8;margin-top:4px;}
+    nav{background:#1a1a2e;display:flex;overflow-x:auto;}
+    nav a{color:#ccc;text-decoration:none;padding:14px 16px;font-size:.88em;white-space:nowrap;cursor:pointer;}
+    nav a:hover{background:#006699;color:white;}
+    .nav-logged{display:none;}
+    .nav-logged.vis{display:inline-block;}
+    main{padding:24px;max-width:960px;margin:0 auto;}
+    .sec{background:white;border-radius:10px;padding:28px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+    .hidden{display:none!important;}
+    h2{color:#004d80;margin-bottom:20px;border-bottom:2px solid #006699;padding-bottom:8px;}
+    label{display:block;font-size:.85em;color:#555;margin-top:14px;margin-bottom:4px;font-weight:600;}
+    input,select,textarea{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:6px;font-size:.95em;background:#fafafa;}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#006699;background:white;}
+    textarea{resize:vertical;min-height:70px;}
+    .btn{display:inline-block;padding:10px 22px;background:#006699;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.93em;margin-top:14px;}
+    .btn:hover{background:#004d80;}
+    .btn-block{width:100%;display:block;}
+    .btn-red{background:#c0392b;}.btn-red:hover{background:#a93226;}
+    .btn-green{background:#27ae60;}.btn-green:hover{background:#229954;}
+    .btn-grey{background:#555;}.btn-grey:hover{background:#333;}
+    .btn-sm{padding:5px 12px;font-size:.8em;margin-top:4px;}
+    .fb{margin-top:12px;font-size:.9em;padding:8px 12px;border-radius:6px;}
+    .fb-ok{background:#d4edda;color:#155724;}
+    .fb-err{background:#f8d7da;color:#721c24;}
+    table{width:100%;border-collapse:collapse;margin-top:16px;font-size:.87em;}
+    th{background:#006699;color:white;padding:10px 8px;text-align:left;}
+    td{padding:8px;border-bottom:1px solid #eee;vertical-align:top;}
+    tr:hover td{background:#f0f4f8;}
+    .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.78em;font-weight:600;}
+    .b-blue{background:#d0e8f5;color:#004d80;}
+    .b-yellow{background:#fff3cd;color:#856404;}
+    .b-green{background:#d4edda;color:#155724;}
+    .b-grey{background:#e2e3e5;color:#383d41;}
+    .b-red{background:#f8d7da;color:#721c24;}
+    .card{border:1px solid #e0e0e0;border-radius:8px;padding:14px 18px;margin-bottom:12px;background:#fafafa;}
+    .obs-warn{background:#fff8e1;border-left:4px solid #f39c12;padding:10px 14px;border-radius:4px;margin:10px 0;font-size:.9em;}
+    .obs-red{background:#fff0f0;border-left:4px solid #e74c3c;padding:10px 14px;border-radius:4px;margin:10px 0;font-size:.9em;}
+    .chk-row{display:flex;align-items:flex-start;gap:10px;margin:14px 0;}
+    .chk-row input{width:auto;margin-top:3px;}
+    .stat-grid{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;}
+    .stat-box{flex:1;min-width:130px;text-align:center;padding:18px;background:#f0f4f8;border-radius:8px;}
+    .stat-box h3{font-size:2em;margin-bottom:4px;}
+    .modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;}
+    .modal-box{background:white;border-radius:10px;padding:28px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;}
+    footer{text-align:center;padding:20px;font-size:.82em;color:#999;margin-top:32px;}
+    .flex-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
+    .flex-1{flex:1;}
   </style>
 </head>
 <body>
 
 <header>
-  <h1>🏥 Farmácia da Liga — PIMs</h1>
-  <p>Preparação Individualizada da Medicação</p>
+  <h1>Farmacia da Liga &mdash; Gestao de PIMs</h1>
+  <p>Preparacao Individualizada da Medicacao</p>
 </header>
 
 <nav id="mainNav">
-  <a href="#" onclick="showSection('login'); return false;" id="navLogin">🔐 Login</a>
-  <a href="#" onclick="showSection('dashboard'); return false;" class="nav-logged" id="navDash">📊 Dashboard</a>
-  <a href="#" onclick="showSection('registerPim'); return false;" class="nav-logged">➕ Registar PIM</a>
-  <a href="#" onclick="showSection('searchPim'); return false;" class="nav-logged">🔍 Consultar PIM</a>
-  <a href="#" onclick="showSection('dispensePim'); return false;" class="nav-logged">📦 Dispensar PIM</a>
-  <a href="#" onclick="showSection('managePims'); return false;" class="nav-logged">⚙️ Gestão PIMs</a>
-  <a href="#" onclick="showSection('createUser'); return false;" class="nav-logged" id="navAdmin">👤 Criar Colaborador</a>
-  <a href="#" onclick="doLogout(); return false;" class="nav-logged" style="color:#ff8080;">🚪 Sair</a>
+  <a onclick="showSec('login')">Login</a>
+  <a onclick="showSec('dashboard')" class="nav-logged" id="navDash">Dashboard</a>
+  <a onclick="showSec('registerPim')" class="nav-logged">Registar PIM</a>
+  <a onclick="showSec('searchPim')" class="nav-logged">Consultar PIM</a>
+  <a onclick="showSec('dispensePim')" class="nav-logged">Dispensar PIM</a>
+  <a onclick="showSec('managePims')" class="nav-logged">Gestao PIMs</a>
+  <a onclick="showSec('createUser')" class="nav-logged">Criar Colaborador</a>
+  <a onclick="doLogout()" class="nav-logged" style="color:#ff8080;">Sair</a>
 </nav>
 
 <main>
 
-  <!-- LOGIN -->
-  <section id="login" class="section">
-    <h2>🔐 Login</h2>
-    <label>Código de utilizador</label>
+  <section id="login" class="sec">
+    <h2>Login</h2>
+    <label>Codigo de utilizador</label>
     <input type="text" id="userCode" placeholder="Ex: 001" autocomplete="off" />
     <label>Password</label>
     <input type="password" id="userPassword" placeholder="Password" />
-    <button class="btn btn-block" onclick="loginByCode()">Entrar</button>
-    <div id="loginFeedback" class="feedback"></div>
+    <button class="btn btn-block" id="btnLogin">Entrar</button>
+    <div id="loginFeedback"></div>
   </section>
 
-  <!-- DASHBOARD -->
-  <section id="dashboard" class="section hidden">
-    <h2>📊 Dashboard</h2>
+  <section id="dashboard" class="sec hidden">
+    <h2>Dashboard</h2>
     <p>Bem-vindo, <strong id="displayName"></strong></p>
-    <p style="margin-top:6px;color:#666;">Função: <span id="userRole"></span></p>
-    <div id="dashboardStats" style="margin-top:20px;"></div>
+    <p style="margin-top:6px;color:#666;">Funcao: <span id="userRole"></span></p>
+    <div id="dashStats" class="stat-grid"></div>
   </section>
 
-  <!-- CRIAR COLABORADOR -->
-  <section id="createUser" class="section hidden">
-    <h2>👤 Criar Colaborador</h2>
+  <section id="createUser" class="sec hidden">
+    <h2>Criar Colaborador</h2>
     <form id="formCreateUser">
-      <label>Código de utilizador (ex: 002)</label>
-      <input type="text" id="newUserCode" required placeholder="002" />
+      <label>Codigo (ex: 002)</label>
+      <input type="text" id="newCode" required placeholder="002" />
       <label>Nome completo</label>
-      <input type="text" id="newUserName" required />
-      <label>Função</label>
-      <select id="newUserRole" required>
+      <input type="text" id="newName" required />
+      <label>Funcao</label>
+      <select id="newRole" required>
         <option value="">-- Selecionar --</option>
-        <option value="pharmacist">Farmacêutico</option>
-        <option value="technician">Técnico</option>
+        <option value="pharmacist">Farmaceutico</option>
+        <option value="technician">Tecnico</option>
         <option value="operator">Operador</option>
       </select>
       <label>Password</label>
-      <input type="password" id="newUserPassword" required />
+      <input type="password" id="newPass" required />
       <label>Confirmar Password</label>
-      <input type="password" id="newUserPasswordConfirm" required />
+      <input type="password" id="newPassConfirm" required />
       <button type="submit" class="btn btn-green btn-block">Criar Colaborador</button>
     </form>
-    <div id="userCreationFeedback" class="feedback"></div>
+    <div id="fbCreateUser"></div>
   </section>
 
-  <!-- REGISTAR PIM -->
-  <section id="registerPim" class="section hidden">
-    <h2>➕ Registar PIM</h2>
+  <section id="registerPim" class="sec hidden">
+    <h2>Registar PIM</h2>
     <form id="formPim">
-      <label>Nome do Utente</label>
-      <input type="text" id="patientName" required placeholder="Nome completo" />
-      <label>Código do Utente</label>
-      <input type="text" id="patientCode" required placeholder="Ex: U-123" />
-      <label>Código PIM (ex: 73MCC26)</label>
-      <input type="text" id="pimCodeInput" required placeholder="73MCC26" />
-      <label>Farmacêutico Responsável</label>
-      <input type="text" id="pimPharmacist" placeholder="Nome do farmacêutico" />
-      <label>Técnico Responsável</label>
-      <input type="text" id="pimTechnician" placeholder="Nome do técnico" />
-      <label>Observações internas (notas para a preparação)</label>
-      <textarea id="pimInternalNotes" placeholder="Notas internas sobre a preparação..."></textarea>
-      <label>Observações para a entrega (visíveis no momento da dispensa)</label>
-      <textarea id="pimDeliveryNotes" placeholder="Ex: Tem pickup. Entregar saco com dinheiro..."></textarea>
-      <label>Prazo de preparação</label>
-      <input type="date" id="pimDeadline" />
+      <label>Nome do Utente *</label>
+      <input type="text" id="pPatientName" required placeholder="Nome completo" />
+      <label>Codigo do Utente *</label>
+      <input type="text" id="pPatientCode" required placeholder="Ex: U-123" />
+      <label>Codigo PIM base (ex: 73MCC26) *</label>
+      <input type="text" id="pPimCode" required placeholder="73MCC26" />
+      <label>Farmaceutico Responsavel</label>
+      <input type="text" id="pPharmacist" placeholder="Nome do farmaceutico" />
+      <label>Tecnico Responsavel</label>
+      <input type="text" id="pTechnician" placeholder="Nome do tecnico" />
+      <label>Observacoes internas</label>
+      <textarea id="pIntNotes" placeholder="Notas internas sobre a preparacao..."></textarea>
+      <label>Observacoes para entrega (visiveis na dispensa)</label>
+      <textarea id="pDelNotes" placeholder="Ex: Tem pickup. Entregar saco com dinheiro..."></textarea>
+      <label>Prazo de preparacao</label>
+      <input type="date" id="pDeadline" />
       <button type="submit" class="btn btn-block">Registar PIM</button>
     </form>
-    <div id="pimFeedback" class="feedback"></div>
+    <div id="fbPim"></div>
   </section>
 
-  <!-- CONSULTAR PIM -->
-  <section id="searchPim" class="section hidden">
-    <h2>🔍 Consultar PIMs</h2>
-    <div style="display:flex;gap:8px;align-items:flex-end;">
-      <div style="flex:1;">
-        <label>Pesquisar (código PIM, nome do utente)</label>
-        <input type="text" id="searchQuery" placeholder="Ex: 73MCC26 ou nome do utente" />
+  <section id="searchPim" class="sec hidden">
+    <h2>Consultar PIMs</h2>
+    <div class="flex-row">
+      <div class="flex-1">
+        <label>Pesquisar por codigo PIM</label>
+        <input type="text" id="searchQ" placeholder="Ex: 73MCC26" />
       </div>
-      <button class="btn" onclick="searchPims()" style="margin-top:0;">Pesquisar</button>
-      <button class="btn" onclick="loadAllPims()" style="margin-top:0;background:#555;">Ver Todas</button>
+      <button class="btn" onclick="doSearch()">Pesquisar</button>
+      <button class="btn btn-grey" onclick="loadAll('pimResults')">Ver Todas</button>
     </div>
     <div id="pimResults" style="margin-top:16px;"></div>
   </section>
 
-  <!-- DISPENSAR PIM -->
-  <section id="dispensePim" class="section hidden">
-    <h2>📦 Dispensar PIM</h2>
-    <label>Código PIM (ex: 73MCC26)</label>
-    <input type="text" id="pimCodeDispense" placeholder="73MCC26" />
-    <button class="btn" onclick="loadPimForDispense()">Carregar PIM</button>
-    <div id="dispenseDetails" style="margin-top:16px;"></div>
+  <section id="dispensePim" class="sec hidden">
+    <h2>Dispensar PIM</h2>
+    <label>Codigo PIM</label>
+    <input type="text" id="dispCode" placeholder="Ex: 73MCC26" />
+    <button class="btn" onclick="loadForDispense()">Carregar PIM</button>
+    <div id="dispDetails" style="margin-top:16px;"></div>
   </section>
 
-  <!-- GESTÃO DE PIMs -->
-  <section id="managePims" class="section hidden">
-    <h2>⚙️ Gestão de PIMs</h2>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
-      <button class="btn" onclick="loadPimsByStatus('Aguarda preparação')">⏳ Aguarda Preparação</button>
-      <button class="btn btn-green" onclick="loadPimsByStatus('Preparada')">✅ Preparadas</button>
-      <button class="btn" onclick="loadPimsByStatus('Dispensada')" style="background:#8e44ad;">📬 Dispensadas</button>
-      <button class="btn btn-red" onclick="loadPimsByStatus('Anulada')">❌ Anuladas</button>
-      <button class="btn" onclick="loadAllPims()" style="background:#555;">📋 Todas</button>
-      <button class="btn btn-green" onclick="exportToCSV()" style="float:right;">⬇️ Exportar Excel</button>
+  <section id="managePims" class="sec hidden">
+    <h2>Gestao de PIMs</h2>
+    <div class="flex-row" style="margin-bottom:14px;">
+      <button class="btn btn-sm" onclick="filterStatus('Aguarda preparacao')">Aguarda</button>
+      <button class="btn btn-sm btn-green" onclick="filterStatus('Preparada')">Preparadas</button>
+      <button class="btn btn-sm" style="background:#8e44ad;" onclick="filterStatus('Dispensada')">Dispensadas</button>
+      <button class="btn btn-sm btn-red" onclick="filterStatus('Anulada')">Anuladas</button>
+      <button class="btn btn-sm btn-grey" onclick="loadAll('pimList')">Todas</button>
+      <button class="btn btn-sm btn-green" onclick="exportCSV()">Exportar Excel</button>
     </div>
     <div id="pimList"></div>
   </section>
 
 </main>
 
-<footer>© 2026 Farmácia da Liga — Gestão de PIMs</footer>
+<footer>&copy; 2026 Farmacia da Liga</footer>
 
-<!-- FIREBASE CDN (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
 <script>
-// =============================================
-// FIREBASE CONFIG
-// =============================================
-const firebaseConfig = {
+// ---- FIREBASE INIT ----
+var fbConfig = {
   apiKey: "AIzaSyBa6pjv7czSYaQ2ecShefFeLXAsxsd4Dnc",
   authDomain: "pims-84362.firebaseapp.com",
   projectId: "pims-84362",
@@ -291,644 +194,544 @@ const firebaseConfig = {
   messagingSenderId: "21232070010",
   appId: "1:21232070010:web:330d2f68be460632753ac3"
 };
+firebase.initializeApp(fbConfig);
+var auth = firebase.auth();
+var db   = firebase.firestore();
 
-firebase.initializeApp(firebaseConfig);
-const auth  = firebase.auth();
-const db    = firebase.firestore();
+// ---- ESTADO GLOBAL ----
+var currentUser     = null;
+var currentUserData = null;
+var userMap         = {};
 
-// =============================================
-// ESTADO GLOBAL
-// =============================================
-let currentUser = null;
-let currentUserData = null;
-const userMap = new Map(); // codigo -> email
+// ---- UTILS ----
+function genEmail(code){ return "user_" + code + "@farmacialiga.pt"; }
 
-// =============================================
-// UTILIDADES
-// =============================================
-function generateEmail(code) {
-  return "user_" + code + "@farmacialiga.pt";
+function fmtDate(iso){
+  if(!iso) return "---";
+  try{ return new Date(iso).toLocaleString("pt-PT"); }catch(e){ return iso; }
 }
 
-function formatDate(iso) {
-  if (!iso) return "—";
-  try { return new Date(iso).toLocaleString("pt-PT"); } catch(e) { return iso; }
+function mkBadge(s){
+  var cls = "b-grey";
+  if(s === "Registada")                              cls = "b-blue";
+  else if(s === "Aguarda preparacao" || s === "Em preparacao") cls = "b-yellow";
+  else if(s === "Preparada" || s === "Pronta para levantamento") cls = "b-green";
+  else if(s === "Dispensada")                        cls = "b-grey";
+  else if(s === "Anulada")                           cls = "b-red";
+  return "<span class='badge " + cls + "'>" + s + "</span>";
 }
 
-function badge(status) {
-  const map = {
-    "Registada":              "badge-blue",
-    "Aguarda preparação":     "badge-yellow",
-    "Em preparação":          "badge-yellow",
-    "Preparada":              "badge-green",
-    "Pronta para levantamento":"badge-green",
-    "Dispensada":             "badge-grey",
-    "Anulada":                "badge-red"
-  };
-  const cls = map[status] || "badge-grey";
-  return "<span class=\"badge " + cls + "\">" + status + "</span>";
-}
-
-// =============================================
-// NAVEGAÇÃO
-// =============================================
-function showSection(id) {
-  document.querySelectorAll(".section").forEach(function(s) {
-    s.classList.add("hidden");
-  });
+function fb(id, msg, ok){
   var el = document.getElementById(id);
-  if (el) el.classList.remove("hidden");
-  document.querySelectorAll(".nav-logged").forEach(function(a) {
-    if (currentUser) { a.classList.add("visible"); }
-    else             { a.classList.remove("visible"); }
-  });
+  if(!el) return;
+  el.className = "fb " + (ok ? "fb-ok" : "fb-err");
+  el.innerText = msg;
 }
 
-// =============================================
-// AUTH — onAuthStateChanged
-// =============================================
-auth.onAuthStateChanged(function(user) {
-  if (user) {
-    db.collection("users").doc(user.uid).get().then(function(doc) {
-      if (doc.exists) {
+// ---- NAVEGACAO ----
+function showSec(id){
+  var secs = document.querySelectorAll(".sec");
+  for(var i=0;i<secs.length;i++) secs[i].classList.add("hidden");
+  var el = document.getElementById(id);
+  if(el) el.classList.remove("hidden");
+  var navItems = document.querySelectorAll(".nav-logged");
+  for(var j=0;j<navItems.length;j++){
+    if(currentUser) navItems[j].classList.add("vis");
+    else            navItems[j].classList.remove("vis");
+  }
+}
+
+// ---- AUTH STATE ----
+auth.onAuthStateChanged(function(user){
+  if(user){
+    db.collection("users").doc(user.uid).get().then(function(doc){
+      currentUser = user;
+      if(doc.exists){
         currentUserData = doc.data();
-        currentUser = user;
-        document.getElementById("displayName").innerText = currentUserData.name || user.email;
-        document.getElementById("userRole").innerText    = currentUserData.role || "";
-        showSection("dashboard");
-        loadDashboardStats();
       } else {
-        // Utilizador existe no Auth mas não tem doc em Firestore
-        currentUser = user;
-        currentUserData = { name: user.email, role: "operator" };
-        document.getElementById("displayName").innerText = user.email;
-        document.getElementById("userRole").innerText    = "operator";
-        showSection("dashboard");
+        currentUserData = { name: user.email, role: "operator", userCode: "000" };
       }
-    }).catch(function(err) {
-      console.error("Erro ao carregar dados do utilizador:", err);
+      document.getElementById("displayName").innerText = currentUserData.name || user.email;
+      document.getElementById("userRole").innerText    = currentUserData.role || "";
+      showSec("dashboard");
+      loadDashStats();
+    }).catch(function(e){
+      console.error("Erro perfil:", e);
       doLogout();
     });
   } else {
-    currentUser = null;
+    currentUser     = null;
     currentUserData = null;
-    showSection("login");
+    showSec("login");
   }
 });
 
-// =============================================
-// CARREGAR userMap (codigo -> email)
-// =============================================
-function loadUserMap() {
-  db.collection("users").get().then(function(snapshot) {
-    userMap.clear();
-    snapshot.forEach(function(doc) {
+// ---- CARREGAR userMap ----
+function loadUserMap(){
+  db.collection("users").get().then(function(snap){
+    userMap = {};
+    snap.forEach(function(doc){
       var d = doc.data();
-      if (d.userCode && d.email) {
-        userMap.set(String(d.userCode).trim(), d.email);
+      if(d.userCode && d.email){
+        userMap[String(d.userCode).trim()] = d.email;
       }
     });
-    console.log("userMap carregado:", userMap.size, "utilizadores");
-  }).catch(function(err) {
-    console.warn("Não foi possível carregar userMap:", err.message);
+    console.log("userMap OK:", Object.keys(userMap).length, "utilizadores");
+  }).catch(function(e){
+    console.warn("userMap erro:", e.message);
   });
 }
 loadUserMap();
 
-// =============================================
-// 1. LOGIN
-// =============================================
-function loginByCode() {
-  var userCode  = document.getElementById("userCode").value.trim();
-  var password  = document.getElementById("userPassword").value;
-  var feedback  = document.getElementById("loginFeedback");
+// ---- LOGIN ----
+function loginByCode(){
+  var code  = document.getElementById("userCode").value.trim();
+  var pass  = document.getElementById("userPassword").value;
+  var fbEl  = document.getElementById("loginFeedback");
+  fbEl.className = "fb";
+  fbEl.innerText = "";
 
-  if (!userCode || !password) {
-    feedback.className = "feedback err";
-    feedback.innerText = "Preencha o código e a password.";
+  if(!code || !pass){
+    fbEl.className = "fb fb-err";
+    fbEl.innerText = "Preencha o codigo e a password.";
     return;
   }
 
-  var email = userMap.get(userCode);
-  if (!email) {
-    feedback.className = "feedback err";
-    feedback.innerText = "Código de utilizador inválido. Verifique e tente novamente.";
+  var email = userMap[code];
+  if(!email){
+    fbEl.className = "fb fb-err";
+    fbEl.innerText = "Codigo invalido. Verifique o codigo de utilizador.";
     return;
   }
 
-  feedback.className = "feedback";
-  feedback.innerText = "A entrar...";
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then(function() {
-      feedback.innerText = "";
-    })
-    .catch(function(error) {
-      console.error("Erro login:", error.code, error.message);
-      feedback.className = "feedback err";
-      if (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
-        feedback.innerText = "Password incorrecta.";
-      } else if (error.code === "auth/user-not-found") {
-        feedback.innerText = "Utilizador não encontrado.";
-      } else {
-        feedback.innerText = "Erro: " + error.message;
-      }
-    });
+  fbEl.innerText = "A entrar...";
+  auth.signInWithEmailAndPassword(email, pass).then(function(){
+    fbEl.innerText = "";
+  }).catch(function(e){
+    console.error("Login erro:", e.code, e.message);
+    fbEl.className = "fb fb-err";
+    if(e.code === "auth/wrong-password" || e.code === "auth/invalid-credential"){
+      fbEl.innerText = "Password incorrecta.";
+    } else if(e.code === "auth/user-not-found"){
+      fbEl.innerText = "Utilizador nao encontrado.";
+    } else {
+      fbEl.innerText = "Erro: " + e.message;
+    }
+  });
 }
 
-// =============================================
-// LOGOUT
-// =============================================
-function doLogout() {
-  auth.signOut();
-}
+// Permitir login com Enter
+document.getElementById("userPassword").addEventListener("keydown", function(e){
+  if(e.key === "Enter") loginByCode();
+});
 
-// =============================================
-// DASHBOARD STATS
-// =============================================
-function loadDashboardStats() {
-  var div = document.getElementById("dashboardStats");
-  div.innerHTML = "<p>A carregar estatísticas...</p>";
-  db.collection("pims").get().then(function(snap) {
-    var total = snap.size;
-    var aguarda = 0; var preparadas = 0; var dispensadas = 0; var anuladas = 0;
-    snap.forEach(function(d) {
+// ---- LOGOUT ----
+function doLogout(){ auth.signOut(); }
+
+// ---- DASHBOARD STATS ----
+function loadDashStats(){
+  var div = document.getElementById("dashStats");
+  div.innerHTML = "<p>A carregar...</p>";
+  db.collection("pims").get().then(function(snap){
+    var total=0, aguarda=0, prep=0, disp=0;
+    snap.forEach(function(d){
+      total++;
       var s = d.data().status || "";
-      if (s === "Aguarda preparação" || s === "Registada") aguarda++;
-      if (s === "Preparada" || s === "Pronta para levantamento") preparadas++;
-      if (s === "Dispensada") dispensadas++;
-      if (s === "Anulada") anuladas++;
+      if(s==="Aguarda preparacao"||s==="Registada") aguarda++;
+      if(s==="Preparada"||s==="Pronta para levantamento") prep++;
+      if(s==="Dispensada") disp++;
     });
     div.innerHTML =
-      "<div style='display:flex;gap:16px;flex-wrap:wrap;'>" +
-      "<div class='pim-card' style='flex:1;min-width:140px;text-align:center;'><h3>" + total + "</h3><p>Total PIMs</p></div>" +
-      "<div class='pim-card' style='flex:1;min-width:140px;text-align:center;'><h3 style='color:#856404;'>" + aguarda + "</h3><p>Aguarda Preparação</p></div>" +
-      "<div class='pim-card' style='flex:1;min-width:140px;text-align:center;'><h3 style='color:#155724;'>" + preparadas + "</h3><p>Preparadas</p></div>" +
-      "<div class='pim-card' style='flex:1;min-width:140px;text-align:center;'><h3 style='color:#383d41;'>" + dispensadas + "</h3><p>Dispensadas</p></div>" +
-      "</div>";
-  }).catch(function() { div.innerHTML = ""; });
+      "<div class='stat-box'><h3>" + total + "</h3><p>Total PIMs</p></div>" +
+      "<div class='stat-box'><h3 style='color:#856404;'>" + aguarda + "</h3><p>Aguarda Preparacao</p></div>" +
+      "<div class='stat-box'><h3 style='color:#155724;'>" + prep + "</h3><p>Preparadas</p></div>" +
+      "<div class='stat-box'><h3 style='color:#383d41;'>" + disp + "</h3><p>Dispensadas</p></div>";
+  }).catch(function(){ div.innerHTML = ""; });
 }
 
-// =============================================
-// 2. CRIAR COLABORADOR
-// =============================================
-document.getElementById("formCreateUser").addEventListener("submit", function(e) {
+// ---- CRIAR COLABORADOR ----
+document.getElementById("formCreateUser").addEventListener("submit", function(e){
   e.preventDefault();
-  var userCode  = document.getElementById("newUserCode").value.trim();
-  var name      = document.getElementById("newUserName").value.trim();
-  var role      = document.getElementById("newUserRole").value;
-  var password  = document.getElementById("newUserPassword").value;
-  var confirm   = document.getElementById("newUserPasswordConfirm").value;
-  var feedback  = document.getElementById("userCreationFeedback");
+  var code    = document.getElementById("newCode").value.trim();
+  var name    = document.getElementById("newName").value.trim();
+  var role    = document.getElementById("newRole").value;
+  var pass    = document.getElementById("newPass").value;
+  var confirm = document.getElementById("newPassConfirm").value;
 
-  if (!userCode || !name || !role || !password) {
-    feedback.className = "feedback err";
-    feedback.innerText = "Preencha todos os campos.";
-    return;
-  }
-  if (password !== confirm) {
-    feedback.className = "feedback err";
-    feedback.innerText = "As passwords não coincidem.";
-    return;
-  }
-  if (password.length < 6) {
-    feedback.className = "feedback err";
-    feedback.innerText = "A password deve ter pelo menos 6 caracteres.";
-    return;
-  }
+  if(!code||!name||!role||!pass){ fb("fbCreateUser","Preencha todos os campos.",false); return; }
+  if(pass !== confirm)           { fb("fbCreateUser","As passwords nao coincidem.",false); return; }
+  if(pass.length < 6)            { fb("fbCreateUser","Password minimo 6 caracteres.",false); return; }
 
-  var email = generateEmail(userCode);
-  feedback.className = "feedback";
-  feedback.innerText = "A criar colaborador...";
+  var email = genEmail(code);
+  fb("fbCreateUser","A criar colaborador...","");
 
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(function(cred) {
-      var uid = cred.user.uid;
-      return db.collection("users").doc(uid).set({
-        userCode: userCode,
-        name: name,
-        role: role,
-        email: email,
-        createdAt: new Date().toISOString()
-      }).then(function() {
-        userMap.set(userCode, email);
-        feedback.className = "feedback ok";
-        feedback.innerText = "Colaborador " + name + " criado com sucesso! Código: " + userCode;
-        document.getElementById("formCreateUser").reset();
-        // Reautenticar para não perder sessão
-        auth.signInWithEmailAndPassword(
-          generateEmail(currentUserData.userCode),
-          prompt("Para manter a sessão, introduza a sua password:")
-        );
-      });
-    })
-    .catch(function(error) {
-      feedback.className = "feedback err";
-      if (error.code === "auth/email-already-in-use") {
-        feedback.innerText = "Esse código já existe. Escolha um código diferente.";
-      } else {
-        feedback.innerText = "Erro: " + error.message;
-      }
+  // Guardar email/pass do admin para re-login depois
+  var adminEmail = currentUserData ? genEmail(currentUserData.userCode) : null;
+
+  auth.createUserWithEmailAndPassword(email, pass).then(function(cred){
+    return db.collection("users").doc(cred.user.uid).set({
+      userCode: code, name: name, role: role, email: email,
+      createdAt: new Date().toISOString()
+    }).then(function(){
+      userMap[code] = email;
+      fb("fbCreateUser","Colaborador " + name + " criado! Codigo: " + code, true);
+      document.getElementById("formCreateUser").reset();
     });
-});
-
-// =============================================
-// 3. REGISTAR PIM
-// =============================================
-document.getElementById("formPim").addEventListener("submit", function(e) {
-  e.preventDefault();
-  if (!currentUser) { alert("Faça login antes de registar uma PIM."); return; }
-
-  var patientName    = document.getElementById("patientName").value.trim();
-  var patientCode    = document.getElementById("patientCode").value.trim();
-  var pimCodeBase    = document.getElementById("pimCodeInput").value.trim().toUpperCase();
-  var pharmacist     = document.getElementById("pimPharmacist").value.trim() || (currentUserData ? currentUserData.name : "");
-  var technician     = document.getElementById("pimTechnician").value.trim();
-  var internalNotes  = document.getElementById("pimInternalNotes").value.trim();
-  var deliveryNotes  = document.getElementById("pimDeliveryNotes").value.trim();
-  var deadline       = document.getElementById("pimDeadline").value;
-
-  if (!patientName || !patientCode || !pimCodeBase) {
-    document.getElementById("pimFeedback").className = "feedback err";
-    document.getElementById("pimFeedback").innerText = "Preencha os campos obrigatórios.";
-    return;
-  }
-
-  // Conta quantas preparações já existem para este código base
-  db.collection("pims").where("pimCode", "==", pimCodeBase).get().then(function(snap) {
-    var prepNum = snap.size + 1;
-    var prepCode = pimCodeBase + "." + String(prepNum).padStart(3, "0");
-
-    var pimDocRef = db.collection("pims").doc();
-    var pimId = pimDocRef.id;
-
-    return pimDocRef.set({
-      pimId:           pimId,
-      pimCode:         pimCodeBase,
-      pimPrepCode:     prepCode,
-      patientName:     patientName,
-      patientCode:     patientCode,
-      pharmacistName:  pharmacist,
-      technicianName:  technician,
-      pharmacistId:    currentUser.uid,
-      status:          "Registada",
-      statusHistory: [{
-        status: "Registada",
-        date:   new Date().toISOString(),
-        by:     pharmacist
-      }],
-      preparationNumber: prepNum,
-      internalNotes:   internalNotes,
-      deliveryNotes:   deliveryNotes,
-      deadline:        deadline || "",
-      autoRenew:       false,
-      createdAt:       new Date().toISOString(),
-      updatedAt:       new Date().toISOString()
-    }).then(function() {
-      document.getElementById("pimFeedback").className = "feedback ok";
-      document.getElementById("pimFeedback").innerText =
-        "PIM registada com sucesso: " + prepCode;
-      document.getElementById("formPim").reset();
-    });
-  }).catch(function(err) {
-    document.getElementById("pimFeedback").className = "feedback err";
-    document.getElementById("pimFeedback").innerText = "Erro: " + err.message;
+  }).catch(function(e){
+    if(e.code==="auth/email-already-in-use"){
+      fb("fbCreateUser","Esse codigo ja existe. Use um codigo diferente.",false);
+    } else {
+      fb("fbCreateUser","Erro: " + e.message, false);
+    }
   });
 });
 
-// =============================================
-// 4. CONSULTAR PIMs
-// =============================================
-function searchPims() {
-  var q = document.getElementById("searchQuery").value.trim().toUpperCase();
-  var div = document.getElementById("pimResults");
-  div.innerHTML = "<p>A pesquisar...</p>";
+// ---- REGISTAR PIM ----
+document.getElementById("formPim").addEventListener("submit", function(e){
+  e.preventDefault();
+  if(!currentUser){ alert("Faca login primeiro."); return; }
 
-  var ref = db.collection("pims");
-  var query = q
-    ? ref.where("pimCode", "==", q)
-    : ref.orderBy("createdAt", "desc").limit(50);
+  var patName   = document.getElementById("pPatientName").value.trim();
+  var patCode   = document.getElementById("pPatientCode").value.trim();
+  var pimBase   = document.getElementById("pPimCode").value.trim().toUpperCase();
+  var pharm     = document.getElementById("pPharmacist").value.trim() || (currentUserData ? currentUserData.name : "");
+  var tech      = document.getElementById("pTechnician").value.trim();
+  var intNotes  = document.getElementById("pIntNotes").value.trim();
+  var delNotes  = document.getElementById("pDelNotes").value.trim();
+  var deadline  = document.getElementById("pDeadline").value;
 
-  query.get().then(function(snap) {
-    renderPimTable(snap, div);
-  }).catch(function(err) {
-    div.innerHTML = "<p class='feedback err'>Erro: " + err.message + "</p>";
+  if(!patName||!patCode||!pimBase){ fb("fbPim","Preencha os campos obrigatorios.",false); return; }
+
+  db.collection("pims").where("pimCode","==",pimBase).get().then(function(snap){
+    var num      = snap.size + 1;
+    var prepCode = pimBase + "." + ("00"+num).slice(-3);
+    var ref      = db.collection("pims").doc();
+
+    return ref.set({
+      pimId:             ref.id,
+      pimCode:           pimBase,
+      pimPrepCode:       prepCode,
+      patientName:       patName,
+      patientCode:       patCode,
+      pharmacistName:    pharm,
+      technicianName:    tech,
+      pharmacistId:      currentUser.uid,
+      status:            "Registada",
+      statusHistory:     [{ status:"Registada", date: new Date().toISOString(), by: pharm }],
+      preparationNumber: num,
+      internalNotes:     intNotes,
+      deliveryNotes:     delNotes,
+      deadline:          deadline || "",
+      autoRenew:         false,
+      createdAt:         new Date().toISOString(),
+      updatedAt:         new Date().toISOString()
+    });
+  }).then(function(){
+    fb("fbPim","PIM registada com sucesso!", true);
+    document.getElementById("formPim").reset();
+    loadDashStats();
+  }).catch(function(e){
+    fb("fbPim","Erro: " + e.message, false);
   });
-}
+});
 
-function loadAllPims() {
-  var div = document.getElementById("pimResults") || document.getElementById("pimList");
-  div.innerHTML = "<p>A carregar todas as PIMs...</p>";
-  db.collection("pims").orderBy("createdAt", "desc").limit(100).get().then(function(snap) {
-    renderPimTable(snap, div);
-  }).catch(function(err) {
-    div.innerHTML = "<p class='feedback err'>Erro: " + err.message + "</p>";
-  });
-}
+// ---- RENDER TABELA PIMs ----
+function renderTable(snap, containerId){
+  var div = document.getElementById(containerId);
+  if(!div) return;
+  if(snap.empty){ div.innerHTML = "<p style='margin-top:12px;'>Nenhuma PIM encontrada.</p>"; return; }
 
-function loadPimsByStatus(status) {
-  var div = document.getElementById("pimList");
-  div.innerHTML = "<p>A carregar...</p>";
-  db.collection("pims").where("status", "==", status).get().then(function(snap) {
-    renderPimTable(snap, div);
-  }).catch(function(err) {
-    div.innerHTML = "<p class='feedback err'>Erro: " + err.message + "</p>";
-  });
-}
-
-function renderPimTable(snap, container) {
-  if (snap.empty) {
-    container.innerHTML = "<p>Nenhuma PIM encontrada.</p>";
-    return;
-  }
-  var html = "<table><thead><tr>" +
-    "<th>Código PIM</th><th>Utente</th><th>Farmacêutico</th>" +
-    "<th>Estado</th><th>Data</th><th>Ações</th>" +
-    "</tr></thead><tbody>";
-  snap.forEach(function(doc) {
-    var p = doc.data();
-    html += "<tr>" +
-      "<td><strong>" + (p.pimPrepCode || p.pimCode) + "</strong></td>" +
-      "<td>" + p.patientName + "<br><small style='color:#999;'>" + (p.patientCode||"") + "</small></td>" +
-      "<td>" + (p.pharmacistName||"—") + "</td>" +
-      "<td>" + badge(p.status) + "</td>" +
-      "<td><small>" + formatDate(p.createdAt) + "</small></td>" +
+  var h = "<table><thead><tr><th>Codigo</th><th>Utente</th><th>Farmaceutico</th><th>Estado</th><th>Data</th><th>Acoes</th></tr></thead><tbody>";
+  snap.forEach(function(d){
+    var p = d.data();
+    var pid = d.id;
+    h += "<tr>" +
+      "<td><strong>" + (p.pimPrepCode||p.pimCode||"--") + "</strong></td>" +
+      "<td>" + (p.patientName||"--") + "<br><small style='color:#999;'>" + (p.patientCode||"") + "</small></td>" +
+      "<td>" + (p.pharmacistName||"--") + "</td>" +
+      "<td>" + mkBadge(p.status||"--") + "</td>" +
+      "<td><small>" + fmtDate(p.createdAt) + "</small></td>" +
       "<td>" +
-        "<button class='btn btn-small' onclick='viewPimDetail(\"" + doc.id + "\")'>Ver</button> " +
+        "<button class='btn btn-sm' onclick='viewDetail(\"" + pid + "\")'>Ver</button> " +
         (p.status !== "Anulada" && p.status !== "Dispensada"
-          ? "<button class='btn btn-small btn-green' onclick='updatePimStatus(\"" + doc.id + "\", \"" + p.status + "\")'>Avançar</button> " : "") +
-        "<button class='btn btn-small btn-red' onclick='cancelPim(\"" + doc.id + "\")'>Anular</button>" +
+          ? "<button class='btn btn-sm btn-green' onclick='advanceStatus(\"" + pid + "\",\"" + (p.status||"") + "\")'>Avan</button> " : "") +
+        "<button class='btn btn-sm btn-red' onclick='cancelPim(\"" + pid + "\")'>Anular</button>" +
       "</td></tr>";
   });
-  html += "</tbody></table>";
-  container.innerHTML = html;
+  h += "</tbody></table>";
+  div.innerHTML = h;
 }
 
-// =============================================
-// VER DETALHE DA PIM
-// =============================================
-function viewPimDetail(pimId) {
-  db.collection("pims").doc(pimId).get().then(function(doc) {
-    if (!doc.exists) { alert("PIM não encontrada."); return; }
+// ---- CARREGAR TODAS ----
+function loadAll(containerId){
+  var div = document.getElementById(containerId);
+  if(div) div.innerHTML = "<p>A carregar...</p>";
+  db.collection("pims").orderBy("createdAt","desc").limit(100).get().then(function(s){
+    renderTable(s, containerId);
+  }).catch(function(e){
+    if(div) div.innerHTML = "<p class='fb fb-err'>Erro: " + e.message + "</p>";
+  });
+}
+
+// ---- FILTRAR POR ESTADO ----
+function filterStatus(status){
+  var div = document.getElementById("pimList");
+  if(div) div.innerHTML = "<p>A carregar...</p>";
+  db.collection("pims").where("status","==",status).get().then(function(s){
+    renderTable(s, "pimList");
+  }).catch(function(e){
+    if(div) div.innerHTML = "<p class='fb fb-err'>Erro: " + e.message + "</p>";
+  });
+}
+
+// ---- PESQUISAR ----
+function doSearch(){
+  var q   = document.getElementById("searchQ").value.trim().toUpperCase();
+  var div = document.getElementById("pimResults");
+  div.innerHTML = "<p>A pesquisar...</p>";
+  var ref = q
+    ? db.collection("pims").where("pimCode","==",q)
+    : db.collection("pims").orderBy("createdAt","desc").limit(50);
+  ref.get().then(function(s){ renderTable(s,"pimResults"); })
+     .catch(function(e){ div.innerHTML="<p class='fb fb-err'>Erro: "+e.message+"</p>"; });
+}
+
+// ---- VER DETALHE ----
+function viewDetail(pimId){
+  db.collection("pims").doc(pimId).get().then(function(doc){
+    if(!doc.exists){ alert("PIM nao encontrada."); return; }
     var p = doc.data();
-    var hist = (p.statusHistory || []).map(function(h) {
-      return "<li>" + h.status + " — " + formatDate(h.date) + " por " + (h.by||"—") + "</li>";
+    var hist = (p.statusHistory||[]).map(function(h){
+      return "<li style='margin:4px 0;'>" + (h.status||"--") + " &mdash; " + fmtDate(h.date) + " por " + (h.by||"--") + "</li>";
     }).join("");
-    var modal = document.createElement("div");
-    modal.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;";
-    modal.innerHTML =
-      "<div style='background:white;border-radius:10px;padding:28px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;'>" +
-      "<h2 style='margin-bottom:16px;'>📋 " + (p.pimPrepCode||p.pimCode) + "</h2>" +
+
+    var bg = document.createElement("div");
+    bg.className = "modal-bg";
+    bg.onclick = function(ev){ if(ev.target===bg) bg.remove(); };
+    bg.innerHTML =
+      "<div class='modal-box'>" +
+      "<h2 style='margin-bottom:14px;'>" + (p.pimPrepCode||p.pimCode) + "</h2>" +
       "<p><strong>Utente:</strong> " + p.patientName + " (" + (p.patientCode||"") + ")</p>" +
-      "<p><strong>Farmacêutico:</strong> " + (p.pharmacistName||"—") + "</p>" +
-      "<p><strong>Técnico:</strong> " + (p.technicianName||"—") + "</p>" +
-      "<p><strong>Estado:</strong> " + badge(p.status) + "</p>" +
-      "<p><strong>Criada em:</strong> " + formatDate(p.createdAt) + "</p>" +
-      (p.deadline ? "<p><strong>Prazo:</strong> " + p.deadline + "</p>" : "") +
-      (p.internalNotes ? "<div class='obs-box'><strong>Obs. internas:</strong><br>" + p.internalNotes + "</div>" : "") +
-      (p.deliveryNotes ? "<div class='obs-box' style='border-color:#e74c3c;background:#fff0f0;'><strong>⚠️ Obs. entrega:</strong><br>" + p.deliveryNotes + "</div>" : "") +
-      "<h3 style='margin-top:14px;'>Histórico de Estados</h3>" +
-      "<ul style='font-size:0.88em;color:#555;'>" + hist + "</ul>" +
-      "<button class='btn' onclick='this.closest(\"[style*=fixed]\").remove()' style='margin-top:16px;'>Fechar</button>" +
+      "<p style='margin-top:6px;'><strong>Farmaceutico:</strong> " + (p.pharmacistName||"--") + "</p>" +
+      "<p style='margin-top:6px;'><strong>Tecnico:</strong> " + (p.technicianName||"--") + "</p>" +
+      "<p style='margin-top:6px;'><strong>Estado:</strong> " + mkBadge(p.status) + "</p>" +
+      "<p style='margin-top:6px;'><strong>Criada:</strong> " + fmtDate(p.createdAt) + "</p>" +
+      (p.deadline ? "<p style='margin-top:6px;'><strong>Prazo:</strong> " + p.deadline + "</p>" : "") +
+      (p.internalNotes ? "<div class='obs-warn' style='margin-top:10px;'><strong>Obs. internas:</strong><br>" + p.internalNotes + "</div>" : "") +
+      (p.deliveryNotes ? "<div class='obs-red' style='margin-top:10px;'><strong>Obs. entrega:</strong><br>" + p.deliveryNotes + "</div>" : "") +
+      "<h3 style='margin-top:14px;margin-bottom:8px;'>Historico</h3>" +
+      "<ul style='font-size:.87em;color:#555;padding-left:16px;'>" + hist + "</ul>" +
+      "<button class='btn' style='margin-top:16px;' onclick='this.closest(\".modal-bg\").remove()'>Fechar</button>" +
       "</div>";
-    document.body.appendChild(modal);
+    document.body.appendChild(bg);
   });
 }
 
-// =============================================
-// AVANÇAR ESTADO DA PIM
-// =============================================
-var statusFlow = [
-  "Registada",
-  "Aguarda preparação",
-  "Em preparação",
-  "Preparada",
-  "Pronta para levantamento"
-];
+// ---- AVANCAR ESTADO ----
+var flowStates = ["Registada","Aguarda preparacao","Em preparacao","Preparada","Pronta para levantamento"];
 
-function updatePimStatus(pimId, currentStatus) {
-  var idx = statusFlow.indexOf(currentStatus);
-  if (idx === -1 || idx >= statusFlow.length - 1) {
-    alert("Esta PIM não pode avançar de estado.");
-    return;
-  }
-  var nextStatus = statusFlow[idx + 1];
-  if (!confirm("Avançar para: " + nextStatus + "?")) return;
-
-  var by = currentUserData ? currentUserData.name : (currentUser ? currentUser.email : "—");
-
-  db.collection("pims").doc(pimId).get().then(function(doc) {
+function advanceStatus(pimId, cur){
+  var idx = flowStates.indexOf(cur);
+  if(idx < 0 || idx >= flowStates.length - 1){ alert("Nao e possivel avancar este estado."); return; }
+  var next = flowStates[idx+1];
+  if(!confirm("Avancar estado para: " + next + "?")) return;
+  var by = currentUserData ? currentUserData.name : "---";
+  db.collection("pims").doc(pimId).get().then(function(doc){
     var hist = doc.data().statusHistory || [];
-    hist.push({ status: nextStatus, date: new Date().toISOString(), by: by });
+    hist.push({ status: next, date: new Date().toISOString(), by: by });
     return db.collection("pims").doc(pimId).update({
-      status: nextStatus,
-      statusHistory: hist,
-      updatedAt: new Date().toISOString()
+      status: next, statusHistory: hist, updatedAt: new Date().toISOString()
     });
-  }).then(function() {
-    alert("Estado actualizado para: " + nextStatus);
-    loadAllPims();
-  }).catch(function(err) {
-    alert("Erro: " + err.message);
-  });
+  }).then(function(){
+    alert("Estado actualizado: " + next);
+    loadAll("pimList");
+    loadDashStats();
+  }).catch(function(e){ alert("Erro: " + e.message); });
 }
 
-// =============================================
-// CANCELAR / ANULAR PIM
-// =============================================
-function cancelPim(pimId) {
-  var code = prompt("Para anular esta PIM, introduza o código de anulação:");
-  if (!code || code.trim() !== "F03573") {
-    alert("Código de anulação inválido. Operação cancelada.");
-    return;
-  }
-  var by = currentUserData ? currentUserData.name : "—";
-  db.collection("pims").doc(pimId).get().then(function(doc) {
+// ---- ANULAR PIM ----
+function cancelPim(pimId){
+  var code = prompt("Codigo de anulacao:");
+  if(!code || code.trim() !== "F03573"){ alert("Codigo invalido. Operacao cancelada."); return; }
+  var by = currentUserData ? currentUserData.name : "---";
+  db.collection("pims").doc(pimId).get().then(function(doc){
     var hist = doc.data().statusHistory || [];
-    hist.push({ status: "Anulada", date: new Date().toISOString(), by: by });
+    hist.push({ status:"Anulada", date: new Date().toISOString(), by: by });
     return db.collection("pims").doc(pimId).update({
-      status: "Anulada",
-      statusHistory: hist,
-      cancelledAt: new Date().toISOString(),
-      cancelledBy: by,
+      status:"Anulada", statusHistory: hist,
+      cancelledAt: new Date().toISOString(), cancelledBy: by,
       updatedAt: new Date().toISOString()
     });
-  }).then(function() {
+  }).then(function(){
     alert("PIM anulada com sucesso.");
-    loadAllPims();
-  }).catch(function(err) {
-    alert("Erro ao anular: " + err.message);
-  });
+    loadAll("pimList");
+    loadDashStats();
+  }).catch(function(e){ alert("Erro: " + e.message); });
 }
 
-// =============================================
-// 5. DISPENSAR PIM
-// =============================================
-function loadPimForDispense() {
-  var pimCode = document.getElementById("pimCodeDispense").value.trim().toUpperCase();
-  var div = document.getElementById("dispenseDetails");
-  if (!pimCode) { alert("Introduza um código PIM."); return; }
-
+// ---- DISPENSAR PIM ----
+function loadForDispense(){
+  var code = document.getElementById("dispCode").value.trim().toUpperCase();
+  var div  = document.getElementById("dispDetails");
+  if(!code){ alert("Introduza um codigo PIM."); return; }
   div.innerHTML = "<p>A pesquisar...</p>";
 
-  db.collection("pims").where("pimCode", "==", pimCode)
-    .where("status", "in", ["Preparada", "Pronta para levantamento"])
-    .get().then(function(snap) {
-      if (snap.empty) {
-        div.innerHTML = "<p class='feedback err'>Nenhuma PIM pronta para levantamento com esse código.</p>";
+  db.collection("pims").where("pimCode","==",code).where("status","in",["Preparada","Pronta para levantamento"])
+    .get().then(function(snap){
+      if(snap.empty){
+        div.innerHTML = "<p class='fb fb-err'>Nenhuma PIM pronta com esse codigo.</p>";
         return;
       }
-      var p = snap.docs[0].data();
-      var pimId = snap.docs[0].id;
-      var obsBlock = p.deliveryNotes
-        ? "<div class='obs-box' style='border-color:#e74c3c;background:#fff0f0;'>" +
-          "<strong>⚠️ Atenção — Obs. de entrega:</strong><br>" + p.deliveryNotes +
-          "</div>" +
-          "<div class='confirm-checkbox'>" +
-          "<input type='checkbox' id='confirmedObs' />" +
-          "<label for='confirmedObs'>Li as observações e agi em conformidade.</label>" +
-          "</div>"
-        : "";
-      div.innerHTML =
-        "<div class='pim-card'>" +
-        "<p><strong>PIM:</strong> " + (p.pimPrepCode||p.pimCode) + " &nbsp; " + badge(p.status) + "</p>" +
-        "<p><strong>Utente:</strong> " + p.patientName + " (" + (p.patientCode||"") + ")</p>" +
-        "<p><strong>Farmacêutico:</strong> " + (p.pharmacistName||"—") + "</p>" +
-        "</div>" +
-        obsBlock +
-        "<label>Nome de quem veio levantar</label>" +
+      var doc = snap.docs[0];
+      var p   = doc.data();
+      var pid = doc.id;
+      var hasObs = !!(p.deliveryNotes && p.deliveryNotes.trim());
+
+      var html =
+        "<div class='card'>" +
+        "<p><strong>PIM:</strong> " + (p.pimPrepCode||p.pimCode) + " &nbsp; " + mkBadge(p.status) + "</p>" +
+        "<p style='margin-top:6px;'><strong>Utente:</strong> " + p.patientName + " (" + (p.patientCode||"") + ")</p>" +
+        "<p style='margin-top:6px;'><strong>Farmaceutico:</strong> " + (p.pharmacistName||"--") + "</p>" +
+        "</div>";
+
+      if(hasObs){
+        html += "<div class='obs-red'><strong>Atencao — Observacoes de entrega:</strong><br>" + p.deliveryNotes + "</div>" +
+          "<div class='chk-row'><input type='checkbox' id='chkObs' /><label for='chkObs'>Li as observacoes e agi em conformidade.</label></div>";
+      }
+
+      html +=
+        "<label>Nome de quem levantou</label>" +
         "<input type='text' id='pickupName' placeholder='Nome completo' />" +
-        "<label>Operador (código)</label>" +
-        "<input type='text' id='operatorCode' placeholder='Ex: 003' />" +
-        "<label>Observações da entrega</label>" +
-        "<textarea id='dispenseNotes' placeholder='Observações...' rows='2'></textarea>" +
-        "<button class='btn btn-green btn-block' onclick='confirmDispense(\"" + pimId + "\", " + (!!p.deliveryNotes) + ")'>Confirmar Dispensa</button>";
-    }).catch(function(err) {
-      div.innerHTML = "<p class='feedback err'>Erro: " + err.message + "</p>";
+        "<label>Codigo do operador</label>" +
+        "<input type='text' id='opCode' placeholder='Ex: 003' />" +
+        "<label>Observacoes da entrega</label>" +
+        "<textarea id='dispNotes' placeholder='Observacoes...' rows='2'></textarea>" +
+        "<button class='btn btn-green btn-block' onclick='doDispense(\"" + pid + "\"," + hasObs + ")'>Confirmar Dispensa</button>" +
+        "<div id='fbDisp'></div>";
+
+      div.innerHTML = html;
+    }).catch(function(e){
+      div.innerHTML = "<p class='fb fb-err'>Erro: " + e.message + "</p>";
     });
 }
 
-function confirmDispense(pimId, hasObs) {
-  if (hasObs) {
-    var chk = document.getElementById("confirmedObs");
-    if (!chk || !chk.checked) {
-      alert("Deve confirmar que leu as observações de entrega antes de dispensar.");
-      return;
-    }
+function doDispense(pimId, hasObs){
+  if(hasObs){
+    var chk = document.getElementById("chkObs");
+    if(!chk || !chk.checked){ alert("Deve confirmar que leu as observacoes de entrega."); return; }
   }
-  var pickupName   = document.getElementById("pickupName").value.trim();
-  var operatorCode = document.getElementById("operatorCode").value.trim();
-  var dispenseNotes = document.getElementById("dispenseNotes").value.trim();
-  if (!pickupName)   { alert("Indique o nome de quem veio levantar."); return; }
-  if (!operatorCode) { alert("Indique o código do operador."); return; }
+  var pickup  = (document.getElementById("pickupName")  ? document.getElementById("pickupName").value.trim()  : "");
+  var opCode  = (document.getElementById("opCode")      ? document.getElementById("opCode").value.trim()      : "");
+  var notes   = (document.getElementById("dispNotes")   ? document.getElementById("dispNotes").value.trim()   : "");
+  if(!pickup) { alert("Indique o nome de quem levantou."); return; }
+  if(!opCode) { alert("Indique o codigo do operador."); return; }
 
-  var by = currentUserData ? currentUserData.name : operatorCode;
+  var by = currentUserData ? currentUserData.name : opCode;
 
-  db.collection("pims").doc(pimId).get().then(function(doc) {
-    var p = doc.data();
+  db.collection("pims").doc(pimId).get().then(function(doc){
+    var p    = doc.data();
     var hist = p.statusHistory || [];
-    hist.push({ status: "Dispensada", date: new Date().toISOString(), by: by });
+    hist.push({ status:"Dispensada", date: new Date().toISOString(), by: by });
     return db.collection("pims").doc(pimId).update({
-      status:        "Dispensada",
-      statusHistory: hist,
-      dispensedAt:   new Date().toISOString(),
-      dispensedBy:   by,
-      operatorCode:  operatorCode,
-      pickupName:    pickupName,
-      dispenseNotes: dispenseNotes,
-      updatedAt:     new Date().toISOString()
-    }).then(function() {
-      // Registo na colecao dispenses
+      status: "Dispensada", statusHistory: hist,
+      dispensedAt: new Date().toISOString(), dispensedBy: by,
+      operatorCode: opCode, pickupName: pickup, dispenseNotes: notes,
+      updatedAt: new Date().toISOString()
+    }).then(function(){
       return db.collection("dispenses").add({
-        pimId:        pimId,
-        pimCode:      p.pimPrepCode || p.pimCode,
-        patientName:  p.patientName,
-        patientCode:  p.patientCode,
-        pickupName:   pickupName,
-        operatorCode: operatorCode,
-        dispenseNotes:dispenseNotes,
-        dispensedAt:  new Date().toISOString(),
-        dispensedBy:  by
+        pimId: pimId, pimCode: p.pimPrepCode||p.pimCode,
+        patientName: p.patientName, patientCode: p.patientCode,
+        pickupName: pickup, operatorCode: opCode, dispenseNotes: notes,
+        dispensedAt: new Date().toISOString(), dispensedBy: by
       });
-    });
-  }).then(function() {
-    document.getElementById("dispenseDetails").innerHTML =
-      "<p class='feedback ok'>✅ PIM dispensada com sucesso.</p>";
-    document.getElementById("pimCodeDispense").value = "";
-    printDispenseReceipt(pimId);
-  }).catch(function(err) {
-    alert("Erro: " + err.message);
-  });
+    }).then(function(){ return p; });
+  }).then(function(p){
+    document.getElementById("dispDetails").innerHTML = "<p class='fb fb-ok'>PIM dispensada com sucesso.</p>";
+    document.getElementById("dispCode").value = "";
+    printTalao(pimId);
+    loadDashStats();
+  }).catch(function(e){ alert("Erro: " + e.message); });
 }
 
-// =============================================
-// IMPRIMIR TALÃO
-// =============================================
-function printDispenseReceipt(pimId) {
-  db.collection("pims").doc(pimId).get().then(function(doc) {
-    var p = doc.data();
-    var win = window.open("", "_blank", "width=400,height=500");
+// ---- IMPRIMIR TALAO ----
+function printTalao(pimId){
+  db.collection("pims").doc(pimId).get().then(function(doc){
+    var p   = doc.data();
+    var win = window.open("","_blank","width=400,height=500");
     win.document.write("<!DOCTYPE html><html><head><meta charset='UTF-8'>" +
-      "<style>body{font-family:Arial,sans-serif;font-size:13px;padding:20px;max-width:320px;}" +
-      "h2{font-size:15px;text-align:center;}" +
-      ".line{border-top:1px dashed #000;margin:10px 0;}" +
-      ".center{text-align:center;}" +
+      "<style>body{font-family:Arial,sans-serif;font-size:13px;padding:20px;max-width:300px;}" +
+      "h2{font-size:14px;text-align:center;margin-bottom:4px;}" +
+      ".ln{border-top:1px dashed #000;margin:10px 0;}" +
+      ".ctr{text-align:center;}" +
       ".sig{margin-top:30px;border-top:1px solid #000;padding-top:8px;font-size:12px;}" +
       "</style></head><body>" +
-      "<h2>Farmácia da Liga</h2>" +
-      "<div class='line'></div>" +
-      "<p><strong>TALÃO DE ENTREGA DE PIM</strong></p>" +
-      "<div class='line'></div>" +
-      "<p>Confirmo que foi entregue a <strong>Preparação Individualizada da Medicação</strong></p>" +
-      "<p><strong>Código PIM:</strong> " + (p.pimPrepCode||p.pimCode) + "</p>" +
+      "<h2>Farmacia da Liga</h2>" +
+      "<p class='ctr' style='font-size:11px;'>Preparacao Individualizada da Medicacao</p>" +
+      "<div class='ln'></div>" +
+      "<p><strong>Codigo PIM:</strong> " + (p.pimPrepCode||p.pimCode) + "</p>" +
       "<p><strong>Utente:</strong> " + p.patientName + "</p>" +
-      "<p><strong>Cód. Utente:</strong> " + (p.patientCode||"—") + "</p>" +
-      "<p><strong>Entregue a:</strong> " + (p.pickupName||"—") + "</p>" +
-      "<p><strong>Data:</strong> " + formatDate(p.dispensedAt||new Date().toISOString()) + "</p>" +
-      "<p><strong>Operador:</strong> " + (p.operatorCode||"—") + "</p>" +
+      "<p><strong>Cod. Utente:</strong> " + (p.patientCode||"---") + "</p>" +
+      "<p><strong>Entregue a:</strong> " + (p.pickupName||"---") + "</p>" +
+      "<p><strong>Data:</strong> " + fmtDate(p.dispensedAt||new Date().toISOString()) + "</p>" +
+      "<p><strong>Operador:</strong> " + (p.operatorCode||"---") + "</p>" +
       (p.dispenseNotes ? "<p><strong>Obs:</strong> " + p.dispenseNotes + "</p>" : "") +
-      "<div class='line'></div>" +
-      "<div class='sig'><p>Assinatura: ____________________________</p></div>" +
-      "<div class='center' style='margin-top:16px;font-size:11px;color:#666;'>Farmácia da Liga · " + new Date().getFullYear() + "</div>" +
+      "<div class='ln'></div>" +
+      "<p>Confirmo que foi entregue a preparacao individualizada da medicacao acima identificada.</p>" +
+      "<div class='sig'>Assinatura: ____________________________</div>" +
+      "<p class='ctr' style='margin-top:16px;font-size:11px;color:#666;'>Farmacia da Liga &copy; " + new Date().getFullYear() + "</p>" +
       "</body></html>");
     win.document.close();
+    win.focus();
     win.print();
   });
 }
 
-// =============================================
-// EXPORTAR PARA EXCEL (CSV)
-// =============================================
-function exportToCSV() {
-  db.collection("pims").orderBy("createdAt", "desc").get().then(function(snap) {
-    var rows = ["Código PIM;Cód. Prep.;Utente;Cód. Utente;Farmacêutico;Técnico;Estado;Criada em;Prazo;Obs. Internas;Obs. Entrega"];
-    snap.forEach(function(doc) {
+// ---- EXPORTAR CSV ----
+function exportCSV(){
+  db.collection("pims").orderBy("createdAt","desc").get().then(function(snap){
+    var rows = ["Codigo PIM;Cod Prep;Utente;Cod Utente;Farmaceutico;Tecnico;Estado;Criada em;Prazo;Obs Internas;Obs Entrega"];
+    snap.forEach(function(doc){
       var p = doc.data();
-      var clean = function(s) { return (s||"").replace(/;/g, ",").replace(/
-/g, " "); };
+      var cl = function(s){ return (s||"").replace(/;/g,",").replace(/\\n/g," "); };
       rows.push([
-        clean(p.pimCode),
-        clean(p.pimPrepCode),
-        clean(p.patientName),
-        clean(p.patientCode),
-        clean(p.pharmacistName),
-        clean(p.technicianName),
-        clean(p.status),
-        formatDate(p.createdAt),
-        clean(p.deadline),
-        clean(p.internalNotes),
-        clean(p.deliveryNotes)
+        cl(p.pimCode), cl(p.pimPrepCode), cl(p.patientName), cl(p.patientCode),
+        cl(p.pharmacistName), cl(p.technicianName), cl(p.status),
+        fmtDate(p.createdAt), cl(p.deadline), cl(p.internalNotes), cl(p.deliveryNotes)
       ].join(";"));
     });
-    var csv = rows.join("
-");
-    var blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "historico_pims_" + new Date().toISOString().split("T")[0] + ".csv";
+    var blob = new Blob(["\\uFEFF" + rows.join("\\n")], { type:"text/csv;charset=utf-8;" });
+    var a    = document.createElement("a");
+    a.href   = URL.createObjectURL(blob);
+    a.download = "pims_" + new Date().toISOString().slice(0,10) + ".csv";
     a.click();
   });
 }
+
+// Ligar botao login
+document.getElementById("btnLogin").addEventListener("click", loginByCode);
 </script>
 </body>
-</html>
+</html>"""
+
+with open("/home/user/output/index.html", "w", encoding="utf-8") as f:
+    f.write(html)
+
+import os
+size = os.path.getsize("/home/user/output/index.html")
+print(f"index.html gerado: {size} bytes ({round(size/1024,1)} KB)")
+
+# Verificar que nao ha imports nem regex invalidos
+problemas = []
+for i, line in enumerate(html.split("\n"), 1):
+    if "import {" in line or "import{" in line:
+        problemas.append(f"Linha {i}: import modular encontrado: {line.strip()}")
+    if "from \"firebase" in line or "from 'firebase" in line:
+        problemas.append(f"Linha {i}: import firebase modular: {line.strip()}")
+
+if problemas:
+    for p in problemas:
+        print("PROBLEMA:", p)
+else:
+    print("Sem imports modulares - OK")
+    print("Sem regex invalidas - OK")
+    print("Ficheiro pronto para upload no GitHub Pages")
