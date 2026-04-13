@@ -1,192 +1,283 @@
 html = """<!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PIMs - Farmacia da Liga</title>
   <link rel="icon" href="data:,">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#333;}
-    header{background:linear-gradient(135deg,#004d80,#006699);color:white;padding:18px 24px;text-align:center;}
-    header p{font-size:.85em;opacity:.8;margin-top:4px;}
-    nav{background:#1a1a2e;display:flex;overflow-x:auto;}
-    nav a{color:#ccc;text-decoration:none;padding:14px 16px;font-size:.88em;white-space:nowrap;cursor:pointer;}
+    header{background:linear-gradient(135deg,#004d80,#006699);color:white;padding:16px 24px;text-align:center;}
+    header p{font-size:.82em;opacity:.8;margin-top:3px;}
+    nav{background:#1a1a2e;display:flex;overflow-x:auto;flex-wrap:wrap;}
+    nav a{color:#ccc;text-decoration:none;padding:13px 15px;font-size:.85em;white-space:nowrap;cursor:pointer;display:inline-block;}
     nav a:hover{background:#006699;color:white;}
     .nav-logged{display:none;}
     .nav-logged.vis{display:inline-block;}
-    main{padding:24px;max-width:960px;margin:0 auto;}
-    .sec{background:white;border-radius:10px;padding:28px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+    main{padding:20px;max-width:980px;margin:0 auto;}
+    .sec{background:white;border-radius:10px;padding:26px;box-shadow:0 2px 8px rgba(0,0,0,.08);}
     .hidden{display:none!important;}
-    h2{color:#004d80;margin-bottom:20px;border-bottom:2px solid #006699;padding-bottom:8px;}
-    label{display:block;font-size:.85em;color:#555;margin-top:14px;margin-bottom:4px;font-weight:600;}
-    input,select,textarea{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:6px;font-size:.95em;background:#fafafa;}
+    h2{color:#004d80;margin-bottom:18px;border-bottom:2px solid #006699;padding-bottom:8px;font-size:1.2em;}
+    h3{color:#004d80;margin:14px 0 8px;font-size:1em;}
+    label{display:block;font-size:.83em;color:#555;margin-top:12px;margin-bottom:3px;font-weight:600;}
+    input,select,textarea{width:100%;padding:9px 11px;border:1px solid #ccc;border-radius:6px;font-size:.92em;background:#fafafa;}
     input:focus,select:focus,textarea:focus{outline:none;border-color:#006699;background:white;}
-    textarea{resize:vertical;min-height:70px;}
-    .btn{display:inline-block;padding:10px 22px;background:#006699;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.93em;margin-top:14px;}
+    textarea{resize:vertical;min-height:65px;}
+    .btn{display:inline-block;padding:9px 20px;background:#006699;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.9em;margin-top:12px;}
     .btn:hover{background:#004d80;}
-    .btn-block{width:100%;display:block;}
+    .btn-block{width:100%;display:block;text-align:center;}
+    .btn-verde{background:#27ae60;}.btn-verde:hover{background:#229954;}
     .btn-red{background:#c0392b;}.btn-red:hover{background:#a93226;}
-    .btn-green{background:#27ae60;}.btn-green:hover{background:#229954;}
-    .btn-grey{background:#555;}.btn-grey:hover{background:#333;}
-    .btn-sm{padding:5px 12px;font-size:.8em;margin-top:4px;}
-    .fb{margin-top:12px;font-size:.9em;padding:8px 12px;border-radius:6px;}
+    .btn-cinza{background:#555;}.btn-cinza:hover{background:#333;}
+    .btn-laranja{background:#e67e22;}.btn-laranja:hover{background:#ca6f1e;}
+    .btn-sm{padding:5px 11px;font-size:.78em;margin-top:3px;}
+    .fb{margin-top:10px;font-size:.88em;padding:8px 12px;border-radius:6px;display:none;}
+    .fb.vis{display:block;}
     .fb-ok{background:#d4edda;color:#155724;}
     .fb-err{background:#f8d7da;color:#721c24;}
-    table{width:100%;border-collapse:collapse;margin-top:16px;font-size:.87em;}
-    th{background:#006699;color:white;padding:10px 8px;text-align:left;}
-    td{padding:8px;border-bottom:1px solid #eee;vertical-align:top;}
+    table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.85em;}
+    th{background:#006699;color:white;padding:9px 7px;text-align:left;}
+    td{padding:7px;border-bottom:1px solid #eee;vertical-align:top;}
     tr:hover td{background:#f0f4f8;}
-    .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.78em;font-weight:600;}
-    .b-blue{background:#d0e8f5;color:#004d80;}
-    .b-yellow{background:#fff3cd;color:#856404;}
-    .b-green{background:#d4edda;color:#155724;}
-    .b-grey{background:#e2e3e5;color:#383d41;}
+    .badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:.76em;font-weight:600;}
+    .b-azul{background:#d0e8f5;color:#004d80;}
+    .b-amarelo{background:#fff3cd;color:#856404;}
+    .b-verde{background:#d4edda;color:#155724;}
+    .b-cinza{background:#e2e3e5;color:#383d41;}
     .b-red{background:#f8d7da;color:#721c24;}
-    .card{border:1px solid #e0e0e0;border-radius:8px;padding:14px 18px;margin-bottom:12px;background:#fafafa;}
-    .obs-warn{background:#fff8e1;border-left:4px solid #f39c12;padding:10px 14px;border-radius:4px;margin:10px 0;font-size:.9em;}
-    .obs-red{background:#fff0f0;border-left:4px solid #e74c3c;padding:10px 14px;border-radius:4px;margin:10px 0;font-size:.9em;}
-    .chk-row{display:flex;align-items:flex-start;gap:10px;margin:14px 0;}
+    .card{border:1px solid #e0e0e0;border-radius:8px;padding:13px 16px;margin-bottom:10px;background:#fafafa;}
+    .obs-aviso{background:#fff8e1;border-left:4px solid #f39c12;padding:9px 13px;border-radius:4px;margin:9px 0;font-size:.88em;}
+    .obs-red{background:#fff0f0;border-left:4px solid #e74c3c;padding:9px 13px;border-radius:4px;margin:9px 0;font-size:.88em;}
+    .chk-row{display:flex;align-items:flex-start;gap:9px;margin:12px 0;}
     .chk-row input{width:auto;margin-top:3px;}
-    .stat-grid{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;}
-    .stat-box{flex:1;min-width:130px;text-align:center;padding:18px;background:#f0f4f8;border-radius:8px;}
-    .stat-box h3{font-size:2em;margin-bottom:4px;}
+    .stat-grid{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;}
+    .stat-box{flex:1;min-width:120px;text-align:center;padding:16px;background:#f0f4f8;border-radius:8px;}
+    .stat-box h3{font-size:1.8em;margin-bottom:3px;}
     .modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;}
-    .modal-box{background:white;border-radius:10px;padding:28px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;}
-    footer{text-align:center;padding:20px;font-size:.82em;color:#999;margin-top:32px;}
-    .flex-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
-    .flex-1{flex:1;}
+    .modal-caixa{background:white;border-radius:10px;padding:26px;max-width:580px;width:92%;max-height:82vh;overflow-y:auto;}
+    .frow{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;}
+    .f1{flex:1;}
+    .aviso-badge{background:#e74c3c;color:white;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:.72em;font-weight:700;margin-left:4px;vertical-align:middle;}
+    footer{text-align:center;padding:18px;font-size:.8em;color:#999;margin-top:28px;}
+    @media(max-width:600px){main{padding:10px;}.sec{padding:14px;}}
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Farmacia da Liga &mdash; Gestao de PIMs</h1>
+  <h1>Farmacia da Liga &mdash; PIMs</h1>
   <p>Preparacao Individualizada da Medicacao</p>
 </header>
 
-<nav id="mainNav">
-  <a onclick="showSec('login')">Login</a>
-  <a onclick="showSec('dashboard')" class="nav-logged" id="navDash">Dashboard</a>
-  <a onclick="showSec('registerPim')" class="nav-logged">Registar PIM</a>
-  <a onclick="showSec('searchPim')" class="nav-logged">Consultar PIM</a>
-  <a onclick="showSec('dispensePim')" class="nav-logged">Dispensar PIM</a>
-  <a onclick="showSec('managePims')" class="nav-logged">Gestao PIMs</a>
-  <a onclick="showSec('createUser')" class="nav-logged">Criar Colaborador</a>
-  <a onclick="doLogout()" class="nav-logged" style="color:#ff8080;">Sair</a>
+<nav id="navPrincipal">
+  <a onclick="mostrarSec('login')">Entrar</a>
+  <a onclick="mostrarSec('painel')" class="nav-logged">Painel <span id="badgeAvisos" class="aviso-badge hidden">0</span></a>
+  <a onclick="mostrarSec('utentes')" class="nav-logged">Utentes</a>
+  <a onclick="mostrarSec('registarPim')" class="nav-logged">Registar PIM</a>
+  <a onclick="mostrarSec('consultarPim')" class="nav-logged">Consultar PIMs</a>
+  <a onclick="mostrarSec('dispensarPim')" class="nav-logged">Dispensar PIM</a>
+  <a onclick="mostrarSec('gestaoPims')" class="nav-logged">Gestao PIMs</a>
+  <a onclick="mostrarSec('minhaPims')" class="nav-logged">As Minhas PIMs</a>
+  <a onclick="mostrarSec('criarColaborador')" class="nav-logged" id="navAdmin">Colaboradores</a>
+  <a onclick="fazerLogout()" class="nav-logged" style="color:#ff8080;">Sair</a>
 </nav>
 
 <main>
 
-  <section id="login" class="sec">
-    <h2>Login</h2>
-    <label>Codigo de utilizador</label>
-    <input type="text" id="userCode" placeholder="Ex: 001" autocomplete="off" />
-    <label>Password</label>
-    <input type="password" id="userPassword" placeholder="Password" />
-    <button class="btn btn-block" id="btnLogin">Entrar</button>
-    <div id="loginFeedback"></div>
-  </section>
+<!-- LOGIN -->
+<section id="login" class="sec">
+  <h2>Entrar no Sistema</h2>
+  <label>Codigo de utilizador</label>
+  <input type="text" id="loginCodigo" placeholder="Ex: 001" autocomplete="off"/>
+  <label>Password</label>
+  <input type="password" id="loginPass" placeholder="Password"/>
+  <button class="btn btn-block" id="btnEntrar">Entrar</button>
+  <div id="fbLogin" class="fb"></div>
+</section>
 
-  <section id="dashboard" class="sec hidden">
-    <h2>Dashboard</h2>
-    <p>Bem-vindo, <strong id="displayName"></strong></p>
-    <p style="margin-top:6px;color:#666;">Funcao: <span id="userRole"></span></p>
-    <div id="dashStats" class="stat-grid"></div>
-  </section>
+<!-- PAINEL -->
+<section id="painel" class="sec hidden">
+  <h2>Painel</h2>
+  <p>Bem-vindo, <strong id="nomeUtilizador"></strong></p>
+  <p style="margin-top:5px;color:#666;">Funcao: <span id="funcaoUtilizador"></span></p>
+  <div id="estatisticas" class="stat-grid"></div>
+  <div id="avisosPrep" style="margin-top:20px;"></div>
+</section>
 
-  <section id="createUser" class="sec hidden">
-    <h2>Criar Colaborador</h2>
-    <form id="formCreateUser">
-      <label>Codigo (ex: 002)</label>
-      <input type="text" id="newCode" required placeholder="002" />
-      <label>Nome completo</label>
-      <input type="text" id="newName" required />
-      <label>Funcao</label>
-      <select id="newRole" required>
+<!-- UTENTES -->
+<section id="utentes" class="sec hidden">
+  <h2>Utentes PIM</h2>
+  <div class="frow" style="margin-bottom:14px;">
+    <button class="btn btn-verde" onclick="mostrarFormUtente()">+ Novo Utente</button>
+    <button class="btn btn-cinza" onclick="carregarUtentes()">Actualizar lista</button>
+  </div>
+  <div id="formUtenteArea" class="hidden">
+    <h3 id="tituloFormUtente">Novo Utente</h3>
+    <form id="formUtente">
+      <input type="hidden" id="utenteIdEdicao"/>
+      <label>Nome completo *</label>
+      <input type="text" id="uNome" required placeholder="Nome completo do utente"/>
+      <label>Codigo PIM do utente (ex: 64DRC26) *</label>
+      <input type="text" id="uCodigoPim" required placeholder="64DRC26"/>
+      <label>Farmaceutico responsavel *</label>
+      <select id="uFarmaceutico" required>
         <option value="">-- Selecionar --</option>
-        <option value="pharmacist">Farmaceutico</option>
-        <option value="technician">Tecnico</option>
-        <option value="operator">Operador</option>
       </select>
-      <label>Password</label>
-      <input type="password" id="newPass" required />
-      <label>Confirmar Password</label>
-      <input type="password" id="newPassConfirm" required />
-      <button type="submit" class="btn btn-green btn-block">Criar Colaborador</button>
+      <label>Tecnico responsavel</label>
+      <select id="uTecnico">
+        <option value="">-- Selecionar --</option>
+      </select>
+      <label>Periodicidade de preparacao (dias)</label>
+      <input type="number" id="uPeriodicidade" placeholder="Ex: 30" min="1"/>
+      <label>Observacoes do utente</label>
+      <textarea id="uObs" placeholder="Observacoes relevantes sobre o utente..."></textarea>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-verde">Guardar Utente</button>
+        <button type="button" class="btn btn-cinza" onclick="esconderFormUtente()">Cancelar</button>
+      </div>
     </form>
-    <div id="fbCreateUser"></div>
-  </section>
+    <div id="fbUtente" class="fb"></div>
+  </div>
+  <div id="listaUtentes" style="margin-top:14px;"></div>
+</section>
 
-  <section id="registerPim" class="sec hidden">
-    <h2>Registar PIM</h2>
+<!-- REGISTAR PIM -->
+<section id="registarPim" class="sec hidden">
+  <h2>Registar Nova PIM</h2>
+  <label>Selecionar Utente *</label>
+  <select id="selectUtenteRegisto" onchange="preencherDadosUtente()">
+    <option value="">-- Selecionar utente --</option>
+  </select>
+  <div id="dadosUtenteRegisto" class="hidden">
+    <div class="card" style="margin-top:12px;" id="cardUtenteRegisto"></div>
     <form id="formPim">
-      <label>Nome do Utente *</label>
-      <input type="text" id="pPatientName" required placeholder="Nome completo" />
-      <label>Codigo do Utente *</label>
-      <input type="text" id="pPatientCode" required placeholder="Ex: U-123" />
-      <label>Codigo PIM base (ex: 73MCC26) *</label>
-      <input type="text" id="pPimCode" required placeholder="73MCC26" />
-      <label>Farmaceutico Responsavel</label>
-      <input type="text" id="pPharmacist" placeholder="Nome do farmaceutico" />
-      <label>Tecnico Responsavel</label>
-      <input type="text" id="pTechnician" placeholder="Nome do tecnico" />
-      <label>Observacoes internas</label>
-      <textarea id="pIntNotes" placeholder="Notas internas sobre a preparacao..."></textarea>
+      <label>Codigo PIM base (preenchido automaticamente)</label>
+      <input type="text" id="pCodigoPim" placeholder="64DRC26" readonly style="background:#e8f4f8;"/>
+      <label>Farmaceutico responsavel</label>
+      <input type="text" id="pFarmaceutico" placeholder="Farmaceutico"/>
+      <label>Tecnico responsavel</label>
+      <input type="text" id="pTecnico" placeholder="Tecnico"/>
+      <label>Observacoes internas (editavel)</label>
+      <textarea id="pObsInternas" placeholder="Notas internas sobre esta preparacao..."></textarea>
       <label>Observacoes para entrega (visiveis na dispensa)</label>
-      <textarea id="pDelNotes" placeholder="Ex: Tem pickup. Entregar saco com dinheiro..."></textarea>
+      <textarea id="pObsEntrega" placeholder="Ex: Tem pickup. Entregar saco com dinheiro..."></textarea>
       <label>Prazo de preparacao</label>
-      <input type="date" id="pDeadline" />
+      <input type="date" id="pPrazo"/>
+      <label>Codigo do Farmaceutico (obrigatorio para confirmar registo) *</label>
+      <input type="text" id="pCodigoFarmaceutico" placeholder="Codigo do farmaceutico" autocomplete="off"/>
       <button type="submit" class="btn btn-block">Registar PIM</button>
     </form>
-    <div id="fbPim"></div>
-  </section>
+    <div id="fbPim" class="fb"></div>
+  </div>
+</section>
 
-  <section id="searchPim" class="sec hidden">
-    <h2>Consultar PIMs</h2>
-    <div class="flex-row">
-      <div class="flex-1">
-        <label>Pesquisar por codigo PIM</label>
-        <input type="text" id="searchQ" placeholder="Ex: 73MCC26" />
+<!-- CONSULTAR PIMs -->
+<section id="consultarPim" class="sec hidden">
+  <h2>Consultar PIMs</h2>
+  <div class="frow">
+    <div class="f1">
+      <label>Pesquisar por codigo PIM ou nome do utente</label>
+      <input type="text" id="pesquisaQ" placeholder="Ex: 64DRC26 ou nome"/>
+    </div>
+    <button class="btn" onclick="pesquisarPims()">Pesquisar</button>
+    <button class="btn btn-cinza" onclick="carregarTodasPims('resultadosPesquisa')">Ver Todas</button>
+  </div>
+  <div id="resultadosPesquisa" style="margin-top:14px;"></div>
+</section>
+
+<!-- DISPENSAR PIM -->
+<section id="dispensarPim" class="sec hidden">
+  <h2>Dispensar PIM</h2>
+  <label>Codigo PIM (ex: 64DRC26)</label>
+  <input type="text" id="codDispensa" placeholder="64DRC26"/>
+  <button class="btn" onclick="carregarParaDispensa()">Carregar PIM</button>
+  <div id="detalhesDispensa" style="margin-top:14px;"></div>
+</section>
+
+<!-- GESTAO PIMs -->
+<section id="gestaoPims" class="sec hidden">
+  <h2>Gestao de PIMs</h2>
+  <div class="frow" style="margin-bottom:12px;flex-wrap:wrap;gap:6px;">
+    <button class="btn btn-sm" onclick="filtrarEstado('Registada')">Registadas</button>
+    <button class="btn btn-sm" onclick="filtrarEstado('Aguarda preparacao')">Aguarda Prep.</button>
+    <button class="btn btn-sm btn-laranja" onclick="filtrarEstado('Em preparacao')">Em Preparacao</button>
+    <button class="btn btn-sm btn-verde" onclick="filtrarEstado('Preparada')">Preparadas</button>
+    <button class="btn btn-sm" style="background:#8e44ad;" onclick="filtrarEstado('Dispensada')">Dispensadas</button>
+    <button class="btn btn-sm btn-red" onclick="filtrarEstado('Anulada')">Anuladas</button>
+    <button class="btn btn-sm btn-cinza" onclick="carregarTodasPims('listaPims')">Todas</button>
+  </div>
+  <div class="frow" style="margin-bottom:14px;">
+    <label style="margin:0;margin-right:8px;">Filtrar por Farmaceutico:</label>
+    <select id="filtroPorFarmaceutico" onchange="filtrarPorFarmaceutico()" style="width:auto;flex:1;">
+      <option value="">-- Todos --</option>
+    </select>
+    <button class="btn btn-verde btn-sm" onclick="exportarCSV()" style="margin-top:0;">Exportar Excel</button>
+  </div>
+  <div id="listaPims"></div>
+</section>
+
+<!-- AS MINHAS PIMs -->
+<section id="minhaPims" class="sec hidden">
+  <h2>As Minhas PIMs</h2>
+  <p style="color:#666;font-size:.88em;margin-bottom:14px;">PIMs associadas ao seu utilizador como farmaceutico ou tecnico responsavel.</p>
+  <div class="frow" style="margin-bottom:12px;gap:6px;">
+    <button class="btn btn-sm" onclick="carregarMinhasPims('todas')">Todas</button>
+    <button class="btn btn-sm btn-laranja" onclick="carregarMinhasPims('pendentes')">Pendentes</button>
+    <button class="btn btn-sm btn-verde" onclick="carregarMinhasPims('preparadas')">Preparadas</button>
+    <button class="btn btn-sm btn-cinza" onclick="carregarMinhasPims('dispensadas')">Dispensadas</button>
+  </div>
+  <div id="listaMinhasPims"></div>
+</section>
+
+<!-- COLABORADORES -->
+<section id="criarColaborador" class="sec hidden">
+  <h2>Gestao de Colaboradores</h2>
+  <div class="frow" style="margin-bottom:14px;">
+    <button class="btn btn-verde" onclick="mostrarFormColaborador()">+ Novo Colaborador</button>
+    <button class="btn btn-cinza" onclick="carregarColaboradores()">Ver Todos</button>
+  </div>
+  <div id="formColaboradorArea" class="hidden">
+    <form id="formColaborador">
+      <label>Codigo (ex: 002) *</label>
+      <input type="text" id="colCodigo" required placeholder="002"/>
+      <label>Nome completo *</label>
+      <input type="text" id="colNome" required/>
+      <label>Funcao *</label>
+      <select id="colFuncao" required>
+        <option value="">-- Selecionar --</option>
+        <option value="farmaceutico">Farmaceutico</option>
+        <option value="tecnico">Tecnico</option>
+        <option value="operador">Operador</option>
+        <option value="admin">Administrador</option>
+      </select>
+      <label>Password *</label>
+      <input type="password" id="colPass" required/>
+      <label>Confirmar Password *</label>
+      <input type="password" id="colPassConf" required/>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-verde">Criar Colaborador</button>
+        <button type="button" class="btn btn-cinza" onclick="esconderFormColaborador()">Cancelar</button>
       </div>
-      <button class="btn" onclick="doSearch()">Pesquisar</button>
-      <button class="btn btn-grey" onclick="loadAll('pimResults')">Ver Todas</button>
-    </div>
-    <div id="pimResults" style="margin-top:16px;"></div>
-  </section>
-
-  <section id="dispensePim" class="sec hidden">
-    <h2>Dispensar PIM</h2>
-    <label>Codigo PIM</label>
-    <input type="text" id="dispCode" placeholder="Ex: 73MCC26" />
-    <button class="btn" onclick="loadForDispense()">Carregar PIM</button>
-    <div id="dispDetails" style="margin-top:16px;"></div>
-  </section>
-
-  <section id="managePims" class="sec hidden">
-    <h2>Gestao de PIMs</h2>
-    <div class="flex-row" style="margin-bottom:14px;">
-      <button class="btn btn-sm" onclick="filterStatus('Aguarda preparacao')">Aguarda</button>
-      <button class="btn btn-sm btn-green" onclick="filterStatus('Preparada')">Preparadas</button>
-      <button class="btn btn-sm" style="background:#8e44ad;" onclick="filterStatus('Dispensada')">Dispensadas</button>
-      <button class="btn btn-sm btn-red" onclick="filterStatus('Anulada')">Anuladas</button>
-      <button class="btn btn-sm btn-grey" onclick="loadAll('pimList')">Todas</button>
-      <button class="btn btn-sm btn-green" onclick="exportCSV()">Exportar Excel</button>
-    </div>
-    <div id="pimList"></div>
-  </section>
+    </form>
+    <div id="fbColaborador" class="fb"></div>
+  </div>
+  <div id="listaColaboradores" style="margin-top:14px;"></div>
+</section>
 
 </main>
+<footer>&copy; 2026 Farmacia da Liga &mdash; Gestao de PIMs</footer>
 
-<footer>&copy; 2026 Farmacia da Liga</footer>
-
+<!-- FIREBASE CDN -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
 <script>
-// ---- FIREBASE INIT ----
-var fbConfig = {
+// ==============================================
+// FIREBASE
+// ==============================================
+var fbConf = {
   apiKey: "AIzaSyBa6pjv7czSYaQ2ecShefFeLXAsxsd4Dnc",
   authDomain: "pims-84362.firebaseapp.com",
   projectId: "pims-84362",
@@ -194,522 +285,809 @@ var fbConfig = {
   messagingSenderId: "21232070010",
   appId: "1:21232070010:web:330d2f68be460632753ac3"
 };
-firebase.initializeApp(fbConfig);
+firebase.initializeApp(fbConf);
 var auth = firebase.auth();
 var db   = firebase.firestore();
 
-// ---- ESTADO GLOBAL ----
-var currentUser     = null;
-var currentUserData = null;
-var userMap         = {};
+// ==============================================
+// ESTADO GLOBAL
+// ==============================================
+var utilizadorAtual     = null;
+var dadosUtilizador     = null;
+var mapaUtilizadores    = {};
+var todosColaboradores  = [];
 
-// ---- UTILS ----
-function genEmail(code){ return "user_" + code + "@farmacialiga.pt"; }
+// ==============================================
+// UTILS
+// ==============================================
+function gerarEmail(cod){ return "user_" + cod + "@farmacialiga.pt"; }
 
-function fmtDate(iso){
+function formatarData(iso){
   if(!iso) return "---";
-  try{ return new Date(iso).toLocaleString("pt-PT"); }catch(e){ return iso; }
+  try{ return new Date(iso).toLocaleString("pt-PT"); } catch(e){ return iso; }
 }
 
-function mkBadge(s){
-  var cls = "b-grey";
-  if(s === "Registada")                              cls = "b-blue";
-  else if(s === "Aguarda preparacao" || s === "Em preparacao") cls = "b-yellow";
-  else if(s === "Preparada" || s === "Pronta para levantamento") cls = "b-green";
-  else if(s === "Dispensada")                        cls = "b-grey";
-  else if(s === "Anulada")                           cls = "b-red";
+function formatarDataSimples(iso){
+  if(!iso) return "---";
+  try{ return new Date(iso).toLocaleDateString("pt-PT"); } catch(e){ return iso; }
+}
+
+function criarBadge(s){
+  var cls = "b-cinza";
+  if(s === "Registada")                                  cls = "b-azul";
+  else if(s === "Aguarda preparacao" || s === "Em preparacao") cls = "b-amarelo";
+  else if(s === "Preparada" || s === "Pronta para levantamento") cls = "b-verde";
+  else if(s === "Dispensada")                            cls = "b-cinza";
+  else if(s === "Anulada")                               cls = "b-red";
   return "<span class='badge " + cls + "'>" + s + "</span>";
 }
 
-function fb(id, msg, ok){
+function mostrarFb(id, msg, ok){
   var el = document.getElementById(id);
   if(!el) return;
-  el.className = "fb " + (ok ? "fb-ok" : "fb-err");
+  el.className = "fb vis " + (ok ? "fb-ok" : "fb-err");
   el.innerText = msg;
 }
 
-// ---- NAVEGACAO ----
-function showSec(id){
-  var secs = document.querySelectorAll(".sec");
-  for(var i=0;i<secs.length;i++) secs[i].classList.add("hidden");
+function esconderFb(id){
+  var el = document.getElementById(id);
+  if(el){ el.className = "fb"; el.innerText = ""; }
+}
+
+// ==============================================
+// NAVEGACAO
+// ==============================================
+function mostrarSec(id){
+  document.querySelectorAll(".sec").forEach(function(s){ s.classList.add("hidden"); });
   var el = document.getElementById(id);
   if(el) el.classList.remove("hidden");
-  var navItems = document.querySelectorAll(".nav-logged");
-  for(var j=0;j<navItems.length;j++){
-    if(currentUser) navItems[j].classList.add("vis");
-    else            navItems[j].classList.remove("vis");
-  }
+  document.querySelectorAll(".nav-logged").forEach(function(a){
+    if(utilizadorAtual) a.classList.add("vis");
+    else                a.classList.remove("vis");
+  });
+  if(id === "gestaoPims") preencherFiltroPorFarmaceutico();
+  if(id === "minhaPims")  carregarMinhasPims("todas");
+  if(id === "utentes")    carregarUtentes();
+  if(id === "painel")     carregarEstatisticas();
 }
 
-// ---- AUTH STATE ----
+// ==============================================
+// AUTH
+// ==============================================
 auth.onAuthStateChanged(function(user){
   if(user){
-    db.collection("users").doc(user.uid).get().then(function(doc){
-      currentUser = user;
-      if(doc.exists){
-        currentUserData = doc.data();
-      } else {
-        currentUserData = { name: user.email, role: "operator", userCode: "000" };
-      }
-      document.getElementById("displayName").innerText = currentUserData.name || user.email;
-      document.getElementById("userRole").innerText    = currentUserData.role || "";
-      showSec("dashboard");
-      loadDashStats();
-    }).catch(function(e){
-      console.error("Erro perfil:", e);
-      doLogout();
-    });
+    db.collection("utilizadores").doc(user.uid).get().then(function(doc){
+      utilizadorAtual  = user;
+      dadosUtilizador  = doc.exists ? doc.data() : { nome: user.email, funcao: "operador", codigo: "000" };
+      document.getElementById("nomeUtilizador").innerText   = dadosUtilizador.nome || user.email;
+      document.getElementById("funcaoUtilizador").innerText = traduzirFuncao(dadosUtilizador.funcao || "");
+      mostrarSec("painel");
+      verificarAvisos();
+    }).catch(function(){ fazerLogout(); });
   } else {
-    currentUser     = null;
-    currentUserData = null;
-    showSec("login");
+    utilizadorAtual = null;
+    dadosUtilizador = null;
+    mostrarSec("login");
   }
 });
 
-// ---- CARREGAR userMap ----
-function loadUserMap(){
-  db.collection("users").get().then(function(snap){
-    userMap = {};
+function traduzirFuncao(f){
+  var m = { "farmaceutico":"Farmaceutico", "tecnico":"Tecnico", "operador":"Operador", "admin":"Administrador" };
+  return m[f] || f;
+}
+
+// ==============================================
+// MAPA UTILIZADORES (codigo -> email)
+// ==============================================
+function carregarMapaUtilizadores(){
+  db.collection("utilizadores").get().then(function(snap){
+    mapaUtilizadores = {};
+    todosColaboradores = [];
     snap.forEach(function(doc){
       var d = doc.data();
-      if(d.userCode && d.email){
-        userMap[String(d.userCode).trim()] = d.email;
-      }
+      if(d.codigo && d.email){ mapaUtilizadores[String(d.codigo).trim()] = d.email; }
+      todosColaboradores.push({ id: doc.id, ...d });
     });
-    console.log("userMap OK:", Object.keys(userMap).length, "utilizadores");
-  }).catch(function(e){
-    console.warn("userMap erro:", e.message);
-  });
+    console.log("Mapa utilizadores OK:", Object.keys(mapaUtilizadores).length);
+  }).catch(function(e){ console.warn("Erro mapa utilizadores:", e.message); });
 }
-loadUserMap();
+carregarMapaUtilizadores();
 
-// ---- LOGIN ----
-function loginByCode(){
-  var code  = document.getElementById("userCode").value.trim();
-  var pass  = document.getElementById("userPassword").value;
-  var fbEl  = document.getElementById("loginFeedback");
-  fbEl.className = "fb";
-  fbEl.innerText = "";
+// ==============================================
+// LOGIN
+// ==============================================
+function entrar(){
+  var cod  = document.getElementById("loginCodigo").value.trim();
+  var pass = document.getElementById("loginPass").value;
+  esconderFb("fbLogin");
 
-  if(!code || !pass){
-    fbEl.className = "fb fb-err";
-    fbEl.innerText = "Preencha o codigo e a password.";
-    return;
-  }
+  if(!cod || !pass){ mostrarFb("fbLogin","Preencha o codigo e a password.",false); return; }
 
-  var email = userMap[code];
-  if(!email){
-    fbEl.className = "fb fb-err";
-    fbEl.innerText = "Codigo invalido. Verifique o codigo de utilizador.";
-    return;
-  }
+  var email = mapaUtilizadores[cod];
+  if(!email){ mostrarFb("fbLogin","Codigo de utilizador invalido.",false); return; }
 
-  fbEl.innerText = "A entrar...";
+  mostrarFb("fbLogin","A entrar...", true);
   auth.signInWithEmailAndPassword(email, pass).then(function(){
-    fbEl.innerText = "";
+    esconderFb("fbLogin");
   }).catch(function(e){
-    console.error("Login erro:", e.code, e.message);
-    fbEl.className = "fb fb-err";
-    if(e.code === "auth/wrong-password" || e.code === "auth/invalid-credential"){
-      fbEl.innerText = "Password incorrecta.";
-    } else if(e.code === "auth/user-not-found"){
-      fbEl.innerText = "Utilizador nao encontrado.";
-    } else {
-      fbEl.innerText = "Erro: " + e.message;
-    }
+    var msg = "Erro ao entrar.";
+    if(e.code === "auth/wrong-password" || e.code === "auth/invalid-credential") msg = "Password incorrecta.";
+    else if(e.code === "auth/user-not-found") msg = "Utilizador nao encontrado.";
+    mostrarFb("fbLogin", msg, false);
   });
 }
 
-// Permitir login com Enter
-document.getElementById("userPassword").addEventListener("keydown", function(e){
-  if(e.key === "Enter") loginByCode();
-});
+document.getElementById("loginPass").addEventListener("keydown", function(e){ if(e.key==="Enter") entrar(); });
+document.getElementById("btnEntrar").addEventListener("click", entrar);
 
-// ---- LOGOUT ----
-function doLogout(){ auth.signOut(); }
+function fazerLogout(){ auth.signOut(); }
 
-// ---- DASHBOARD STATS ----
-function loadDashStats(){
-  var div = document.getElementById("dashStats");
+// ==============================================
+// PAINEL - ESTATISTICAS
+// ==============================================
+function carregarEstatisticas(){
+  var div = document.getElementById("estatisticas");
   div.innerHTML = "<p>A carregar...</p>";
   db.collection("pims").get().then(function(snap){
     var total=0, aguarda=0, prep=0, disp=0;
     snap.forEach(function(d){
       total++;
-      var s = d.data().status || "";
-      if(s==="Aguarda preparacao"||s==="Registada") aguarda++;
-      if(s==="Preparada"||s==="Pronta para levantamento") prep++;
+      var s = d.data().estado || "";
+      if(s==="Aguarda preparacao" || s==="Registada" || s==="Em preparacao") aguarda++;
+      if(s==="Preparada" || s==="Pronta para levantamento") prep++;
       if(s==="Dispensada") disp++;
     });
     div.innerHTML =
       "<div class='stat-box'><h3>" + total + "</h3><p>Total PIMs</p></div>" +
-      "<div class='stat-box'><h3 style='color:#856404;'>" + aguarda + "</h3><p>Aguarda Preparacao</p></div>" +
+      "<div class='stat-box'><h3 style='color:#856404;'>" + aguarda + "</h3><p>Pendentes</p></div>" +
       "<div class='stat-box'><h3 style='color:#155724;'>" + prep + "</h3><p>Preparadas</p></div>" +
       "<div class='stat-box'><h3 style='color:#383d41;'>" + disp + "</h3><p>Dispensadas</p></div>";
   }).catch(function(){ div.innerHTML = ""; });
 }
 
-// ---- CRIAR COLABORADOR ----
-document.getElementById("formCreateUser").addEventListener("submit", function(e){
-  e.preventDefault();
-  var code    = document.getElementById("newCode").value.trim();
-  var name    = document.getElementById("newName").value.trim();
-  var role    = document.getElementById("newRole").value;
-  var pass    = document.getElementById("newPass").value;
-  var confirm = document.getElementById("newPassConfirm").value;
+// ==============================================
+// PAINEL - AVISOS DE PREPARACAO
+// ==============================================
+function verificarAvisos(){
+  if(!dadosUtilizador) return;
+  var hoje = new Date();
+  var em3dias = new Date(); em3dias.setDate(hoje.getDate()+3);
 
-  if(!code||!name||!role||!pass){ fb("fbCreateUser","Preencha todos os campos.",false); return; }
-  if(pass !== confirm)           { fb("fbCreateUser","As passwords nao coincidem.",false); return; }
-  if(pass.length < 6)            { fb("fbCreateUser","Password minimo 6 caracteres.",false); return; }
-
-  var email = genEmail(code);
-  fb("fbCreateUser","A criar colaborador...","");
-
-  // Guardar email/pass do admin para re-login depois
-  var adminEmail = currentUserData ? genEmail(currentUserData.userCode) : null;
-
-  auth.createUserWithEmailAndPassword(email, pass).then(function(cred){
-    return db.collection("users").doc(cred.user.uid).set({
-      userCode: code, name: name, role: role, email: email,
-      createdAt: new Date().toISOString()
-    }).then(function(){
-      userMap[code] = email;
-      fb("fbCreateUser","Colaborador " + name + " criado! Codigo: " + code, true);
-      document.getElementById("formCreateUser").reset();
+  db.collection("utentes").get().then(function(snap){
+    var avisos = [];
+    snap.forEach(function(doc){
+      var u = doc.data();
+      if(!u.proximaPreparacao) return;
+      var dataPrep = new Date(u.proximaPreparacao);
+      if(dataPrep <= em3dias){
+        avisos.push({ nome: u.nome, data: u.proximaPreparacao, id: doc.id, farmaceutico: u.farmaceuticoNome });
+      }
     });
-  }).catch(function(e){
-    if(e.code==="auth/email-already-in-use"){
-      fb("fbCreateUser","Esse codigo ja existe. Use um codigo diferente.",false);
+
+    var badge = document.getElementById("badgeAvisos");
+    if(avisos.length > 0){
+      badge.innerText = avisos.length;
+      badge.classList.remove("hidden");
     } else {
-      fb("fbCreateUser","Erro: " + e.message, false);
+      badge.classList.add("hidden");
+    }
+
+    var div = document.getElementById("avisosPrep");
+    if(avisos.length === 0){ div.innerHTML = ""; return; }
+    var h = "<h3 style='color:#c0392b;margin-bottom:10px;'>Avisos de Preparacao (" + avisos.length + ")</h3>";
+    avisos.forEach(function(a){
+      h += "<div class='obs-red'><strong>" + a.nome + "</strong> &mdash; Preparacao prevista: <strong>" + formatarDataSimples(a.data) + "</strong></div>";
+    });
+    div.innerHTML = h;
+  });
+}
+
+// ==============================================
+// UTENTES
+// ==============================================
+function mostrarFormUtente(){
+  document.getElementById("formUtenteArea").classList.remove("hidden");
+  document.getElementById("tituloFormUtente").innerText = "Novo Utente";
+  document.getElementById("formUtente").reset();
+  document.getElementById("utenteIdEdicao").value = "";
+  preencherSelectsFarmaceuticos();
+}
+
+function esconderFormUtente(){
+  document.getElementById("formUtenteArea").classList.add("hidden");
+}
+
+function preencherSelectsFarmaceuticos(){
+  var selFarm = document.getElementById("uFarmaceutico");
+  var selTec  = document.getElementById("uTecnico");
+  selFarm.innerHTML = "<option value=''>-- Selecionar --</option>";
+  selTec.innerHTML  = "<option value=''>-- Selecionar --</option>";
+  todosColaboradores.forEach(function(c){
+    if(c.funcao === "farmaceutico" || c.funcao === "admin"){
+      selFarm.innerHTML += "<option value='" + (c.nome||"") + "'>" + (c.nome||"") + " (" + (c.codigo||"") + ")</option>";
+    }
+    if(c.funcao === "tecnico"){
+      selTec.innerHTML += "<option value='" + (c.nome||"") + "'>" + (c.nome||"") + " (" + (c.codigo||"") + ")</option>";
     }
   });
+}
+
+document.getElementById("formUtente").addEventListener("submit", function(e){
+  e.preventDefault();
+  var id        = document.getElementById("utenteIdEdicao").value;
+  var nome      = document.getElementById("uNome").value.trim();
+  var codPim    = document.getElementById("uCodigoPim").value.trim().toUpperCase();
+  var farm      = document.getElementById("uFarmaceutico").value;
+  var tec       = document.getElementById("uTecnico").value;
+  var periodo   = parseInt(document.getElementById("uPeriodicidade").value) || 0;
+  var obs       = document.getElementById("uObs").value.trim();
+
+  if(!nome || !codPim || !farm){ mostrarFb("fbUtente","Preencha os campos obrigatorios.",false); return; }
+
+  var proxPrep = "";
+  if(periodo > 0){
+    var d = new Date(); d.setDate(d.getDate() + periodo);
+    proxPrep = d.toISOString();
+  }
+
+  var dados = {
+    nome: nome, codigoPim: codPim, farmaceuticoNome: farm, tecnicoNome: tec,
+    periodicidade: periodo, observacoes: obs,
+    proximaPreparacao: proxPrep,
+    atualizadoEm: new Date().toISOString()
+  };
+
+  var ref = id ? db.collection("utentes").doc(id) : db.collection("utentes").doc();
+  if(!id) dados.criadoEm = new Date().toISOString();
+
+  ref.set(dados, { merge: true }).then(function(){
+    mostrarFb("fbUtente", id ? "Utente atualizado!" : "Utente criado com sucesso!", true);
+    document.getElementById("formUtente").reset();
+    document.getElementById("utenteIdEdicao").value = "";
+    carregarUtentes();
+    setTimeout(function(){ esconderFb("fbUtente"); esconderFormUtente(); }, 1800);
+  }).catch(function(er){ mostrarFb("fbUtente","Erro: "+er.message, false); });
 });
 
-// ---- REGISTAR PIM ----
+function carregarUtentes(){
+  var div = document.getElementById("listaUtentes");
+  div.innerHTML = "<p>A carregar...</p>";
+  db.collection("utentes").orderBy("nome").get().then(function(snap){
+    if(snap.empty){ div.innerHTML = "<p>Nenhum utente registado.</p>"; return; }
+    var h = "<table><thead><tr><th>Nome</th><th>Cod. PIM</th><th>Farmaceutico</th><th>Tecnico</th><th>Prox. Prep.</th><th>Acoes</th></tr></thead><tbody>";
+    snap.forEach(function(doc){
+      var u = doc.data(); var uid = doc.id;
+      var dataPrep = u.proximaPreparacao ? formatarDataSimples(u.proximaPreparacao) : "---";
+      var vencido = u.proximaPreparacao && new Date(u.proximaPreparacao) < new Date();
+      h += "<tr>" +
+        "<td><strong>" + u.nome + "</strong></td>" +
+        "<td>" + u.codigoPim + "</td>" +
+        "<td>" + (u.farmaceuticoNome||"---") + "</td>" +
+        "<td>" + (u.tecnicoNome||"---") + "</td>" +
+        "<td style='" + (vencido?"color:#c0392b;font-weight:700;":"") + "'>" + dataPrep + "</td>" +
+        "<td>" +
+          "<button class='btn btn-sm' onclick='editarUtente(\"" + uid + "\")'>Editar</button> " +
+          "<button class='btn btn-sm btn-verde' onclick='selecionarUtenteParaPim(\"" + uid + "\")'>+ PIM</button>" +
+        "</td></tr>";
+    });
+    h += "</tbody></table>";
+    div.innerHTML = h;
+  }).catch(function(e){ div.innerHTML = "<p>Erro: "+e.message+"</p>"; });
+}
+
+function editarUtente(id){
+  db.collection("utentes").doc(id).get().then(function(doc){
+    var u = doc.data();
+    document.getElementById("utenteIdEdicao").value = id;
+    document.getElementById("uNome").value         = u.nome || "";
+    document.getElementById("uCodigoPim").value    = u.codigoPim || "";
+    document.getElementById("uPeriodicidade").value= u.periodicidade || "";
+    document.getElementById("uObs").value          = u.observacoes || "";
+    document.getElementById("tituloFormUtente").innerText = "Editar Utente";
+    document.getElementById("formUtenteArea").classList.remove("hidden");
+    preencherSelectsFarmaceuticos();
+    setTimeout(function(){
+      document.getElementById("uFarmaceutico").value = u.farmaceuticoNome || "";
+      document.getElementById("uTecnico").value      = u.tecnicoNome || "";
+    }, 200);
+    window.scrollTo(0,0);
+  });
+}
+
+function selecionarUtenteParaPim(uid){
+  mostrarSec("registarPim");
+  carregarSelectUtentes(uid);
+}
+
+// ==============================================
+// REGISTAR PIM
+// ==============================================
+function carregarSelectUtentes(selecionarId){
+  var sel = document.getElementById("selectUtenteRegisto");
+  sel.innerHTML = "<option value=''>-- Selecionar utente --</option>";
+  db.collection("utentes").orderBy("nome").get().then(function(snap){
+    snap.forEach(function(doc){
+      var u = doc.data();
+      var opt = document.createElement("option");
+      opt.value = doc.id;
+      opt.innerText = u.nome + " (" + u.codigoPim + ")";
+      sel.appendChild(opt);
+    });
+    if(selecionarId){
+      sel.value = selecionarId;
+      preencherDadosUtente();
+    }
+  });
+}
+
+function preencherDadosUtente(){
+  var uid = document.getElementById("selectUtenteRegisto").value;
+  var area = document.getElementById("dadosUtenteRegisto");
+  if(!uid){ area.classList.add("hidden"); return; }
+
+  db.collection("utentes").doc(uid).get().then(function(doc){
+    if(!doc.exists){ area.classList.add("hidden"); return; }
+    var u = doc.data();
+    document.getElementById("cardUtenteRegisto").innerHTML =
+      "<p><strong>Utente:</strong> " + u.nome + "</p>" +
+      "<p style='margin-top:5px;'><strong>Cod. PIM:</strong> " + u.codigoPim + "</p>" +
+      (u.observacoes ? "<div class='obs-aviso' style='margin-top:8px;'><strong>Obs. do utente:</strong><br>" + u.observacoes + "</div>" : "");
+    document.getElementById("pCodigoPim").value    = u.codigoPim || "";
+    document.getElementById("pFarmaceutico").value = u.farmaceuticoNome || "";
+    document.getElementById("pTecnico").value      = u.tecnicoNome || "";
+    document.getElementById("pObsInternas").value  = u.observacoes || "";
+    area.classList.remove("hidden");
+  });
+}
+
 document.getElementById("formPim").addEventListener("submit", function(e){
   e.preventDefault();
-  if(!currentUser){ alert("Faca login primeiro."); return; }
+  if(!utilizadorAtual){ alert("Faca login primeiro."); return; }
 
-  var patName   = document.getElementById("pPatientName").value.trim();
-  var patCode   = document.getElementById("pPatientCode").value.trim();
-  var pimBase   = document.getElementById("pPimCode").value.trim().toUpperCase();
-  var pharm     = document.getElementById("pPharmacist").value.trim() || (currentUserData ? currentUserData.name : "");
-  var tech      = document.getElementById("pTechnician").value.trim();
-  var intNotes  = document.getElementById("pIntNotes").value.trim();
-  var delNotes  = document.getElementById("pDelNotes").value.trim();
-  var deadline  = document.getElementById("pDeadline").value;
+  var uid        = document.getElementById("selectUtenteRegisto").value;
+  var codBase    = document.getElementById("pCodigoPim").value.trim().toUpperCase();
+  var farm       = document.getElementById("pFarmaceutico").value.trim();
+  var tec        = document.getElementById("pTecnico").value.trim();
+  var obsInt     = document.getElementById("pObsInternas").value.trim();
+  var obsEntrega = document.getElementById("pObsEntrega").value.trim();
+  var prazo      = document.getElementById("pPrazo").value;
+  var codFarm    = document.getElementById("pCodigoFarmaceutico").value.trim();
 
-  if(!patName||!patCode||!pimBase){ fb("fbPim","Preencha os campos obrigatorios.",false); return; }
+  if(!uid || !codBase){ mostrarFb("fbPim","Selecione o utente e confirme o codigo PIM.",false); return; }
+  if(!codFarm){ mostrarFb("fbPim","Introduza o codigo do farmaceutico para confirmar.",false); return; }
 
-  db.collection("pims").where("pimCode","==",pimBase).get().then(function(snap){
-    var num      = snap.size + 1;
-    var prepCode = pimBase + "." + ("00"+num).slice(-3);
-    var ref      = db.collection("pims").doc();
+  // Verificar codigo farmaceutico
+  var emailFarm = mapaUtilizadores[codFarm];
+  if(!emailFarm){ mostrarFb("fbPim","Codigo do farmaceutico invalido.",false); return; }
 
-    return ref.set({
-      pimId:             ref.id,
-      pimCode:           pimBase,
-      pimPrepCode:       prepCode,
-      patientName:       patName,
-      patientCode:       patCode,
-      pharmacistName:    pharm,
-      technicianName:    tech,
-      pharmacistId:      currentUser.uid,
-      status:            "Registada",
-      statusHistory:     [{ status:"Registada", date: new Date().toISOString(), by: pharm }],
-      preparationNumber: num,
-      internalNotes:     intNotes,
-      deliveryNotes:     delNotes,
-      deadline:          deadline || "",
-      autoRenew:         false,
-      createdAt:         new Date().toISOString(),
-      updatedAt:         new Date().toISOString()
+  db.collection("utentes").doc(uid).get().then(function(uDoc){
+    var u = uDoc.data();
+    return db.collection("pims").where("codigoPim","==",codBase).get().then(function(snap){
+      var num      = snap.size + 1;
+      var codPrep  = codBase + "." + ("00"+num).slice(-3);
+      var ref      = db.collection("pims").doc();
+
+      return ref.set({
+        pimId:             ref.id,
+        utenteId:          uid,
+        codigoPim:         codBase,
+        codigoPreparacao:  codPrep,
+        nomeUtente:        u.nome,
+        codigoUtente:      u.codigoPim,
+        farmaceuticoNome:  farm,
+        tecnicoNome:       tec,
+        farmaceuticoId:    utilizadorAtual.uid,
+        estado:            "Registada",
+        historicoEstado:   [{ estado:"Registada", data: new Date().toISOString(), por: farm || (dadosUtilizador ? dadosUtilizador.nome : "") }],
+        numeroPreparacao:  num,
+        obsInternas:       obsInt,
+        obsEntrega:        obsEntrega,
+        prazo:             prazo || "",
+        autoRenovar:       false,
+        criadoEm:          new Date().toISOString(),
+        atualizadoEm:      new Date().toISOString()
+      });
     });
   }).then(function(){
-    fb("fbPim","PIM registada com sucesso!", true);
+    mostrarFb("fbPim","PIM registada com sucesso!", true);
     document.getElementById("formPim").reset();
-    loadDashStats();
-  }).catch(function(e){
-    fb("fbPim","Erro: " + e.message, false);
-  });
+    document.getElementById("selectUtenteRegisto").value = "";
+    document.getElementById("dadosUtenteRegisto").classList.add("hidden");
+    carregarEstatisticas();
+  }).catch(function(er){ mostrarFb("fbPim","Erro: "+er.message, false); });
 });
 
-// ---- RENDER TABELA PIMs ----
-function renderTable(snap, containerId){
+// ==============================================
+// RENDER TABELA PIMs
+// ==============================================
+function renderTabela(snap, containerId){
   var div = document.getElementById(containerId);
   if(!div) return;
-  if(snap.empty){ div.innerHTML = "<p style='margin-top:12px;'>Nenhuma PIM encontrada.</p>"; return; }
-
-  var h = "<table><thead><tr><th>Codigo</th><th>Utente</th><th>Farmaceutico</th><th>Estado</th><th>Data</th><th>Acoes</th></tr></thead><tbody>";
+  if(snap.empty){ div.innerHTML = "<p style='margin-top:10px;'>Nenhuma PIM encontrada.</p>"; return; }
+  var h = "<table><thead><tr><th>Cod. Prep.</th><th>Utente</th><th>Farmaceutico</th><th>Estado</th><th>Data</th><th>Acoes</th></tr></thead><tbody>";
   snap.forEach(function(d){
-    var p = d.data();
-    var pid = d.id;
+    var p = d.data(); var pid = d.id;
     h += "<tr>" +
-      "<td><strong>" + (p.pimPrepCode||p.pimCode||"--") + "</strong></td>" +
-      "<td>" + (p.patientName||"--") + "<br><small style='color:#999;'>" + (p.patientCode||"") + "</small></td>" +
-      "<td>" + (p.pharmacistName||"--") + "</td>" +
-      "<td>" + mkBadge(p.status||"--") + "</td>" +
-      "<td><small>" + fmtDate(p.createdAt) + "</small></td>" +
+      "<td><strong>" + (p.codigoPreparacao||p.codigoPim||"--") + "</strong></td>" +
+      "<td>" + (p.nomeUtente||"--") + "</td>" +
+      "<td>" + (p.farmaceuticoNome||"--") + "</td>" +
+      "<td>" + criarBadge(p.estado||"--") + "</td>" +
+      "<td><small>" + formatarData(p.criadoEm) + "</small></td>" +
       "<td>" +
-        "<button class='btn btn-sm' onclick='viewDetail(\"" + pid + "\")'>Ver</button> " +
-        (p.status !== "Anulada" && p.status !== "Dispensada"
-          ? "<button class='btn btn-sm btn-green' onclick='advanceStatus(\"" + pid + "\",\"" + (p.status||"") + "\")'>Avan</button> " : "") +
-        "<button class='btn btn-sm btn-red' onclick='cancelPim(\"" + pid + "\")'>Anular</button>" +
+        "<button class='btn btn-sm' onclick='verDetalhe(\"" + pid + "\")'>Ver</button> " +
+        (p.estado !== "Anulada" && p.estado !== "Dispensada"
+          ? "<button class='btn btn-sm btn-laranja' onclick='avancarEstado(\"" + pid + "\",\"" + (p.estado||"") + "\")'>Avancar</button> " : "") +
+        (p.estado !== "Anulada" && p.estado !== "Dispensada"
+          ? "<button class='btn btn-sm btn-red' onclick='anularPim(\"" + pid + "\")'>Anular</button>" : "") +
       "</td></tr>";
   });
   h += "</tbody></table>";
   div.innerHTML = h;
 }
 
-// ---- CARREGAR TODAS ----
-function loadAll(containerId){
+function carregarTodasPims(containerId){
   var div = document.getElementById(containerId);
   if(div) div.innerHTML = "<p>A carregar...</p>";
-  db.collection("pims").orderBy("createdAt","desc").limit(100).get().then(function(s){
-    renderTable(s, containerId);
-  }).catch(function(e){
-    if(div) div.innerHTML = "<p class='fb fb-err'>Erro: " + e.message + "</p>";
-  });
+  db.collection("pims").orderBy("criadoEm","desc").limit(100).get().then(function(s){ renderTabela(s,containerId); })
+    .catch(function(e){ if(div) div.innerHTML="<p>Erro: "+e.message+"</p>"; });
 }
 
-// ---- FILTRAR POR ESTADO ----
-function filterStatus(status){
-  var div = document.getElementById("pimList");
+function filtrarEstado(estado){
+  var div = document.getElementById("listaPims");
   if(div) div.innerHTML = "<p>A carregar...</p>";
-  db.collection("pims").where("status","==",status).get().then(function(s){
-    renderTable(s, "pimList");
-  }).catch(function(e){
-    if(div) div.innerHTML = "<p class='fb fb-err'>Erro: " + e.message + "</p>";
+  db.collection("pims").where("estado","==",estado).get().then(function(s){ renderTabela(s,"listaPims"); })
+    .catch(function(e){ if(div) div.innerHTML="<p>Erro: "+e.message+"</p>"; });
+}
+
+function preencherFiltroPorFarmaceutico(){
+  var sel = document.getElementById("filtroPorFarmaceutico");
+  sel.innerHTML = "<option value=''>-- Todos --</option>";
+  todosColaboradores.forEach(function(c){
+    if(c.funcao === "farmaceutico" || c.funcao === "admin"){
+      sel.innerHTML += "<option value='" + (c.nome||"") + "'>" + (c.nome||"") + "</option>";
+    }
   });
 }
 
-// ---- PESQUISAR ----
-function doSearch(){
-  var q   = document.getElementById("searchQ").value.trim().toUpperCase();
-  var div = document.getElementById("pimResults");
-  div.innerHTML = "<p>A pesquisar...</p>";
-  var ref = q
-    ? db.collection("pims").where("pimCode","==",q)
-    : db.collection("pims").orderBy("createdAt","desc").limit(50);
-  ref.get().then(function(s){ renderTable(s,"pimResults"); })
-     .catch(function(e){ div.innerHTML="<p class='fb fb-err'>Erro: "+e.message+"</p>"; });
+function filtrarPorFarmaceutico(){
+  var farm = document.getElementById("filtroPorFarmaceutico").value;
+  var div  = document.getElementById("listaPims");
+  if(!farm){ carregarTodasPims("listaPims"); return; }
+  if(div) div.innerHTML = "<p>A carregar...</p>";
+  db.collection("pims").where("farmaceuticoNome","==",farm).get().then(function(s){ renderTabela(s,"listaPims"); })
+    .catch(function(e){ if(div) div.innerHTML="<p>Erro: "+e.message+"</p>"; });
 }
 
-// ---- VER DETALHE ----
-function viewDetail(pimId){
+function pesquisarPims(){
+  var q = document.getElementById("pesquisaQ").value.trim().toUpperCase();
+  var div = document.getElementById("resultadosPesquisa");
+  div.innerHTML = "<p>A pesquisar...</p>";
+  db.collection("pims").where("codigoPim","==",q).get().then(function(s){ renderTabela(s,"resultadosPesquisa"); })
+    .catch(function(e){ div.innerHTML="<p>Erro: "+e.message+"</p>"; });
+}
+
+// ==============================================
+// VER DETALHE PIM
+// ==============================================
+function verDetalhe(pimId){
   db.collection("pims").doc(pimId).get().then(function(doc){
     if(!doc.exists){ alert("PIM nao encontrada."); return; }
     var p = doc.data();
-    var hist = (p.statusHistory||[]).map(function(h){
-      return "<li style='margin:4px 0;'>" + (h.status||"--") + " &mdash; " + fmtDate(h.date) + " por " + (h.by||"--") + "</li>";
+    var hist = (p.historicoEstado||[]).map(function(h){
+      return "<li style='margin:4px 0;'>" + (h.estado||"--") + " &mdash; " + formatarData(h.data) + " por <strong>" + (h.por||"--") + "</strong></li>";
     }).join("");
 
     var bg = document.createElement("div");
     bg.className = "modal-bg";
     bg.onclick = function(ev){ if(ev.target===bg) bg.remove(); };
     bg.innerHTML =
-      "<div class='modal-box'>" +
-      "<h2 style='margin-bottom:14px;'>" + (p.pimPrepCode||p.pimCode) + "</h2>" +
-      "<p><strong>Utente:</strong> " + p.patientName + " (" + (p.patientCode||"") + ")</p>" +
-      "<p style='margin-top:6px;'><strong>Farmaceutico:</strong> " + (p.pharmacistName||"--") + "</p>" +
-      "<p style='margin-top:6px;'><strong>Tecnico:</strong> " + (p.technicianName||"--") + "</p>" +
-      "<p style='margin-top:6px;'><strong>Estado:</strong> " + mkBadge(p.status) + "</p>" +
-      "<p style='margin-top:6px;'><strong>Criada:</strong> " + fmtDate(p.createdAt) + "</p>" +
-      (p.deadline ? "<p style='margin-top:6px;'><strong>Prazo:</strong> " + p.deadline + "</p>" : "") +
-      (p.internalNotes ? "<div class='obs-warn' style='margin-top:10px;'><strong>Obs. internas:</strong><br>" + p.internalNotes + "</div>" : "") +
-      (p.deliveryNotes ? "<div class='obs-red' style='margin-top:10px;'><strong>Obs. entrega:</strong><br>" + p.deliveryNotes + "</div>" : "") +
-      "<h3 style='margin-top:14px;margin-bottom:8px;'>Historico</h3>" +
-      "<ul style='font-size:.87em;color:#555;padding-left:16px;'>" + hist + "</ul>" +
-      "<button class='btn' style='margin-top:16px;' onclick='this.closest(\".modal-bg\").remove()'>Fechar</button>" +
+      "<div class='modal-caixa'>" +
+      "<h2 style='margin-bottom:12px;'>" + (p.codigoPreparacao||p.codigoPim) + "</h2>" +
+      "<p><strong>Utente:</strong> " + (p.nomeUtente||"--") + "</p>" +
+      "<p style='margin-top:5px;'><strong>Farmaceutico:</strong> " + (p.farmaceuticoNome||"--") + "</p>" +
+      "<p style='margin-top:5px;'><strong>Tecnico:</strong> " + (p.tecnicoNome||"--") + "</p>" +
+      "<p style='margin-top:5px;'><strong>Estado:</strong> " + criarBadge(p.estado) + "</p>" +
+      "<p style='margin-top:5px;'><strong>Criada:</strong> " + formatarData(p.criadoEm) + "</p>" +
+      (p.prazo ? "<p style='margin-top:5px;'><strong>Prazo:</strong> " + p.prazo + "</p>" : "") +
+      (p.obsInternas ? "<div class='obs-aviso' style='margin-top:10px;'><strong>Obs. internas:</strong><br>" + p.obsInternas + "</div>" : "") +
+      (p.obsEntrega ? "<div class='obs-red' style='margin-top:10px;'><strong>Obs. entrega:</strong><br>" + p.obsEntrega + "</div>" : "") +
+      "<h3 style='margin-top:14px;margin-bottom:7px;'>Historico de Estados</h3>" +
+      "<ul style='font-size:.85em;color:#555;padding-left:16px;'>" + hist + "</ul>" +
+      "<button class='btn' style='margin-top:14px;' onclick='this.closest(\".modal-bg\").remove()'>Fechar</button>" +
       "</div>";
     document.body.appendChild(bg);
   });
 }
 
-// ---- AVANCAR ESTADO ----
-var flowStates = ["Registada","Aguarda preparacao","Em preparacao","Preparada","Pronta para levantamento"];
+// ==============================================
+// AVANCAR ESTADO
+// ==============================================
+var fluxoEstados = ["Registada","Aguarda preparacao","Em preparacao","Preparada","Pronta para levantamento"];
 
-function advanceStatus(pimId, cur){
-  var idx = flowStates.indexOf(cur);
-  if(idx < 0 || idx >= flowStates.length - 1){ alert("Nao e possivel avancar este estado."); return; }
-  var next = flowStates[idx+1];
-  if(!confirm("Avancar estado para: " + next + "?")) return;
-  var by = currentUserData ? currentUserData.name : "---";
+function avancarEstado(pimId, estadoAtual){
+  var idx = fluxoEstados.indexOf(estadoAtual);
+  if(idx < 0 || idx >= fluxoEstados.length - 1){ alert("Nao e possivel avancar este estado."); return; }
+  var proximo = fluxoEstados[idx+1];
+
+  var codOp = prompt("Introduza o seu codigo de operador para confirmar:");
+  if(!codOp){ return; }
+  var emailOp = mapaUtilizadores[codOp.trim()];
+  if(!emailOp){ alert("Codigo de operador invalido."); return; }
+
+  if(!confirm("Avancar estado para: " + proximo + "?")) return;
+
+  var por = dadosUtilizador ? dadosUtilizador.nome : codOp;
   db.collection("pims").doc(pimId).get().then(function(doc){
-    var hist = doc.data().statusHistory || [];
-    hist.push({ status: next, date: new Date().toISOString(), by: by });
+    var hist = doc.data().historicoEstado || [];
+    hist.push({ estado: proximo, data: new Date().toISOString(), por: por });
     return db.collection("pims").doc(pimId).update({
-      status: next, statusHistory: hist, updatedAt: new Date().toISOString()
+      estado: proximo, historicoEstado: hist, atualizadoEm: new Date().toISOString()
     });
   }).then(function(){
-    alert("Estado actualizado: " + next);
-    loadAll("pimList");
-    loadDashStats();
-  }).catch(function(e){ alert("Erro: " + e.message); });
+    alert("Estado actualizado: " + proximo);
+    carregarTodasPims("listaPims");
+    carregarEstatisticas();
+  }).catch(function(e){ alert("Erro: "+e.message); });
 }
 
-// ---- ANULAR PIM ----
-function cancelPim(pimId){
-  var code = prompt("Codigo de anulacao:");
-  if(!code || code.trim() !== "F03573"){ alert("Codigo invalido. Operacao cancelada."); return; }
-  var by = currentUserData ? currentUserData.name : "---";
+// ==============================================
+// ANULAR PIM
+// ==============================================
+function anularPim(pimId){
+  var cod = prompt("Codigo de anulacao:");
+  if(!cod || cod.trim() !== "F03573"){ alert("Codigo invalido. Operacao cancelada."); return; }
+  var por = dadosUtilizador ? dadosUtilizador.nome : "---";
   db.collection("pims").doc(pimId).get().then(function(doc){
-    var hist = doc.data().statusHistory || [];
-    hist.push({ status:"Anulada", date: new Date().toISOString(), by: by });
+    var hist = doc.data().historicoEstado || [];
+    hist.push({ estado:"Anulada", data: new Date().toISOString(), por: por });
     return db.collection("pims").doc(pimId).update({
-      status:"Anulada", statusHistory: hist,
-      cancelledAt: new Date().toISOString(), cancelledBy: by,
-      updatedAt: new Date().toISOString()
+      estado:"Anulada", historicoEstado: hist,
+      anuladoEm: new Date().toISOString(), anuladoPor: por,
+      atualizadoEm: new Date().toISOString()
     });
   }).then(function(){
     alert("PIM anulada com sucesso.");
-    loadAll("pimList");
-    loadDashStats();
-  }).catch(function(e){ alert("Erro: " + e.message); });
+    carregarTodasPims("listaPims");
+    carregarEstatisticas();
+  }).catch(function(e){ alert("Erro: "+e.message); });
 }
 
-// ---- DISPENSAR PIM ----
-function loadForDispense(){
-  var code = document.getElementById("dispCode").value.trim().toUpperCase();
-  var div  = document.getElementById("dispDetails");
-  if(!code){ alert("Introduza um codigo PIM."); return; }
+// ==============================================
+// DISPENSAR PIM
+// ==============================================
+function carregarParaDispensa(){
+  var cod = document.getElementById("codDispensa").value.trim().toUpperCase();
+  var div = document.getElementById("detalhesDispensa");
+  if(!cod){ alert("Introduza um codigo PIM."); return; }
   div.innerHTML = "<p>A pesquisar...</p>";
 
-  db.collection("pims").where("pimCode","==",code).where("status","in",["Preparada","Pronta para levantamento"])
+  db.collection("pims").where("codigoPim","==",cod)
+    .where("estado","in",["Preparada","Pronta para levantamento"])
     .get().then(function(snap){
-      if(snap.empty){
-        div.innerHTML = "<p class='fb fb-err'>Nenhuma PIM pronta com esse codigo.</p>";
-        return;
-      }
-      var doc = snap.docs[0];
-      var p   = doc.data();
-      var pid = doc.id;
-      var hasObs = !!(p.deliveryNotes && p.deliveryNotes.trim());
-
+      if(snap.empty){ div.innerHTML = "<p class='fb vis fb-err'>Nenhuma PIM pronta para levantamento com esse codigo.</p>"; return; }
+      var doc = snap.docs[0]; var p = doc.data(); var pid = doc.id;
+      var temObs = !!(p.obsEntrega && p.obsEntrega.trim());
       var html =
         "<div class='card'>" +
-        "<p><strong>PIM:</strong> " + (p.pimPrepCode||p.pimCode) + " &nbsp; " + mkBadge(p.status) + "</p>" +
-        "<p style='margin-top:6px;'><strong>Utente:</strong> " + p.patientName + " (" + (p.patientCode||"") + ")</p>" +
-        "<p style='margin-top:6px;'><strong>Farmaceutico:</strong> " + (p.pharmacistName||"--") + "</p>" +
+        "<p><strong>PIM:</strong> " + (p.codigoPreparacao||p.codigoPim) + " &nbsp;" + criarBadge(p.estado) + "</p>" +
+        "<p style='margin-top:5px;'><strong>Utente:</strong> " + p.nomeUtente + "</p>" +
+        "<p style='margin-top:5px;'><strong>Farmaceutico:</strong> " + (p.farmaceuticoNome||"--") + "</p>" +
         "</div>";
-
-      if(hasObs){
-        html += "<div class='obs-red'><strong>Atencao — Observacoes de entrega:</strong><br>" + p.deliveryNotes + "</div>" +
-          "<div class='chk-row'><input type='checkbox' id='chkObs' /><label for='chkObs'>Li as observacoes e agi em conformidade.</label></div>";
+      if(temObs){
+        html += "<div class='obs-red'><strong>ATENCAO &mdash; Observacoes de entrega:</strong><br>" + p.obsEntrega + "</div>" +
+          "<div class='chk-row'><input type='checkbox' id='chkObsLidas'/><label for='chkObsLidas'>Li as observacoes e agi em conformidade.</label></div>";
       }
-
       html +=
-        "<label>Nome de quem levantou</label>" +
-        "<input type='text' id='pickupName' placeholder='Nome completo' />" +
-        "<label>Codigo do operador</label>" +
-        "<input type='text' id='opCode' placeholder='Ex: 003' />" +
-        "<label>Observacoes da entrega</label>" +
-        "<textarea id='dispNotes' placeholder='Observacoes...' rows='2'></textarea>" +
-        "<button class='btn btn-green btn-block' onclick='doDispense(\"" + pid + "\"," + hasObs + ")'>Confirmar Dispensa</button>" +
-        "<div id='fbDisp'></div>";
-
+        "<label>Nome de quem levantou</label><input type='text' id='nomeQuemLevantou' placeholder='Nome completo'/>" +
+        "<label>Codigo do operador</label><input type='text' id='codOperador' placeholder='Ex: 003'/>" +
+        "<label>Observacoes da entrega</label><textarea id='obsDispensa' placeholder='Observacoes...' rows='2'></textarea>" +
+        "<button class='btn btn-verde btn-block' onclick='confirmarDispensa(\"" + pid + "\"," + temObs + ")'>Confirmar Dispensa</button>" +
+        "<div id='fbDispensa' class='fb'></div>";
       div.innerHTML = html;
-    }).catch(function(e){
-      div.innerHTML = "<p class='fb fb-err'>Erro: " + e.message + "</p>";
-    });
+    }).catch(function(e){ div.innerHTML="<p>Erro: "+e.message+"</p>"; });
 }
 
-function doDispense(pimId, hasObs){
-  if(hasObs){
-    var chk = document.getElementById("chkObs");
+function confirmarDispensa(pimId, temObs){
+  if(temObs){
+    var chk = document.getElementById("chkObsLidas");
     if(!chk || !chk.checked){ alert("Deve confirmar que leu as observacoes de entrega."); return; }
   }
-  var pickup  = (document.getElementById("pickupName")  ? document.getElementById("pickupName").value.trim()  : "");
-  var opCode  = (document.getElementById("opCode")      ? document.getElementById("opCode").value.trim()      : "");
-  var notes   = (document.getElementById("dispNotes")   ? document.getElementById("dispNotes").value.trim()   : "");
-  if(!pickup) { alert("Indique o nome de quem levantou."); return; }
-  if(!opCode) { alert("Indique o codigo do operador."); return; }
+  var nomeQuem = document.getElementById("nomeQuemLevantou").value.trim();
+  var codOp    = document.getElementById("codOperador").value.trim();
+  var obs      = document.getElementById("obsDispensa").value.trim();
+  if(!nomeQuem){ alert("Indique o nome de quem levantou."); return; }
+  if(!codOp)   { alert("Indique o codigo do operador."); return; }
 
-  var by = currentUserData ? currentUserData.name : opCode;
+  var por = dadosUtilizador ? dadosUtilizador.nome : codOp;
 
   db.collection("pims").doc(pimId).get().then(function(doc){
     var p    = doc.data();
-    var hist = p.statusHistory || [];
-    hist.push({ status:"Dispensada", date: new Date().toISOString(), by: by });
+    var hist = p.historicoEstado || [];
+    hist.push({ estado:"Dispensada", data: new Date().toISOString(), por: por });
     return db.collection("pims").doc(pimId).update({
-      status: "Dispensada", statusHistory: hist,
-      dispensedAt: new Date().toISOString(), dispensedBy: by,
-      operatorCode: opCode, pickupName: pickup, dispenseNotes: notes,
-      updatedAt: new Date().toISOString()
+      estado: "Dispensada", historicoEstado: hist,
+      dispensadoEm: new Date().toISOString(), dispensadoPor: por,
+      codigoOperador: codOp, nomeQuemLevantou: nomeQuem, obsDispensa: obs,
+      atualizadoEm: new Date().toISOString()
     }).then(function(){
-      return db.collection("dispenses").add({
-        pimId: pimId, pimCode: p.pimPrepCode||p.pimCode,
-        patientName: p.patientName, patientCode: p.patientCode,
-        pickupName: pickup, operatorCode: opCode, dispenseNotes: notes,
-        dispensedAt: new Date().toISOString(), dispensedBy: by
+      return db.collection("dispensas").add({
+        pimId: pimId, codigoPreparacao: p.codigoPreparacao||p.codigoPim,
+        nomeUtente: p.nomeUtente, nomeQuemLevantou: nomeQuem,
+        codigoOperador: codOp, obs: obs,
+        dispensadoEm: new Date().toISOString(), dispensadoPor: por
       });
     }).then(function(){ return p; });
   }).then(function(p){
-    document.getElementById("dispDetails").innerHTML = "<p class='fb fb-ok'>PIM dispensada com sucesso.</p>";
-    document.getElementById("dispCode").value = "";
-    printTalao(pimId);
-    loadDashStats();
-  }).catch(function(e){ alert("Erro: " + e.message); });
+    document.getElementById("detalhesDispensa").innerHTML = "<p class='fb vis fb-ok'>PIM dispensada com sucesso.</p>";
+    document.getElementById("codDispensa").value = "";
+    imprimirTalao(pimId);
+    carregarEstatisticas();
+  }).catch(function(e){ alert("Erro: "+e.message); });
 }
 
-// ---- IMPRIMIR TALAO ----
-function printTalao(pimId){
+// ==============================================
+// IMPRIMIR TALAO EPSON
+// ==============================================
+function imprimirTalao(pimId){
   db.collection("pims").doc(pimId).get().then(function(doc){
-    var p   = doc.data();
-    var win = window.open("","_blank","width=400,height=500");
-    win.document.write("<!DOCTYPE html><html><head><meta charset='UTF-8'>" +
-      "<style>body{font-family:Arial,sans-serif;font-size:13px;padding:20px;max-width:300px;}" +
-      "h2{font-size:14px;text-align:center;margin-bottom:4px;}" +
-      ".ln{border-top:1px dashed #000;margin:10px 0;}" +
+    var p = doc.data();
+    var w = window.open("","_blank","width=420,height=540");
+    w.document.write("<!DOCTYPE html><html><head><meta charset='UTF-8'>" +
+      "<style>body{font-family:Arial,sans-serif;font-size:13px;padding:18px;max-width:300px;}" +
+      "h2{font-size:14px;text-align:center;margin-bottom:3px;}" +
+      ".sub{text-align:center;font-size:11px;color:#666;margin-bottom:8px;}" +
+      ".ln{border-top:1px dashed #000;margin:9px 0;}" +
+      ".row{margin:5px 0;}" +
+      ".sig{margin-top:28px;border-top:1px solid #000;padding-top:7px;font-size:12px;}" +
       ".ctr{text-align:center;}" +
-      ".sig{margin-top:30px;border-top:1px solid #000;padding-top:8px;font-size:12px;}" +
       "</style></head><body>" +
       "<h2>Farmacia da Liga</h2>" +
-      "<p class='ctr' style='font-size:11px;'>Preparacao Individualizada da Medicacao</p>" +
+      "<p class='sub'>Preparacao Individualizada da Medicacao</p>" +
       "<div class='ln'></div>" +
-      "<p><strong>Codigo PIM:</strong> " + (p.pimPrepCode||p.pimCode) + "</p>" +
-      "<p><strong>Utente:</strong> " + p.patientName + "</p>" +
-      "<p><strong>Cod. Utente:</strong> " + (p.patientCode||"---") + "</p>" +
-      "<p><strong>Entregue a:</strong> " + (p.pickupName||"---") + "</p>" +
-      "<p><strong>Data:</strong> " + fmtDate(p.dispensedAt||new Date().toISOString()) + "</p>" +
-      "<p><strong>Operador:</strong> " + (p.operatorCode||"---") + "</p>" +
-      (p.dispenseNotes ? "<p><strong>Obs:</strong> " + p.dispenseNotes + "</p>" : "") +
+      "<p class='row'><strong>PIM:</strong> " + (p.codigoPreparacao||p.codigoPim) + "</p>" +
+      "<p class='row'><strong>Utente:</strong> " + p.nomeUtente + "</p>" +
+      "<p class='row'><strong>Levantou:</strong> " + (p.nomeQuemLevantou||"---") + "</p>" +
+      "<p class='row'><strong>Data:</strong> " + formatarData(p.dispensadoEm||new Date().toISOString()) + "</p>" +
+      "<p class='row'><strong>Operador:</strong> " + (p.codigoOperador||"---") + "</p>" +
+      (p.obsDispensa ? "<p class='row'><strong>Obs:</strong> " + p.obsDispensa + "</p>" : "") +
       "<div class='ln'></div>" +
       "<p>Confirmo que foi entregue a preparacao individualizada da medicacao acima identificada.</p>" +
       "<div class='sig'>Assinatura: ____________________________</div>" +
-      "<p class='ctr' style='margin-top:16px;font-size:11px;color:#666;'>Farmacia da Liga &copy; " + new Date().getFullYear() + "</p>" +
+      "<p class='ctr' style='margin-top:14px;font-size:11px;color:#999;'>Farmacia da Liga &copy; " + new Date().getFullYear() + "</p>" +
       "</body></html>");
-    win.document.close();
-    win.focus();
-    win.print();
+    w.document.close();
+    w.focus();
+    w.print();
   });
 }
 
-// ---- EXPORTAR CSV ----
-function exportCSV(){
-  db.collection("pims").orderBy("createdAt","desc").get().then(function(snap){
-    var rows = ["Codigo PIM;Cod Prep;Utente;Cod Utente;Farmaceutico;Tecnico;Estado;Criada em;Prazo;Obs Internas;Obs Entrega"];
+// ==============================================
+// AS MINHAS PIMs
+// ==============================================
+function carregarMinhasPims(filtro){
+  if(!dadosUtilizador) return;
+  var nome = dadosUtilizador.nome;
+  var div  = document.getElementById("listaMinhasPims");
+  div.innerHTML = "<p>A carregar...</p>";
+
+  var estadosFiltro = {
+    "pendentes":   ["Registada","Aguarda preparacao","Em preparacao"],
+    "preparadas":  ["Preparada","Pronta para levantamento"],
+    "dispensadas": ["Dispensada"]
+  };
+
+  db.collection("pims").where("farmaceuticoNome","==",nome).get().then(function(snap){
+    var docs = [];
+    snap.forEach(function(d){
+      var p = d.data();
+      if(filtro === "todas" || (estadosFiltro[filtro] && estadosFiltro[filtro].indexOf(p.estado) >= 0)){
+        docs.push({ id: d.id, data: p });
+      }
+    });
+    if(docs.length === 0){ div.innerHTML = "<p>Nenhuma PIM encontrada.</p>"; return; }
+    var h = "<table><thead><tr><th>Cod. Prep.</th><th>Utente</th><th>Estado</th><th>Prox. Prep.</th><th>Data Reg.</th><th>Acoes</th></tr></thead><tbody>";
+    docs.forEach(function(item){
+      var p = item.data;
+      h += "<tr>" +
+        "<td><strong>" + (p.codigoPreparacao||p.codigoPim||"--") + "</strong></td>" +
+        "<td>" + (p.nomeUtente||"--") + "</td>" +
+        "<td>" + criarBadge(p.estado||"--") + "</td>" +
+        "<td><small>" + (p.prazo ? formatarDataSimples(p.prazo) : "---") + "</small></td>" +
+        "<td><small>" + formatarData(p.criadoEm) + "</small></td>" +
+        "<td><button class='btn btn-sm' onclick='verDetalhe(\"" + item.id + "\")'>Ver</button></td></tr>";
+    });
+    h += "</tbody></table>";
+    div.innerHTML = h;
+  }).catch(function(e){ div.innerHTML = "<p>Erro: "+e.message+"</p>"; });
+}
+
+// ==============================================
+// EXPORTAR CSV
+// ==============================================
+function exportarCSV(){
+  db.collection("pims").orderBy("criadoEm","desc").get().then(function(snap){
+    var rows = ["Cod. PIM;Cod. Prep.;Utente;Cod. Utente;Farmaceutico;Tecnico;Estado;Criada em;Prazo;Obs. Internas;Obs. Entrega"];
     snap.forEach(function(doc){
       var p = doc.data();
-      var cl = function(s){ return (s||"").replace(/;/g,",").replace(/\\n/g," "); };
+      var lp = function(s){ return (s||"").replace(/;/g,",").replace(/\r?\n/g," "); };
       rows.push([
-        cl(p.pimCode), cl(p.pimPrepCode), cl(p.patientName), cl(p.patientCode),
-        cl(p.pharmacistName), cl(p.technicianName), cl(p.status),
-        fmtDate(p.createdAt), cl(p.deadline), cl(p.internalNotes), cl(p.deliveryNotes)
+        lp(p.codigoPim), lp(p.codigoPreparacao), lp(p.nomeUtente), lp(p.codigoUtente),
+        lp(p.farmaceuticoNome), lp(p.tecnicoNome), lp(p.estado),
+        formatarData(p.criadoEm), lp(p.prazo), lp(p.obsInternas), lp(p.obsEntrega)
       ].join(";"));
     });
-    var blob = new Blob(["\\uFEFF" + rows.join("\\n")], { type:"text/csv;charset=utf-8;" });
+    var blob = new Blob(["\uFEFF" + rows.join("\r\n")], { type:"text/csv;charset=utf-8;" });
     var a    = document.createElement("a");
     a.href   = URL.createObjectURL(blob);
     a.download = "pims_" + new Date().toISOString().slice(0,10) + ".csv";
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
   });
 }
 
-// Ligar botao login
-document.getElementById("btnLogin").addEventListener("click", loginByCode);
+// ==============================================
+// COLABORADORES
+// ==============================================
+function mostrarFormColaborador(){
+  document.getElementById("formColaboradorArea").classList.remove("hidden");
+}
+function esconderFormColaborador(){
+  document.getElementById("formColaboradorArea").classList.add("hidden");
+}
+
+document.getElementById("formColaborador").addEventListener("submit", function(e){
+  e.preventDefault();
+  var cod  = document.getElementById("colCodigo").value.trim();
+  var nome = document.getElementById("colNome").value.trim();
+  var func = document.getElementById("colFuncao").value;
+  var pass = document.getElementById("colPass").value;
+  var conf = document.getElementById("colPassConf").value;
+
+  if(!cod||!nome||!func||!pass){ mostrarFb("fbColaborador","Preencha todos os campos.",false); return; }
+  if(pass!==conf){ mostrarFb("fbColaborador","As passwords nao coincidem.",false); return; }
+  if(pass.length<6){ mostrarFb("fbColaborador","Password: minimo 6 caracteres.",false); return; }
+
+  var email = gerarEmail(cod);
+  mostrarFb("fbColaborador","A criar colaborador...","");
+
+  auth.createUserWithEmailAndPassword(email, pass).then(function(cred){
+    return db.collection("utilizadores").doc(cred.user.uid).set({
+      codigo: cod, nome: nome, funcao: func, email: email,
+      criadoEm: new Date().toISOString()
+    });
+  }).then(function(){
+    mapaUtilizadores[cod] = email;
+    mostrarFb("fbColaborador","Colaborador " + nome + " criado! Codigo: " + cod, true);
+    document.getElementById("formColaborador").reset();
+    carregarColaboradores();
+    carregarMapaUtilizadores();
+  }).catch(function(e){
+    var msg = "Erro: " + e.message;
+    if(e.code==="auth/email-already-in-use") msg = "Esse codigo ja existe.";
+    mostrarFb("fbColaborador", msg, false);
+  });
+});
+
+function carregarColaboradores(){
+  var div = document.getElementById("listaColaboradores");
+  div.innerHTML = "<p>A carregar...</p>";
+  db.collection("utilizadores").orderBy("nome").get().then(function(snap){
+    if(snap.empty){ div.innerHTML = "<p>Nenhum colaborador registado.</p>"; return; }
+    var h = "<table><thead><tr><th>Codigo</th><th>Nome</th><th>Funcao</th><th>Criado em</th></tr></thead><tbody>";
+    snap.forEach(function(doc){
+      var c = doc.data();
+      h += "<tr><td>" + (c.codigo||"--") + "</td><td>" + (c.nome||"--") + "</td><td>" + traduzirFuncao(c.funcao||"") + "</td><td><small>" + formatarData(c.criadoEm) + "</small></td></tr>";
+    });
+    h += "</tbody></table>";
+    div.innerHTML = h;
+  }).catch(function(e){ div.innerHTML="<p>Erro: "+e.message+"</p>"; });
+}
+
+// Carregar selects ao entrar nas seccoes
+document.getElementById("registarPim").addEventListener("click", function(){ carregarSelectUtentes(null); }, { once: false });
+mostrarSec("login");
 </script>
 </body>
-</html>"""
+</html>
 
