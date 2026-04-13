@@ -84,6 +84,8 @@
       font-size: 0.9em;
       color: #666;
     }
+    /* Ícone minimificado (evita o 404 favicon.ico) */
+    link[rel="icon"] { width: 0; height: 0; }
   </style>
 </head>
 <body>
@@ -220,48 +222,56 @@
       appId: "1:21232070010:web:330d2f68be460632753ac3"
     };
 
-    // Initialize Firebase
+    // Initialize Firebase (compat)
     firebase.initializeApp(firebaseConfig);
 
     // Services
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Expor globalmente para usar no código abaixo
+    // Expor globalmente
     window.auth = auth;
     window.db = db;
   </script>
 
-  <!-- LÓGICA DA APP -->
+  <!-- ===> LÓGICA DA APP COM showSection E loginByCode <=== -->
   <script>
-    const userMap = new Map(); // código -> email
+    let currentUser = null;
+    const userMap = new Map();
 
-    // Função utilitária para gerar email a partir do código
     function generateEmailFromCode(userCode) {
       return `user_${userCode}@farmacialiga.pt`;
     }
 
-    // Troca de seção
+    // Função de navegação
     function showSection(id) {
       document.querySelectorAll(".section").forEach(s => s.classList.add("hidden"));
       const el = document.getElementById(id);
       if (el) el.classList.remove("hidden");
 
-      // Atualiza menu visível
-      const isAdmin = currentUser?.token?.role === "admin" || "pharmacist";
+      // Atualiza o menu (só se há login)
+      const navLinks = document.querySelectorAll(".nav-only-logged");
+      navLinks.forEach(el => el.classList.toggle("visible", !!currentUser));
+
+      const usernameEl = document.getElementById("navUsername");
+      const isAdmin = currentUser?.token?.role === "admin" ||
+                       currentUser?.token?.role === "pharmacist";
       document.getElementById("adminTools").style.display = isAdmin ? "inline" : "none";
 
-      const userLinks = document.querySelectorAll(".nav-only-logged");
-      userLinks.forEach(el => el.classList.toggle("visible", !!currentUser));
-      const usernameEl = document.getElementById("navUsername");
       if (usernameEl && currentUser) {
         usernameEl.innerText = currentUser.token?.name || "";
       }
     }
 
+    // Função de logout (simples)
+    function logout() {
+      auth.signOut();
+    }
+
     // Monitor de login/logout
     auth.onAuthStateChanged(async (user) => {
       const userFeedback = document.getElementById("loginFeedback");
+
       if (user) {
         try {
           const userDoc = await db.collection("users").doc(user.uid).get();
@@ -276,6 +286,7 @@
 
         } catch (error) {
           userFeedback.innerHTML = "<p>Erro ao carregar o seu perfil.</p>";
+          console.warn("Erro ao carregar user:", error);
         }
       } else {
         currentUser = null;
@@ -297,8 +308,9 @@
 
       try {
         const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        // O onAuthStateChanged já faz o resto.
+        // onAuthStateChanged já faz o resto
       } catch (error) {
+        console.error("Erro no login:", error);
         if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
           feedback.innerHTML = "<p>Código ou password inválidos.</p>";
         } else {
@@ -307,7 +319,7 @@
       }
     }
 
-    // 2. CARREGAR o mapa código -> email (no início)
+    // 2. Carregar o mapa código -> email (no início)
     async function loadUserMap() {
       try {
         const snapshot = await db.collection("users").get();
@@ -368,7 +380,7 @@
       }
     });
 
-    // 4. REGISTAR PIM
+    // 4. REGISTAR PIM (exemplo básico)
     document.getElementById("formPim").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -409,62 +421,28 @@
         autoRenew: false
       };
 
-      await pimDocRef.set(pim);
+      try {
+        await pimDocRef.set(pim);
 
-      document.getElementById("pimFeedback").innerHTML =
-        `<p>PIM registada com sucesso: <strong>${pimCodeBase}</strong>.</p>`;
-      document.getElementById("formPim").reset();
+        document.getElementById("pimFeedback").innerHTML =
+          `<p>PIM registada com sucesso: <strong>${pimCodeBase}</strong>.</p>`;
+        document.getElementById("formPim").reset();
 
-      await db.collection(`pims/${pimId}/pimEvents`).add({
-        type: "created",
-        status: "Registada",
-        date: new Date().toISOString(),
-        user: pharmacistName,
-        notes: internalNotes
-      });
+        await db.collection(`pims/${pimId}/pimEvents`).add({
+          type: "created",
+          status: "Registada",
+          date: new Date().toISOString(),
+          user: pharmacistName,
+          notes: internalNotes
+        });
+      } catch (error) {
+        console.error("Erro ao registar PIM:", error);
+        alert("Erro ao registar PIM: " + error.message);
+      }
     });
 
-    // 5. CONSULTAR PIM
+    // 5. CONSULTAR PIM (exemplo básico)
     async function searchPims() {
       const queryText = document.getElementById("searchQuery").value.trim().toLowerCase();
       const resultsDiv = document.getElementById("pimResults");
-      resultsDiv.innerHTML = "<p>Pesquisando...</p>";
-
-      let q;
-      if (queryText) {
-        q = db.collection("pims").where("pimCode", "==", queryText.toUpperCase());
-      } else {
-        q = db.collection("pims");
-      }
-
-      try {
-        const snapshot = await q.get();
-        let content = "<ul>";
-        snapshot.forEach((doc) => {
-          const pim = doc.data();
-          const pimId = pim.pimId;
-          const pimCode = pim.pimCode;
-          const patientName = pim.patientName;
-          const status = pim.status;
-          const updatedAt = new Date(pim.updatedAt).toLocaleString();
-
-          content += `
-            <li>
-              <strong>PIM: ${pimCode}</strong><br>
-              Utente: ${patientName}<br>
-              Estado: ${status}<br>
-              Última alteração: ${updatedAt}<br>
-              <button onclick="viewPimDetails('${pimId}')">Ver detalhes</button>
-            </li>
-          `;
-        });
-        content += "</ul>";
-        resultsDiv.innerHTML = content;
-      } catch (error) {
-        resultsDiv.innerHTML = `<p>Erro ao consultar PIMs: ${error.message}</p>`;
-      }
-    }
-
-    // 6. DETALHES DA PIM
-    async function viewPimDetails(pimId) {
-      const pimDocRef = db.collection("p
+      resultsDiv.innerHTML = "<p>Pesquisando...</
