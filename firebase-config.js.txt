@@ -1,0 +1,25 @@
+// firebase-config.js
+
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBa6pjv7czSYaQ2ecShefFeLXAsxsd4Dnc",
+  authDomain: "pims-84362.firebaseapp.com",
+  projectId: "pims-84362",
+  storageBucket: "pims-84362.firebasestorage.app",
+  messagingSenderId: "21232070010",
+  appId: "1:21232070010:web:330d2f68be460632753ac3"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Services
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Export para usar na app
+export { auth, db };

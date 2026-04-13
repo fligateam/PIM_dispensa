@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de PIMs - Farmácia da Liga</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Gestão de PIMs - Farmácia da Liga</h1>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="#" onclick="showSection('login')">Login</a></li>
+      <li><a href="#" onclick="showSection('dashboard')" class="nav-only-logged">Dashboard</a></li>
+      <li><a href="#" onclick="showSection('createUser')" class="nav-only-logged nav-admin">Criar Colaborador</a></li>
+      <li><a href="#" onclick="showSection('registerPim')" class="nav-only-logged">Registar PIM</a></li>
+      <li><a href="#" onclick="showSection('searchPim')" class="nav-only-logged">Consultar PIM</a></li>
+      <li><a href="#" onclick="showSection('dispensePim')" class="nav-only-logged">Dispensar PIM</a></li>
+      <li><a href="#" onclick="showSection('managePims')" class="nav-only-logged">Gestão de PIMs</a></li>
+      <li><a href="#" onclick="logout()" class="nav-only-logged">Sair</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <!-- 1. LOGIN -->
+    <section id="login" class="section">
+      <h2>Login</h2>
+      <p>Utilize o seu código de utilizador e password</p>
+      <input type="text" id="userCode" placeholder="Código (ex: 001)" />
+      <input type="password" id="userPassword" placeholder="Password" />
+      <button onclick="loginByCode()">Entrar</button>
+      <div id="loginFeedback"></div>
+    </section>
+
+    <!-- 2. DASHBOARD -->
+    <section id="dashboard" class="section hidden">
+      <h2>Dashboard</h2>
+      <p>Utilizador: <span id="username"></span></p>
+      <p>Função: <span id="userRole"></span></p>
+      <div id="dashboardStats"></div>
+    </section>
+
+    <!-- 3. CRIAR COLABORADOR -->
+    <section id="createUser" class="section hidden">
+      <h2>Adicionar Colaborador</h2>
+      <form id="formCreateUser">
+        <label>Código de utilizador</label>
+        <input type="text" id="newUserCode" required placeholder="001" />
+
+        <label>Nome</label>
+        <input type="text" id="newUserName" required />
+
+        <label>Role</label>
+        <select id="newUserRole" required>
+          <option value="pharmacist">Farmacêutico</option>
+          <option value="technician">Técnico</option>
+          <option value="operator">Operador</option>
+        </select>
+
+        <label>Password</label>
+        <input type="password" id="newUserPassword" required />
+
+        <label>Confirmar Password</label>
+        <input type="password" id="newUserPasswordConfirm" required />
+
+        <button type="submit">Criar Colaborador</button>
+      </form>
+      <div id="userCreationFeedback"></div>
+    </section>
+
+    <!-- 4. REGISTAR PIM -->
+    <section id="registerPim" class="section hidden">
+      <h2>Registar PIM</h2>
+      <form id="formPim">
+        <label>Nome do Utente</label>
+        <input type="text" id="patientName" required />
+
+        <label>Código do Utente</label>
+        <input type="text" id="patientCode" required />
+
+        <label>Código PIM (ex: 73MCC26)</label>
+        <input type="text" id="pimCodeInput" required />
+
+        <label>Observações internas</label>
+        <textarea id="pimInternalNotes"></textarea>
+
+        <button type="submit">Registar PIM</button>
+      </form>
+      <div id="pimFeedback"></div>
+    </section>
+
+    <!-- 5. CONSULTAR PIM -->
+    <section id="searchPim" class="section hidden">
+      <h2>Consultar PIM</h2>
+      <input type="text" id="searchQuery" placeholder="Pesquisar PIM por código, nome do utente ou código de PIM" />
+      <button onclick="searchPims()">Pesquisar</button>
+      <div id="pimResults"></div>
+    </section>
+
+    <!-- 6. DISPENSAR PIM -->
+    <section id="dispensePim" class="section hidden">
+      <h2>Dispensar PIM</h2>
+      <input type="text" id="pimCodeDispense" placeholder="Código PIM (ex: 73MCC26.001)" required />
+      <input type="text" id="pickupNameDispense" placeholder="Nome de quem levantou" />
+      <textarea id="deliveryNotesDispense" placeholder="Observações da entrega"></textarea>
+      <button onclick="dispensePim()">Dispensar</button>
+      <div id="dispenseFeedback"></div>
+    </section>
+
+    <!-- 7. GESTÃO DE PIMs -->
+    <section id="managePims" class="section hidden">
+      <h2>Gestão de PIMs</h2>
+      <button onclick="loadPims()">Carregar PIMs</button>
+      <div id="pimList"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Farmácia da Liga</p>
+  </footer>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { app } from "./app.js";
+    window.app = app;
+    window.auth = auth;
+    window.db = db;
+  </script>
+</body>
+</html>

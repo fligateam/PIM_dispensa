@@ -1,0 +1,273 @@
+// app.js
+
+// Importa o módulo Firebase
+import { initializeApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { getFirestore, collection, addDoc, getDoc, setDoc, getDocs, doc, updateDoc, deleteDoc, query, where, orderBy } from "firebase/firestore";
+
+// Local variables
+let currentUser = null;
+const userMap = new Map(); // código → email
+
+// Funções utilitárias
+function generateEmailFromCode(userCode) {
+  return `user_${userCode}@farmacialiga.pt`;
+}
+
+function showSection(id) {
+  document.querySelectorAll(".section").forEach((s) => s.classList.add("hidden"));
+  document.getElementById(id)?.classList.remove("hidden");
+
+  // Atualiza visibilidade do menu
+  const isAdmin = currentUser?.token?.role === "admin";
+  document.querySelectorAll(".nav-admin").forEach((el) => {
+    el.style.display = isAdmin ? "inline" : "none";
+  });
+}
+
+
+// 1. LOGIN via código de utilizador
+async function loginByCode() {
+  const userCode = document.getElementById("userCode").value.trim();
+  const password = document.getElementById("userPassword").value;
+  const feedback = document.getElementById("loginFeedback");
+
+  const email = userMap.get(userCode);
+  if (!email) {
+    feedback.innerHTML = "<p>Código de utilizador inválido.</p>";
+    return;
+  }
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    currentUser = userCredential.user;
+
+    const userDocRef = doc(db, "users", currentUser.uid);
+    const userDoc = await getDoc(userDocRef);
+    const userData = userDoc.data();
+    currentUser.token = { role: userData.role };
+
+    showSection("dashboard");
+    document.getElementById("username").innerText = userData.name;
+    document.getElementById("userRole").innerText = userData.role;
+
+    feedback.innerHTML = "";
+
+  } catch (error) {
+    if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
+      feedback.innerHTML = "<p>Código ou password inválidos.</p>";
+    } else {
+      feedback.innerHTML = `<p>Erro: ${error.message}</p>`;
+    }
+  }
+}
+
+// 2. CRIAR COLABORADOR (a partir da app)
+document.getElementById("formCreateUser").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const userCode = document.getElementById("newUserCode").value.trim();
+  const name = document.getElementById("newUserName").value.trim();
+  const role = document.getElementById("newUserRole").value;
+  const password = document.getElementById("newUserPassword").value;
+  const passwordConfirm = document.getElementById("newUserPasswordConfirm").value;
+  const feedback = document.getElementById("userCreationFeedback");
+
+  if (password !== passwordConfirm) {
+    feedback.innerHTML = "<p>As passwords não coincidem.</p>";
+    return;
+  }
+
+  if (password.length < 6) {
+    feedback.innerHTML = "<p>A password deve ter pelo menos 6 caracteres.</p>";
+    return;
+  }
+
+  const email = generateEmailFromCode(userCode);
+  feedback.innerHTML = `<p>A criar colaborador com código <strong>${userCode}</strong>...</p>`;
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    await setDoc(doc(db, "users", user.uid), {
+      userCode: userCode,
+      name: name,
+      role: role,
+      email: email,
+      createdAt: new Date().toISOString()
+    });
+
+    await user.updateProfile({ displayName: name });
+
+    userMap.set(userCode, email);
+
+    feedback.innerHTML = `<p>Colaborador <strong>${name}</strong> criado com sucesso (código: ${userCode}).</p>`;
+    document.getElementById("formCreateUser").reset();
+
+  } catch (error) {
+    feedback.innerHTML = `<p>Erro: ${error.message}</p>`;
+  }
+});
+
+// 3. REGISTAR PIM
+document.getElementById("formPim").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!currentUser || !currentUser.token?.role) {
+    alert("É necessário fazer login.");
+    return;
+  }
+
+  const patientName = document.getElementById("patientName").value.trim();
+  const patientCode = document.getElementById("patientCode").value.trim();
+  const pimCodeBase = document.getElementById("pimCodeInput").value.trim();
+  const internalNotes = document.getElementById("pimInternalNotes").value;
+
+  const pharmacistDocRef = doc(db, "users", currentUser.uid);
+  const pharmacistDoc = await getDoc(pharmacistDocRef);
+  const pharmacistData = pharmacistDoc.data();
+
+  const pimDocRef = doc(collection(db, "pims"));
+  const pimId = pimDocRef.id;
+
+  const pim = {
+    pimId: pimId,
+    pimCode: pimCodeBase,
+    patientName: patientName,
+    patientCode: patientCode,
+    pharmacistId: currentUser.uid,
+    pharmacistName: pharmacistData.name,
+    status: "Registada",
+    statusHistory: [
+      {
+        status: "Registada",
+        date: new Date().toISOString(),
+        by: pharmacistData.name
+      }
+    ],
+    preparationNumber: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    internalNotes: internalNotes,
+    autoRenew: false
+  };
+
+  // Guarda a PIM
+  await setDoc(pimDocRef, pim);
+  document.getElementById("pimFeedback").innerHTML = `<p>PIM registada com sucesso: <strong>${pimCodeBase}</strong>.</p>`;
+  document.getElementById("formPim").reset();
+
+  // Gera um evento no histórico
+  await addDoc(collection(db, `pims/${pimId}/pimEvents`), {
+    type: "created",
+    status: "Registada",
+    date: new Date().toISOString(),
+    user: pharmacistData.name,
+    notes: internalNotes
+  });
+});
+
+// 4. CONSULTAR PIM
+async function searchPims() {
+  const queryText = document.getElementById("searchQuery").value.trim().toLowerCase();
+  const resultsDiv = document.getElementById("pimResults");
+  resultsDiv.innerHTML = "<p>Pesquisando...</p>";
+
+  let q;
+  if (queryText) {
+    q = query(collection(db, "pims"), where("pimCode", "==", queryText.toUpperCase()));
+  } else {
+    q = collection(db, "pims");
+  }
+
+  const snapshot = await getDocs(q);
+  let content = "<ul>";
+  snapshot.forEach((doc) => {
+    const pim = doc.data();
+    const pimId = pim.pimId;
+    const pimCode = pim.pimCode;
+    const patientName = pim.patientName;
+    const status = pim.status;
+    const updatedAt = new Date(pim.updatedAt).toLocaleString();
+
+    content += `
+      <li>
+        <strong>PIM: ${pimCode}</strong><br>
+        Utente: ${patientName}<br>
+        Estado: ${status}<br>
+        Última alteração: ${updatedAt}<br>
+        <button onclick="viewPimDetails('${pimId}')">Ver detalhes</button>
+      </li>
+    `;
+  });
+  content += "</ul>";
+  resultsDiv.innerHTML = content;
+}
+
+// 5. DETALHES DE UMA PIM
+async function viewPimDetails(pimId) {
+  const pimDocRef = doc(db, "pims", pimId);
+  const pimDoc = await getDoc(pimDocRef);
+  if (!pimDoc.exists()) return;
+
+  const pim = pimDoc.data();
+  const modal = document.getElementById("pimResults");
+  modal.innerHTML = `
+    <h3>Detalhes da PIM</h3>
+    <p><strong>Código PIM:</strong> ${pim.pimCode}</p>
+    <p><strong>Utente:</strong> ${pim.patientName}</p>
+    <p><strong>Estado:</strong> ${pim.status}</p>
+    <p><strong>Observações internas:</strong> ${pim.internalNotes || "Sem observações."}</p>
+    <p><strong>Data de criação:</strong> ${new Date(pim.createdAt).toLocaleString()}</p>
+    <p><strong>Última atualização:</strong> ${new Date(pim.updatedAt).toLocaleString()}</p>
+  `;
+}
+
+// 6. DISPENSAR PIM
+async function dispensePim() {
+  const pimCode = document.getElementById("pimCodeDispense").value.trim();
+  const pickupName = document.getElementById("pickupNameDispense").value.trim();
+  const deliveryNotes = document.getElementById("deliveryNotesDispense").value.trim();
+  const feedback = document.getElementById("dispenseFeedback");
+
+  if (!currentUser || !currentUser.token?.role) {
+    feedback.innerHTML = "<p>É necessário fazer login.</p>";
+    return;
+  }
+
+  const pimsRef = collection(db, "pims");
+  const q = query(pimsRef, where("pimCode", "==", pimCode.toUpperCase()));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    feedback.innerHTML = "<p>PIM não encontrada.</p>";
+    return;
+  }
+
+  const pimDoc = snapshot.docs[0];
+  const pimId = pimDoc.id;
+  const pim = pimDoc.data();
+
+  if (!["Pronta para levantamento", "Preparada"].includes(pim.status)) {
+    feedback.innerHTML = "<p>Esta PIM não está pronta para dispensa.</p>";
+    return;
+  }
+
+  const newStatus = "Dispensada";
+  const updatedStatusHistory = [
+    ...pim.statusHistory,
+    {
+      status: newStatus,
+      date: new Date().toISOString(),
+      by: currentUser.displayName || currentUser.uid
+    }
+  ];
+
+  await updateDoc(pimDoc.ref, {
+    status: newStatus,
+    statusHistory: updatedStatusHistory,
+    updatedAt: new Date().toISOString()
+  });
+
+  // Reg
