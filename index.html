@@ -566,8 +566,8 @@ function carregarUtentes(){
         "<td>" + (u.tecnicoNome||"---") + "</td>" +
         "<td style='" + (vencido?"color:#c0392b;font-weight:700;":"") + "'>" + dataPrep + "</td>" +
         "<td>" +
-"<button class='btn btn-sm' onclick='editarUtente(\"" + uid + "\")'>Editar</button> " +
-"<button class='btn btn-sm btn-verde' onclick='selecionarUtenteParaPim(\"" + uid + "\")'>+ PIM</button>" +
+        "<button class='btn btn-sm' data-uid='" + uid + "' onclick='editarUtente(this.dataset.uid)'>Editar</button> " +
+        "<button class='btn btn-sm btn-verde' data-uid='" + uid + "' onclick='selecionarUtenteParaPim(this.dataset.uid)'>+ PIM</button>" +
         "</td></tr>";
     });
     h += "</tbody></table>";
@@ -725,11 +725,11 @@ function renderTabela(snap, containerId){
       "<td>" + criarBadge(p.estado||"--") + "</td>" +
       "<td><small>" + formatarData(p.criadoEm) + "</small></td>" +
       "<td>" +
-        "<button class='btn btn-sm' onclick='verDetalhe("" + pid + "")'>Ver</button> " +
+        "<button class='btn btn-sm' data-pid='" + pid + "' onclick='verDetalhe(this.dataset.pid)'>Ver</button> " +
         (p.estado !== "Anulada" && p.estado !== "Dispensada"
-          ? "<button class='btn btn-sm btn-laranja' onclick='avancarEstado("" + pid + "","" + (p.estado||"") + "")'>Avancar</button> " : "") +
+        ? "<button class='btn btn-sm btn-laranja' data-pid='" + pid + "' data-estado='" + (p.estado||"") + "' onclick='avancarEstado(this.dataset.pid,this.dataset.estado)'>Avancar</button> " : "") +
         (p.estado !== "Anulada" && p.estado !== "Dispensada"
-          ? "<button class='btn btn-sm btn-red' onclick='anularPim("" + pid + "")'>Anular</button>" : "") +
+        ? "<button class='btn btn-sm btn-red' data-pid='" + pid + "' onclick='anularPim(this.dataset.pid)'>Anular</button>" : "") +
       "</td></tr>";
   });
   h += "</tbody></table>";
@@ -892,7 +892,7 @@ function carregarParaDispensa(){
         "<label>Nome de quem levantou</label><input type='text' id='nomeQuemLevantou' placeholder='Nome completo'/>" +
         "<label>Codigo do operador</label><input type='text' id='codOperador' placeholder='Ex: 003'/>" +
         "<label>Observacoes da entrega</label><textarea id='obsDispensa' placeholder='Observacoes...' rows='2'></textarea>" +
-        "<button class='btn btn-verde btn-block' onclick='confirmarDispensa("" + pid + ""," + temObs + ")'>Confirmar Dispensa</button>" +
+      "<button class='btn btn-verde btn-block' data-pid='" + pid + "' data-temobs='" + temObs + "' onclick='confirmarDispensa(this.dataset.pid, this.dataset.temobs==="true")'>Confirmar Dispensa</button>" +
         "<div id='fbDispensa' class='fb'></div>";
       div.innerHTML = html;
     }).catch(function(e){ div.innerHTML="<p>Erro: "+e.message+"</p>"; });
@@ -1005,7 +1005,7 @@ function carregarMinhasPims(filtro){
         "<td>" + criarBadge(p.estado||"--") + "</td>" +
         "<td><small>" + (p.prazo ? formatarDataSimples(p.prazo) : "---") + "</small></td>" +
         "<td><small>" + formatarData(p.criadoEm) + "</small></td>" +
-        "<td><button class='btn btn-sm' onclick='verDetalhe("" + item.id + "")'>Ver</button></td></tr>";
+      "<td><button class='btn btn-sm' data-pid='" + item.id + "' onclick='verDetalhe(this.dataset.pid)'>Ver</button></td></tr>";
     });
     h += "</tbody></table>";
     div.innerHTML = h;
