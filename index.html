@@ -566,8 +566,8 @@ function carregarUtentes(){
         "<td>" + (u.tecnicoNome||"---") + "</td>" +
         "<td style='" + (vencido?"color:#c0392b;font-weight:700;":"") + "'>" + dataPrep + "</td>" +
         "<td>" +
-          "<button class='btn btn-sm' onclick='editarUtente("" + uid + "")'>Editar</button> " +
-          "<button class='btn btn-sm btn-verde' onclick='selecionarUtenteParaPim("" + uid + "")'>+ PIM</button>" +
+"<button class='btn btn-sm' onclick='editarUtente(\"" + uid + "\")'>Editar</button> " +
+"<button class='btn btn-sm btn-verde' onclick='selecionarUtenteParaPim(\"" + uid + "\")'>+ PIM</button>" +
         "</td></tr>";
     });
     h += "</tbody></table>";
