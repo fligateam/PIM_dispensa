@@ -804,7 +804,7 @@ function verDetalhe(pimId){
       (p.obsEntrega ? "<div class='obs-red' style='margin-top:10px;'><strong>Obs. entrega:</strong><br>" + p.obsEntrega + "</div>" : "") +
       "<h3 style='margin-top:14px;margin-bottom:7px;'>Historico de Estados</h3>" +
       "<ul style='font-size:.85em;color:#555;padding-left:16px;'>" + hist + "</ul>" +
-      "<button class='btn' style='margin-top:14px;' onclick='this.closest(".modal-bg").remove()'>Fechar</button>" +
+      "<button class='btn btn-fechar-modal' style='margin-top:14px;'>Fechar</button>" +
       "</div>";
     document.body.appendChild(bg);
   });
@@ -1018,28 +1018,40 @@ function carregarMinhasPims(filtro){
 function exportarCSV(){
   db.collection("pims").orderBy("criadoEm","desc").get().then(function(snap){
     var rows = ["Cod. PIM;Cod. Prep.;Utente;Cod. Utente;Farmaceutico;Tecnico;Estado;Criada em;Prazo;Obs. Internas;Obs. Entrega"];
+
     snap.forEach(function(doc){
       var p = doc.data();
-      var lp = function(s){ return (s||"").replace(/;/g,",").replace(/
-?
-/g," "); };
+      var lp = function(s){
+        return (s || "").replace(/;/g, ",").replace(/\n/g, " ");
+      };
+
       rows.push([
-        lp(p.codigoPim), lp(p.codigoPreparacao), lp(p.nomeUtente), lp(p.codigoUtente),
-        lp(p.farmaceuticoNome), lp(p.tecnicoNome), lp(p.estado),
-        formatarData(p.criadoEm), lp(p.prazo), lp(p.obsInternas), lp(p.obsEntrega)
+        lp(p.codigoPim),
+        lp(p.codigoPreparacao),
+        lp(p.nomeUtente),
+        lp(p.codigoUtente),
+        lp(p.farmaceuticoNome),
+        lp(p.tecnicoNome),
+        lp(p.estado),
+        formatarData(p.criadoEm),
+        lp(p.prazo),
+        lp(p.obsInternas),
+        lp(p.obsEntrega)
       ].join(";"));
     });
-    var blob = new Blob(["﻿" + rows.join("
-")], { type:"text/csv;charset=utf-8;" });
-    var a    = document.createElement("a");
-    a.href   = URL.createObjectURL(blob);
+
+    var blob = new Blob(["\uFEFF" + rows.join("\r\n")], {
+      type: "text/csv;charset=utf-8;"
+    });
+
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
     a.download = "pims_" + new Date().toISOString().slice(0,10) + ".csv";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   });
 }
-
 // ==============================================
 // COLABORADORES
 // ==============================================
@@ -1098,6 +1110,13 @@ function carregarColaboradores(){
   }).catch(function(e){ div.innerHTML="<p>Erro: "+e.message+"</p>"; });
 }
 
+  document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('btn-fechar-modal')) {
+    var modal = e.target.closest('.modal-bg');
+    if (modal) modal.remove();
+  }
+});
+  
 // Carregar selects ao entrar nas seccoes
 mostrarSec("login");
 </script>
