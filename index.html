@@ -624,8 +624,10 @@ function carregarSelectUtentes(selecionarId){
     });
     if(selecionarId){
       sel.value = selecionarId;
-      preencherDadosUtente();
+      setTimeout(function(){ preencherDadosUtente(); }, 50);
     }
+  }).catch(function(e){
+    console.error("Erro ao carregar utentes para registo:", e);
   });
 }
 
@@ -662,7 +664,7 @@ document.getElementById("formPim").addEventListener("submit", function(e){
   var prazo      = document.getElementById("pPrazo").value;
   var codFarm    = document.getElementById("pCodigoFarmaceutico").value.trim();
 
-  if(!uid || !codBase){ mostrarFb("fbPim","Selecione o utente e confirme o codigo PIM.",false); return; }
+  if(!uid || !codBase){ mostrarFb("fbPim","Tem de selecionar um utente na lista. Se a lista estiver vazia, crie primeiro a ficha do utente em Utentes.",false); return; }
   if(!codFarm){ mostrarFb("fbPim","Introduza o codigo do farmaceutico para confirmar.",false); return; }
 
   // Verificar codigo farmaceutico
