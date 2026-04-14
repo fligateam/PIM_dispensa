@@ -11,29 +11,31 @@
     *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,system-ui,sans-serif;background:radial-gradient(circle at top,#effaf1 0,#f6fff7 35%,#eef7ef 100%);color:var(--text)}
     header{padding:28px 20px;background:linear-gradient(135deg,#0f3d18,#1b5e20 45%,#2e7d32);color:#fff;position:sticky;top:0;z-index:5;box-shadow:var(--shadow)}
     .wrap{max-width:1200px;margin:0 auto} .hero{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-    .brand h1{margin:0;font-size:1.6rem}.brand p{margin:6px 0 0;opacity:.9}.pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:10px 14px;border-radius:999px}
+    .brand h1{margin:0;font-size:1.6rem}.brand p{margin:6px 0 0;opacity:.9}.pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:10px 14px;border-radius:999px;display:none}
     main{max-width:1200px;margin:0 auto;padding:20px} .grid{display:grid;grid-template-columns:320px 1fr;gap:18px}@media (max-width:980px){.grid{grid-template-columns:1fr}}
     .card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden} .card h2{margin:0 0 14px;font-size:1.05rem;padding:0 18px}
     .side{padding:18px} .nav{display:grid;gap:10px}.nav button{border:0;border-radius:14px;padding:12px 14px;font-weight:700;cursor:pointer;transition:.2s;background:#edf7ef;color:var(--p);text-align:left}
     .nav button.active{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff}.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:700;cursor:pointer;transition:.2s}.btn.primary{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff}.btn.secondary{background:#e7f4ea;color:var(--p)}
-    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 18px 18px}@media (max-width:720px){.metrics{grid-template-columns:repeat(2,1fr)}}
+    .btn-block{width:100%}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 18px 18px}@media (max-width:720px){.metrics{grid-template-columns:repeat(2,1fr)}}
     .m{padding:16px;border-radius:18px;background:linear-gradient(180deg,#fff,#f7fdf8);border:1px solid var(--line);text-align:center} .m strong{font-size:1.55rem;display:block}.m span{color:var(--muted);font-size:.9rem}
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;padding:0 18px} input,select,textarea{width:100%;padding:12px 14px;border-radius:14px;border:1px solid #cfe3d2;background:#fbfefb;color:var(--text);outline:none;font-size:1rem}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;padding:0 18px} input,select,textarea{width:100%;padding:12px 14px;border-radius:14px;border:1px solid #cfe3d2;background:#fbfefb;color:var(--text);outline:none;font-size:1rem;margin-bottom:10px}
     input:focus,select:focus,textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(27,94,32,.1)} textarea{min-height:110px;resize:vertical} .row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}@media(max-width:720px){.row{grid-template-columns:1fr}}
     .list{display:grid;gap:12px;padding:0 18px}.item{padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff;transition:.2s}.item:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
     .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start}.tag{padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:800}.green{background:#e8f5e9;color:#1b5e20}.yellow{background:#fff8e1;color:#8a6d00}.blue{background:#e3f2fd;color:#0d47a1}.red{background:#ffebee;color:#b71c1c}
     .hide{display:none!important} .footer{padding:18px 20px;color:var(--muted);text-align:center} .toast{position:fixed;right:18px;bottom:18px;background:var(--p);color:#fff;padding:14px 16px;border-radius:14px;box-shadow:var(--shadow);display:none;max-width:320px;z-index:99}
-    .login{padding:40px 18px;text-align:center;max-width:380px;margin:40px auto}.login input{margin-bottom:14px}.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100}
-    .modal-box{background:var(--card);border-radius:20px;padding:28px;max-width:520px;width:92%;max-height:90vh;overflow:auto}.close{position:absolute;top:14px;right:18px;background:none;border:0;font-size:1.6rem;cursor:pointer;color:var(--muted)}
+    .login{padding:40px 18px;text-align:center;max-width:380px;margin:40px auto;border:1px solid var(--line);border-radius:20px;background:var(--card);box-shadow:var(--shadow)}.login h2{margin-bottom:20px}
+    .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100}
+    .modal-box{background:var(--card);border-radius:20px;padding:28px;max-width:520px;width:92%;max-height:90vh;overflow:auto;box-shadow:var(--shadow)}.close{position:absolute;top:14px;right:18px;background:none;border:0;font-size:1.6rem;cursor:pointer;color:var(--muted)}
     .fb{padding:12px;border-radius:12px;margin-top:12px;display:none}.fb.vis{display:block}.fb-ok{background:#e8f5e9;color:#1b5e20}.fb-err{background:#ffebee;color:#b71c1c}.badge{position:absolute;top:14px;right:18px;background:var(--a);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700}
+    #login{display:block !important}
   </style>
 </head>
 <body>
-  <header><div class="wrap hero"><div class="brand"><h1>GreenFlow PIM</h1><p>Preparação Individualizada da Medicação • Farmácia da Liga</p></div><div class="pill" id="badgeAvisos" style="display:none">0</div></div></header>
-  <main id="main">
-    <div class="login hide" id="login">
-      <h2>Entrar</h2>
-      <input type="text" id="loginCodigo" placeholder="Código ex: 001">
+  <header><div class="wrap hero"><div class="brand"><h1>GreenFlow PIM</h1><p>Preparação Individualizada da Medicação • Farmácia da Liga</p></div><div class="pill" id="badgeAvisos">0</div></div></header>
+  <main>
+    <div class="login" id="login">
+      <h2>Entrar no Sistema</h2>
+      <input type="text" id="loginCodigo" placeholder="Código ex: 001" autocomplete="off">
       <input type="password" id="loginPass" placeholder="Password">
       <button class="btn primary btn-block" onclick="entrar()">Entrar</button>
       <div class="fb" id="fbLogin"></div>
@@ -41,21 +43,22 @@
     <div id="app" class="hide">
       <div class="grid">
         <aside class="card side">
-          <h2>Bem-vindo, <strong id="nomeUser"></strong></h2>
+          <h2>Painel <span id="nomeUser"></span></h2>
           <small id="role"></small>
           <div class="nav" id="nav"></div>
           <div class="card" id="miniStats"></div>
+          <button class="btn secondary btn-block" onclick="fazerLogout()">Sair</button>
         </aside>
-        <section id="view"></section>
+        <section id="view" class="hide"></section>
       </div>
     </div>
   </main>
-  <footer>© 2026 Farmácia da Liga • GreenFlow PIM</footer>
+  <footer>© 2026 Farmácia da Liga • GreenFlow PIM v1.0</footer>
   <div class="toast" id="toast"></div>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-import { getFirestore, collection, doc, getDoc, setDoc, addDoc, getDocs, query, where, orderBy, updateDoc, limit, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import { getFirestore, collection, doc, getDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
 const config = {
   apiKey: "AIzaSyBa6pjv7czSYaQ2ecShefFeLXAsxsd4Dnc",
@@ -69,18 +72,13 @@ const app = initializeApp(config);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let user = null, userData = null, userMap = {}, allUsers = [], currentView = 'dashboard';
-
-const states = ['Registada', 'Aguarda preparação', 'Em preparação', 'Preparada', 'Pronta para levantamento', 'Dispensada', 'Anulada'];
-const stateColors = { 'Registada': 'blue', 'Aguarda preparação': 'yellow', 'Em preparação': 'yellow', 'Preparada': 'green', 'Pronta para levantamento': 'green', 'Dispensada': 'grey', 'Anulada': 'red' };
+let user = null, userData = null, userMap = {}, allUsers = [];
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
   { id: 'patients', label: 'Utentes', icon: '👥' },
   { id: 'newPim', label: 'Nova PIM', icon: '➕' },
-  { id: 'pims', label: 'PIMs', icon: '📋' },
-  { id: 'myPims', label: 'Minhas', icon: '⭐' },
-  { id: 'team', label: 'Equipa', icon: '👨‍⚕️' }
+  { id: 'pims', label: 'PIMs', icon: '📋' }
 ];
 
 function formatDate(iso) {
@@ -105,97 +103,83 @@ function toast(text) {
   setTimeout(() => t.style.display = 'none', 2500);
 }
 
-function go(view) {
-  currentView = view;
-  renderNav();
-  renderView();
-}
-
-function renderNav() {
-  document.getElementById('nav').innerHTML = navItems.map(item => 
-    `<button class="${item.id === currentView ? 'active' : ''}" onclick="go('${item.id}')">${item.icon} ${item.label}</button>`
-  ).join('');
-}
-
 async function loadUserMap() {
-  const snap = await getDocs(collection(db, 'utilizadores'));
-  userMap = {}; allUsers = [];
-  snap.forEach(d => {
-    const data = d.data();
-    if (data.codigo) userMap[data.codigo.trim()] = data.email;
-    allUsers.push({ id: d.id, ...data });
-  });
-  console.log('Mapa utilizadores:', Object.keys(userMap).length);
-}
-
-function renderView() {
-  const view = document.getElementById('view');
-  if (currentView === 'dashboard') {
-    view.innerHTML = `<h2>Dashboard</h2><div class="metrics" id="stats"></div><div class="toolbar"><button class="btn primary" onclick="go('newPim')">➕ Nova PIM</button></div>`;
-    loadStats();
-  } else if (currentView === 'login') {
-    show(document.getElementById('login'));
-    hide(document.getElementById('app'));
-  } else {
-    hide(document.getElementById('login'));
-    show(document.getElementById('app'));
-    // Implement other views similarly
-    view.innerHTML = `<h2>${navItems.find(i => i.id === currentView)?.label || 'Carregando...'}</h2><p>Funcionalidade ${currentView} em produção. Dados reais via Firebase.</p>`;
-  }
-}
-
-async function loadStats() {
-  const statsDiv = document.getElementById('stats');
-  statsDiv.innerHTML = '<div class="m"><strong>A carregar...</strong></div>';
   try {
-    const q = query(collection(db, 'pims'), limit(100));
-    const snap = await getDocs(q);
-    const counts = { total: 0, prepared: 0, dispensed: 0 };
-    snap.forEach(() => counts.total++);
-    statsDiv.innerHTML = `
-      <div class="m"><strong>${counts.total}</strong><span>Total PIMs</span></div>
-      <div class="m"><strong>${counts.prepared}</strong><span>Preparadas</span></div>
-      <div class="m"><strong>${counts.dispensed}</strong><span>Dispensadas</span></div>
-      <div class="m"><strong>0</strong><span>Avisos</span></div>
-    `;
+    const snap = await getDocs(collection(db, 'utilizadores'));
+    userMap = {};
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.codigo) userMap[data.codigo.trim()] = data.email;
+    });
+    console.log('Mapa carregado:', Object.keys(userMap).length, 'utilizadores');
   } catch (e) {
-    statsDiv.innerHTML = '<div class="m"><strong>Erro</strong><span>Ver console</span></div>';
+    console.warn('Erro mapa:', e);
   }
 }
 
 async function entrar() {
   const cod = document.getElementById('loginCodigo').value.trim();
   const pass = document.getElementById('loginPass').value;
+  if (!cod || !pass) return msg('fbLogin', 'Preencha código e password.', false);
   msg('fbLogin', 'A entrar...', true);
   const email = userMap[cod];
   if (!email) return msg('fbLogin', 'Código inválido.', false);
   try {
     await signInWithEmailAndPassword(auth, email, pass);
-    msg('fbLogin');
   } catch (e) {
-    msg('fbLogin', e.code === 'auth/wrong-password' ? 'Password errada.' : 'Erro ao entrar.', false);
+    const msgText = e.code.includes('wrong-password') ? 'Password errada.' : e.code.includes('user-not-found') ? 'Utilizador não encontrado.' : 'Erro ao entrar.';
+    msg('fbLogin', msgText, false);
+    console.error(e);
   }
 }
 
 async function fazerLogout() {
-  await signOut(auth);
+  try {
+    await signOut(auth);
+    toast('Logout efetuado.');
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function loadStats() {
+  const statsDiv = document.getElementById('miniStats');
+  statsDiv.innerHTML = '<div style="padding:14px;color:var(--muted)">Carregando stats...</div>';
+  try {
+    const q = collection(db, 'pims');
+    const snap = await getDocs(q);
+    const total = snap.size;
+    statsDiv.innerHTML = `<div style="padding:14px"><strong>${total}</strong> PIMs totais<br><small>Dashboard pronto para mais métricas</small></div>`;
+  } catch (e) {
+    statsDiv.innerHTML = '<div style="padding:14px;color:var(--warn)">Verifique Firebase</div>';
+  }
 }
 
 onAuthStateChanged(auth, async (u) => {
   user = u;
+  const loginDiv = document.getElementById('login');
+  const appDiv = document.getElementById('app');
   if (u) {
+    hide(loginDiv);
+    show(appDiv);
     const udoc = await getDoc(doc(db, 'utilizadores', u.uid));
-    userData = udoc.exists() ? udoc.data() : { nome: u.email, funcao: 'operador', codigo: '000' };
+    userData = udoc.exists() ? udoc.data() : { nome: u.email || 'User', funcao: 'operador', codigo: '000' };
     document.getElementById('nomeUser').textContent = userData.nome;
-    document.getElementById('role').textContent = `• ${userData.funcao}`;
+    document.getElementById('role').textContent = `• ${userData.funcao || 'operador'}`;
     await loadUserMap();
-    go('dashboard');
+    await loadStats();
+    toast('Bem-vindo!');
   } else {
-    go('login');
+    show(loginDiv);
+    hide(appDiv);
+    document.getElementById('loginCodigo').value = '';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginCodigo').focus();
   }
 });
 
-document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+document.getElementById('loginPass').addEventListener('keydown', e => e.key === 'Enter' && entrar());
+loadUserMap();
 </script>
 </body>
 </html>
