@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PIMs – Farmácia da Liga</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231b5e20'/><text y='.9em' font-size='75' x='12'>Rx</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>😊</text></svg>">
   <style>
     :root{
       --p:#1b5e20;--p2:#2e7d32;--p3:#388e3c;--p4:#43a047;--pa:#c8e6c9;--paa:#e8f5e9;
@@ -126,7 +126,7 @@
 <section id="login" class="sec hidden">
   <div id="loginWrap" style="margin:-28px;padding:40px 20px;">
     <div class="login-box">
-      <div class="login-logo">Olá</div>
+      <div class="login-logo">😊</div>
       <h2>Aceder às PIM's</h2>
       <label>Código de utilizador</label>
       <input type="text" id="loginCodigo" placeholder="Ex: 001" autocomplete="off"/>
@@ -487,7 +487,7 @@ function verificarAvisos(){
     snap.forEach(function(doc){
       var u=doc.data();
       if(u.proximaPreparacao&&new Date(u.proximaPreparacao)<=limite){
-        av.push({nome:u.nome,cod:u.codigoPim,farm:u.farmaceuticoNome,data:u.proximaPreparacao});
+        av.push({uid:doc.id,nome:u.nome,cod:u.codigoPim,farm:u.farmaceuticoNome,data:u.proximaPreparacao,periodo:u.periodicidade||0});
       }
     });
     var badge=document.getElementById("badgeAvisos");
@@ -528,7 +528,7 @@ function carregarAvisosMinhasPims(){
     var h="<div style='background:var(--dangera);border-left:4px solid var(--danger);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;'>";
     h+="<strong style='color:var(--danger);'>Avisos — PIMs a preparar (proximos 3 dias uteis):</strong><ul style='margin-top:8px;padding-left:16px;font-size:.88em;'>";
     av.forEach(function(a){
-      h+="<li style='margin:5px 0;'>Necessario preparar PIM para <strong>"+a.nome+"</strong> ("+a.cod+") — <strong>"+(a.farm||"---")+"</strong> — prevista: "+formatarDataSimples(a.data)+"</li>";
+      h+="<li style='margin:5px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;'>Necessario preparar PIM para <strong>"+a.nome+"</strong> ("+a.cod+") — <strong>"+(a.farm||"---")+"</strong> — prevista: "+formatarDataSimples(a.data)+" <button class='btn btn-xs btn-cinza' data-uid='"+a.uid+"' data-periodo='"+a.periodo+"' onclick='dispensarAviso(this.dataset.uid,this.dataset.periodo)'>Dispensar</button></li>";
     });
     h+="</ul></div>";
     div.innerHTML=h;
@@ -731,10 +731,30 @@ function avancarEstado(pimId,estadoAtual){
     if(!mapaUtilizadores[codOp]){toast("Codigo invalido.");return;}
     var por=dadosUtilizador?dadosUtilizador.nome:codOp;
     db.collection("pims").doc(pimId).get().then(function(doc){
-      var hist=doc.data().historicoEstado||[];
+      var pimData=doc.data();
+      var hist=pimData.historicoEstado||[];
       hist.push({estado:prox,data:new Date().toISOString(),por:por});
-      return db.collection("pims").doc(pimId).update({estado:prox,historicoEstado:hist,atualizadoEm:new Date().toISOString()});
-    }).then(function(){toast("Estado: "+prox);carregarTodasPims("listaPims");carregarEstatisticas();}).catch(function(e){toast("Erro: "+e.message);});
+      var updates={estado:prox,historicoEstado:hist,atualizadoEm:new Date().toISOString()};
+      var p1=db.collection("pims").doc(pimId).update(updates);
+      // Se avança para "Pronto para levantamento", recalcular proximaPreparacao do utente
+      var p2=Promise.resolve();
+      if(prox==="Pronto para levantamento"&&pimData.utenteId){
+        p2=db.collection("utentes").doc(pimData.utenteId).get().then(function(uDoc){
+          if(!uDoc.exists)return;
+          var u=uDoc.data();
+          var periodo=parseInt(u.periodicidade)||0;
+          if(periodo>0){
+            var novaData=new Date();novaData.setDate(novaData.getDate()+periodo);
+            return db.collection("utentes").doc(pimData.utenteId).update({proximaPreparacao:novaData.toISOString(),atualizadoEm:new Date().toISOString()});
+          } else {
+            // Sem periodicidade definida: limpar aviso colocando data muito no futuro
+            var futuro=new Date();futuro.setFullYear(futuro.getFullYear()+10);
+            return db.collection("utentes").doc(pimData.utenteId).update({proximaPreparacao:futuro.toISOString(),atualizadoEm:new Date().toISOString()});
+          }
+        });
+      }
+      return Promise.all([p1,p2]);
+    }).then(function(){toast("Estado: "+prox);carregarTodasPims("listaPims");carregarEstatisticas();verificarAvisos();}).catch(function(e){toast("Erro: "+e.message);});
   });
 }
 
@@ -874,6 +894,20 @@ function carregarColaboradores(){
     snap.forEach(function(doc){var c=doc.data();h+="<tr><td>"+c.codigo+"</td><td><strong>"+c.nome+"</strong></td><td>"+traduzirFuncao(c.funcao||"")+"</td><td><small>"+formatarData(c.criadoEm)+"</small></td></tr>";});
     h+="</tbody></table>";div.innerHTML=h;
   }).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
+}
+
+/* ---- DISPENSAR AVISO MANUAL ---- */
+function dispensarAviso(utenteId,periodo){
+  showModal({title:"Dispensar Aviso",msg:"Marcar este aviso como tratado? A proxima preparacao sera recalculada."}).then(function(ok){
+    if(!ok)return;
+    var p=parseInt(periodo)||0;
+    var novaData=new Date();
+    if(p>0){novaData.setDate(novaData.getDate()+p);}
+    else{novaData.setFullYear(novaData.getFullYear()+10);}
+    db.collection("utentes").doc(utenteId).update({proximaPreparacao:novaData.toISOString(),atualizadoEm:new Date().toISOString()}).then(function(){
+      toast("Aviso dispensado.");verificarAvisos();carregarAvisosMinhasPims();
+    }).catch(function(e){toast("Erro: "+e.message);});
+  });
 }
 
 /* ---- EVENT DELEGATION ---- */
