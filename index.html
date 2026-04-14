@@ -1,254 +1,846 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gestão PIMs | Farmácia da Liga</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%231b5e20'/><text y='.85em' font-size='14' font-weight='700' fill='white' text-anchor='middle' x='50'>PIMs</text></svg>">
-  <meta name="theme-color" content="#1b5e20">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>PIMs – Farmácia da Liga</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <style>
     :root{
-      --p:#1a4c1f;--p2:#2e7d32;--p3:#388e3c;--p4:#4caf50;--pa:#c8e6c9;--paa:#e8f5e8;
-      --bg:#f8faf9;--card:#ffffff;--text:#1a2b1f;--muted:#5a6f5e;--line:#d4e8d3;
-      --warn:#f57c00;--warna:#fff3e0;--danger:#d32f2f;--dangera:#ffebee;
-      --shadow:0 4px 20px rgba(27,94,32,.08);--shadow2:0 8px 32px rgba(27,94,32,.15);
-      --radius:12px;--radius2:20px;--transition:.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --p:#1b5e20;--p2:#2e7d32;--p3:#388e3c;--p4:#43a047;--pa:#c8e6c9;--paa:#e8f5e9;
+      --bg:#f0f7f1;--card:#ffffff;--text:#1a2e1c;--muted:#5a7360;--line:#d0e8d4;
+      --warn:#f57f17;--warna:#fff8e1;--danger:#c62828;--dangera:#ffebee;
+      --shadow:0 4px 20px rgba(27,94,32,.09);--shadow2:0 8px 32px rgba(27,94,32,.14);
+      --radius:14px;--radius2:20px;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'Inter',Segoe UI,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;}
+    body{font-family:'Segoe UI',Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
     /* HEADER */
-    header{background:linear-gradient(135deg,var(--p),var(--p2) 60%,var(--p3));color:#fff;padding:0;position:sticky;top:0;z-index:200;box-shadow:var(--shadow2);}
-    .hinner{display:flex;align-items:center;justify-content:space-between;max-width:1400px;margin:0 auto;padding:0 24px;min-height:70px;}
-    .logo{display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.3rem;letter-spacing:-.02em;}
-    .logo span{background:linear-gradient(135deg,#fff,#f0f7f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-    .user-info{display:flex;align-items:center;gap:12px;font-size:.85em;opacity:.95;}
-    .user-avatar{width:36px;height:36px;border-radius:50%;background:var(--p4);display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff;}
-    .badge-nav{position:absolute;top:14px;right:24px;background:var(--danger);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.8em;font-weight:700;box-shadow:0 2px 8px rgba(211,47,47,.3);}
+    header{background:linear-gradient(135deg,#0a2e10,var(--p) 50%,var(--p2));color:#fff;padding:0 24px;position:sticky;top:0;z-index:200;box-shadow:var(--shadow2);}
+    .hinner{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1200px;margin:0 auto;min-height:64px;}
+    .brand{display:flex;align-items:center;gap:10px;}.brand h1{font-size:1.25rem;font-weight:800;letter-spacing:-.5px;}
+    .brand p{font-size:.78rem;opacity:.85;}
     /* NAV */
-    nav{background:#ffffff33;backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.1);}
-    .nav-inner{display:flex;max-width:1400px;margin:0 auto;padding:0 24px;flex-wrap:nowrap;}
-    nav a{color:#c8e6c9;text-decoration:none;padding:14px 20px;font-size:.88em;font-weight:500;white-space:nowrap;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all var(--transition);position:relative;border-bottom:2px solid transparent;}
-    nav a:hover{color:#fff;background:rgba(255,255,255,.1);border-bottom-color:rgba(255,255,255,.3);}
-    nav a.ativa{color:#fff !important;background:rgba(255,255,255,.15);border-bottom-color:#fff;}
+    nav{background:#0f3d18;overflow-x:auto;}
+    .nav-inner{display:flex;max-width:1200px;margin:0 auto;flex-wrap:nowrap;}
+    nav a{color:#a5d6a7;text-decoration:none;padding:12px 16px;font-size:.84em;white-space:nowrap;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .2s;border-bottom:3px solid transparent;}
+    nav a:hover,nav a.ativa{background:#1b5e20;color:#fff;border-bottom-color:#66bb6a;}
     .nav-logged{display:none;}.nav-logged.vis{display:inline-flex;}
-    nav a.danger{color:#ef9a9a;}.nav-logged.danger:hover{color:#fff;background:var(--danger);}
+    nav a.danger{color:#ef9a9a;}.nav a.danger:hover{background:#b71c1c;color:#fff;}
+    .badge-nav{background:#ef5350;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:.72em;font-weight:700;}
     /* MAIN */
-    main{max-width:1400px;margin:0 auto;padding:32px 24px;}
-    .sec{background:var(--card);border-radius:var(--radius2);padding:32px;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:24px;}
+    main{max-width:1200px;margin:0 auto;padding:24px 20px;}
+    .sec{background:var(--card);border-radius:var(--radius2);padding:28px;box-shadow:var(--shadow);border:1px solid var(--line);}
     .hidden{display:none!important;}
-    h2{color:var(--p);margin-bottom:24px;border-bottom:2px solid var(--pa);padding-bottom:12px;font-size:1.35rem;font-weight:600;display:flex;align-items:center;gap:10px;}
-    h3{color:var(--p2);margin:20px 0 12px;font-size:1.1rem;font-weight:500;}
-    label{display:block;font-size:.86em;color:var(--muted);margin-top:16px;margin-bottom:6px;font-weight:500;letter-spacing:.3px;}
-    input,select,textarea{width:100%;padding:12px 16px;border:1.5px solid var(--line);border-radius:var(--radius);font-size:.95em;background:#fafdfa;color:var(--text);transition:all var(--transition);font-family:inherit;}
-    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p3);background:#fff;box-shadow:0 0 0 3px rgba(56,142,60,.08);}
-    textarea{resize:vertical;min-height:90px;}
-    input[readonly]{background:var(--paa);border-color:var(--pa);color:var(--p2);}
+    h2{color:var(--p);margin-bottom:18px;border-bottom:2px solid var(--pa);padding-bottom:10px;font-size:1.2rem;display:flex;align-items:center;gap:8px;}
+    h3{color:var(--p2);margin:16px 0 8px;font-size:1rem;}
+    label{display:block;font-size:.82em;color:var(--muted);margin-top:14px;margin-bottom:4px;font-weight:600;letter-spacing:.3px;}
+    input,select,textarea{width:100%;padding:10px 13px;border:1.5px solid var(--line);border-radius:var(--radius);font-size:.92em;background:#fafdfa;color:var(--text);transition:border-color .2s,box-shadow .2s;}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--p3);background:#fff;box-shadow:0 0 0 3px rgba(56,142,60,.12);}
+    textarea{resize:vertical;min-height:72px;}
+    input[readonly]{background:var(--paa);border-color:var(--pa);}
     /* BOTÕES */
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 24px;border:none;border-radius:var(--radius);cursor:pointer;font-size:.92em;font-weight:600;transition:all var(--transition);text-decoration:none;letter-spacing:.3px;position:relative;overflow:hidden;}
-    .btn:active{transform:translateY(1px);}
-    .btn-primary{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;box-shadow:0 3px 12px rgba(46,125,50,.3);}
-    .btn-primary:hover{box-shadow:0 6px 20px rgba(46,125,50,.4);transform:translateY(-1px);}
-    .btn-verde{background:var(--p4);color:#fff;box-shadow:0 3px 12px rgba(76,175,80,.3);}
-    .btn-red{background:var(--danger);color:#fff;box-shadow:0 3px 12px rgba(211,47,47,.3);}
-    .btn-cinza{background:#9e9e9e;color:#fff;box-shadow:0 3px 12px rgba(158,158,158,.3);}
-    .btn-laranja{background:#ff9800;color:#fff;box-shadow:0 3px 12px rgba(255,152,0,.4);}
-    .btn-outline{background:transparent;color:var(--p);border:1.5px solid var(--p3);font-weight:500;}
-    .btn-outline:hover{background:var(--paa);border-color:var(--p2);}
-    .btn-block{width:100%;padding:14px;}
-    .btn-sm{padding:8px 16px;font-size:.84em;}
-    .btn-xs{padding:6px 12px;font-size:.8em;}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:var(--radius);cursor:pointer;font-size:.9em;font-weight:700;transition:all .2s;text-decoration:none;}
+    .btn:active{transform:scale(.97);}
+    .btn-primary{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;box-shadow:0 2px 8px rgba(27,94,32,.25);}
+    .btn-primary:hover{background:linear-gradient(135deg,var(--p2),#1a5922);box-shadow:0 4px 14px rgba(27,94,32,.35);}
+    .btn-verde{background:#2e7d32;color:#fff;}.btn-verde:hover{background:#1b5e20;}
+    .btn-red{background:#c62828;color:#fff;}.btn-red:hover{background:#8e0000;}
+    .btn-cinza{background:#546e7a;color:#fff;}.btn-cinza:hover{background:#37474f;}
+    .btn-laranja{background:#ef6c00;color:#fff;}.btn-laranja:hover{background:#e65100;}
+    .btn-outline{background:transparent;color:var(--p);border:1.5px solid var(--p3);}.btn-outline:hover{background:var(--paa);}
+    .btn-block{width:100%;}
+    .btn-sm{padding:6px 12px;font-size:.78em;}
+    .btn-xs{padding:4px 9px;font-size:.75em;}
     /* FEEDBACK */
-    .fb{margin-top:16px;font-size:.9em;padding:12px 16px;border-radius:var(--radius);display:none;border-left:4px solid;font-weight:500;}
+    .fb{margin-top:12px;font-size:.88em;padding:10px 14px;border-radius:var(--radius);display:none;border-left:4px solid;}
     .fb.vis{display:block;}
     .fb-ok{background:var(--paa);color:var(--p);border-color:var(--p3);}
     .fb-err{background:var(--dangera);color:var(--danger);border-color:var(--danger);}
     .fb-info{background:var(--warna);color:var(--warn);border-color:var(--warn);}
     /* TABELA */
-    table{width:100%;border-collapse:collapse;margin-top:18px;font-size:.88em;}
-    th{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;padding:12px 12px;font-weight:600;text-align:left;border-radius:var(--radius) var(--radius) 0 0;}
-    td{padding:14px 12px;border-bottom:1px solid var(--line);vertical-align:middle;}
+    table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.85em;}
+    th{background:var(--p);color:#fff;padding:10px 8px;text-align:left;font-weight:600;}
+    th:first-child{border-radius:10px 0 0 0;}th:last-child{border-radius:0 10px 0 0;}
+    td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle;}
     tr:hover td{background:var(--paa);}
-    tr:last-child td{border-bottom:none;}
     /* BADGES */
-    .badge{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:.8em;font-weight:700;letter-spacing:.3px;box-shadow:0 1px 4px rgba(0,0,0,.1);}
-    .b-azul{background:#e1f5fe;color:#0277bd;}.b-amarelo{background:#fff3e0;color:#f57c00;}
-    .b-verde{background:var(--paa);color:var(--p2);border:1px solid var(--pa);}.b-cinza{background:#f5f5f5;color:#757575;border:1px solid #e0e0e0;}
-    .b-red{background:var(--dangera);color:var(--danger);border:1px solid rgba(211,47,47,.3);}
+    .badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:.76em;font-weight:700;}
+    .b-azul{background:#e3f2fd;color:#0d47a1;}.b-amarelo{background:#fff8e1;color:#8a6d00;}
+    .b-verde{background:var(--paa);color:var(--p);}.b-cinza{background:#eceff1;color:#546e7a;}
+    .b-red{background:var(--dangera);color:var(--danger);}
     /* CARDS */
-    .card{border:1.5px solid var(--line);border-radius:var(--radius2);padding:20px 24px;margin-bottom:16px;background:#fafdfa;box-shadow:0 2px 8px rgba(0,0,0,.04);}
-    .card.focused{box-shadow:var(--shadow2);border-color:var(--pa);}
-    .obs-aviso{background:var(--warna);border-left:4px solid var(--warn);padding:14px 18px;border-radius:var(--radius);margin:14px 0;font-size:.9em;}
-    .obs-red{background:var(--dangera);border-left:4px solid var(--danger);padding:14px 18px;border-radius:var(--radius);margin:14px 0;font-size:.9em;}
+    .card{border:1.5px solid var(--line);border-radius:var(--radius);padding:14px 18px;margin-bottom:12px;background:#fafdfa;}
+    .obs-aviso{background:var(--warna);border-left:4px solid var(--warn);padding:10px 14px;border-radius:8px;margin:10px 0;font-size:.88em;}
+    .obs-red{background:var(--dangera);border-left:4px solid var(--danger);padding:10px 14px;border-radius:8px;margin:10px 0;font-size:.88em;}
     /* STATS */
-    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-top:24px;}
-    .stat-box{text-align:center;padding:24px 16px;background:var(--paa);border-radius:var(--radius2);border:1.5px solid var(--pa);transition:all var(--transition);cursor:pointer;}
-    .stat-box:hover{transform:translateY(-3px);box-shadow:var(--shadow2);}
-    .stat-box h3{font-size:2.2rem;margin-bottom:6px;color:var(--p);font-weight:700;}
-    .stat-box p{color:var(--muted);font-size:.88em;font-weight:500;text-transform:uppercase;letter-spacing:.5px;}
-    /* LAYOUT */
-    .frow{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;}
-    .f1{flex:1;min-width:260px;}
-    .chk-row{display:flex;align-items:flex-start;gap:12px;margin:16px 0;padding:16px;background:var(--dangera);border-radius:var(--radius);border:1px solid rgba(211,47,47,.15);}
-    .chk-row input{width:auto;margin-top:3px;flex-shrink:0;}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;margin-top:16px;}
+    .stat-box{text-align:center;padding:20px 14px;background:var(--paa);border-radius:var(--radius);border:1.5px solid var(--pa);transition:all .2s;}
+    .stat-box:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+    .stat-box h3{font-size:2rem;margin-bottom:4px;color:var(--p);}
+    .stat-box p{color:var(--muted);font-size:.85em;font-weight:600;}
+    /* FROW */
+    .frow{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+    .f1{flex:1;min-width:0;}
+    /* CHKROW */
+    .chk-row{display:flex;align-items:flex-start;gap:10px;margin:14px 0;padding:12px;background:var(--dangera);border-radius:var(--radius);}
+    .chk-row input{width:auto;margin-top:2px;}
     /* MODAL */
-    .modal-bg{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
-    .modal-caixa{background:var(--card);border-radius:var(--radius2);padding:32px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow2);position:relative;}
-    .modal-caixa h2{margin-bottom:20px;border-bottom:2px solid var(--pa);padding-bottom:12px;font-size:1.4rem;}
-    .close{position:absolute;top:20px;right:24px;background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--muted);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:var(--transition);}
-    .close:hover{background:var(--paa);color:var(--p);}
-    .modal-footer{display:flex;gap:12px;margin-top:24px;justify-content:flex-end;flex-wrap:wrap;}
+    .modal-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;}
+    .modal-caixa{background:var(--card);border-radius:var(--radius2);padding:28px;max-width:580px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow2);}
+    .modal-caixa h2{margin-bottom:16px;border-bottom:2px solid var(--pa);padding-bottom:8px;}
+    .modal-footer{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
     /* TOAST */
-    .toast{position:fixed;bottom:28px;right:28px;background:var(--p2);color:#fff;padding:16px 24px;border-radius:var(--radius2);box-shadow:var(--shadow2);display:none;z-index:10000;font-size:.92em;font-weight:500;max-width:380px;animation:toastIn .3s ease-out;}
-    @keyframes toastIn{from{opacity:0;transform:translateY(16px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--p);color:#fff;padding:14px 20px;border-radius:var(--radius);box-shadow:var(--shadow2);display:none;z-index:10000;max-width:340px;font-size:.9em;font-weight:600;animation:fadeIn .25s;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     /* LOGIN */
-    #loginWrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 140px);padding:40px 20px;}
-    .login-box{background:var(--card);border-radius:var(--radius2);padding:48px;max-width:440px;width:100%;box-shadow:var(--shadow2);border:1px solid var(--line);text-align:center;}
-    .login-logo{font-size:4rem;margin-bottom:12px;}
-    .login-box h2{font-size:1.5rem;margin-bottom:32px;}
-    .login-box input{margin-bottom:20px;}
+    #loginWrap{display:flex;align-items:center;justify-content:center;min-height:70vh;padding:20px;}
+    .login-box{background:var(--card);border-radius:var(--radius2);padding:40px;max-width:400px;width:100%;box-shadow:var(--shadow2);border:1px solid var(--line);}
+    .login-box h2{text-align:center;margin-bottom:24px;font-size:1.4rem;}
+    .login-logo{text-align:center;font-size:3rem;margin-bottom:8px;}
     /* PAINEL AVISOS */
-    .aviso-item{display:flex;align-items:flex-start;gap:14px;padding:16px 20px;background:var(--dangera);border-radius:var(--radius);margin-bottom:12px;border-left:5px solid var(--danger);box-shadow:0 2px 8px rgba(211,47,47,.1);}
-    .aviso-icon{font-size:1.6rem;flex-shrink:0;margin-top:2px;}
+    .aviso-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--dangera);border-radius:var(--radius);margin-bottom:8px;border-left:4px solid var(--danger);}
     /* RESPONSIVE */
-    @media(max-width:768px){main{padding:20px 16px;}.sec{padding:24px 20px;}.hinner{padding:0 16px;}.nav-inner{padding:0 16px;}}
-    @media(max-width:480px){.frow{flex-direction:column;}.f1{min-width:auto;}.btn{padding:12px 20px;}}
+    @media(max-width:640px){main{padding:14px 12px;}.sec{padding:18px 14px;}.btn{padding:9px 14px;}}
   </style>
 </head>
 <body>
 
 <header>
   <div class="hinner">
-    <div class="logo">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <rect width="32" height="32" rx="8" fill="currentColor"/>
-        <text x="16" y="22" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">P</text>
-      </svg>
+    <div class="brand">
       <div>
-        <div>Farmácia da Liga</div>
-        <div style="font-size:.78rem;opacity:.9;">Gestão PIMs</div>
+        <h1>🌿 Farmácia da Liga — PIMs</h1>
+        <p>Preparação Individualizada da Medicação</p>
       </div>
     </div>
-    <div id="userInfo" class="user-info hidden">
-      <div class="user-avatar" id="userAvatar">FL</div>
-      <div>
-        <div id="nomeUtilizador" style="font-weight:600;"></div>
-        <div id="funcaoUtilizador" style="opacity:.8;font-size:.85em;"></div>
-      </div>
+    <div id="userInfo" class="hidden" style="display:none;flex-direction:column;align-items:flex-end;font-size:.82em;opacity:.9;">
+      <span id="nomeUtilizador" style="font-weight:700;"></span>
+      <span id="funcaoUtilizador" style="opacity:.75;"></span>
     </div>
   </div>
 </header>
 
 <nav id="navPrincipal">
   <div class="nav-inner">
-    <a onclick="mostrarSec('login')" id="navEntrar">🔐 Iniciar Sessão</a>
-    <a onclick="mostrarSec('painel')" class="nav-logged ativa">📊 Painel <span id="badgeAvisos" class="badge-nav hidden"></span></a>
+    <a onclick="mostrarSec('login')" id="navEntrar">🔐 Entrar</a>
+    <a onclick="mostrarSec('painel')" class="nav-logged">📊 Painel <span id="badgeAvisos" class="badge-nav hidden">0</span></a>
     <a onclick="mostrarSec('utentes')" class="nav-logged">👥 Utentes</a>
-    <a onclick="abrirRegistoNovaPim()" class="nav-logged">➕ Registo PIM</a>
-    <a onclick="mostrarSec('consultarPim')" class="nav-logged">🔍 Consultar PIMs</a>
-    <a onclick="mostrarSec('dispensarPim')" class="nav-logged">💊 Dispensação</a>
+    <a onclick="abrirRegistoNovaPim()" class="nav-logged">➕ Registar PIM</a>
+    <a onclick="mostrarSec('consultarPim')" class="nav-logged">🔍 Consultar</a>
+    <a onclick="mostrarSec('dispensarPim')" class="nav-logged">💊 Dispensar</a>
     <a onclick="mostrarSec('gestaoPims')" class="nav-logged">📋 Gestão PIMs</a>
-    <a onclick="mostrarSec('minhaPims')" class="nav-logged">⭐ Minhas PIMs</a>
-    <a onclick="mostrarSec('criarColaborador')" class="nav-logged">👨‍⚕️ Colaboradores</a>
-    <a onclick="fazerLogout()" class="nav-logged danger">🚪 Terminar Sessão</a>
+    <a onclick="mostrarSec('minhaPims')" class="nav-logged">⭐ As Minhas</a>
+    <a onclick="mostrarSec('criarColaborador')" class="nav-logged">👨‍⚕️ Equipa</a>
+    <a onclick="fazerLogout()" class="nav-logged danger">🚪 Sair</a>
   </div>
 </nav>
 
 <main>
 
-<!-- LOGIN -->
-<section id="login" class="sec">
-  <div id="loginWrap">
+<!-- ===== LOGIN ===== -->
+<section id="login" class="sec hidden">
+  <div id="loginWrap" style="margin:-28px;padding:40px 20px;">
     <div class="login-box">
-      <div class="login-logo"></div>
-      <h2>Iniciar Sessão</h2>
-      <label for="loginCodigo">Código de utilizador</label>
-      <input type="text" id="loginCodigo" placeholder="Ex: 001" autocomplete="username"/>
-      <label for="loginPass">Palavra-passe</label>
-      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"/>
-      <button class="btn btn-primary btn-block" id="btnEntrar" style="margin-top:8px;">🔐 Iniciar Sessão</button>
-      <div id="fbLogin" class="fb fb-info" style="margin-top:18px;">A carregar utilizadores...</div>
+      <div class="login-logo">🌿</div>
+      <h2>Entrar no Sistema</h2>
+      <label>Código de utilizador</label>
+      <input type="text" id="loginCodigo" placeholder="Ex: 001" autocomplete="off"/>
+      <label style="margin-top:14px;">Password</label>
+      <input type="password" id="loginPass" placeholder="••••••••"/>
+      <button class="btn btn-primary btn-block" id="btnEntrar" style="margin-top:20px;padding:13px;">🔐 Entrar</button>
+      <div id="fbLogin" class="fb" style="margin-top:14px;"></div>
     </div>
   </div>
 </section>
 
-<!-- PAINEL -->
+<!-- ===== PAINEL ===== -->
 <section id="painel" class="sec hidden">
-  <h2>📊 Painel de Controlo</h2>
+  <h2>📊 Painel</h2>
   <div id="estatisticas" class="stat-grid"></div>
-  <div id="avisosPrep"></div>
+  <div id="avisosPrep" style="margin-top:22px;"></div>
 </section>
 
-<!-- UTENTES -->
+<!-- ===== UTENTES ===== -->
 <section id="utentes" class="sec hidden">
-  <h2>👥 Gestão de Utentes</h2>
-  <div class="frow" style="margin-bottom:20px;">
+  <h2>👥 Utentes PIM</h2>
+  <div class="frow" style="margin-bottom:16px;">
     <button class="btn btn-verde" onclick="mostrarFormUtente()">➕ Novo Utente</button>
-    <button class="btn btn-outline" onclick="carregarUtentes()">🔄 Atualizar Lista</button>
+    <button class="btn btn-outline" onclick="carregarUtentes()">🔄 Atualizar</button>
   </div>
   <div id="formUtenteArea" class="hidden">
-    <div class="card" style="background:var(--paa);border-color:var(--pa);">
+    <div class="card" style="background:var(--paa);border-color:var(--pa);margin-bottom:16px;">
       <h3 id="tituloFormUtente">Novo Utente</h3>
       <form id="formUtente">
         <input type="hidden" id="utenteIdEdicao"/>
-        <div class="frow">
-          <div class="f1">
-            <label for="uNome">Nome completo *</label>
-            <input type="text" id="uNome" required placeholder="Nome completo do utente"/>
-          </div>
-          <div>
-            <label for="uCodigoPim">Código PIM *</label>
-            <input type="text" id="uCodigoPim" required placeholder="Ex: 64DRC26"/>
-          </div>
-        </div>
-        <div class="frow">
-          <div class="f1">
-            <label for="uFarmaceutico">Farmacêutico responsável *</label>
-            <select id="uFarmaceutico" required><option value="">-- Selecionar --</option></select>
-          </div>
-          <div>
-            <label for="uTecnico">Técnico responsável</label>
-            <select id="uTecnico"><option value="">-- Selecionar --</option></select>
-          </div>
-        </div>
-        <div class="frow">
-          <div class="f1">
-            <label for="uPeriodicidade">Periodicidade (dias)</label>
-            <input type="number" id="uPeriodicidade" placeholder="Ex: 30" min="1"/>
-          </div>
-          <div style="opacity:.6;">
-            <label>Observações</label>
-            <textarea id="uObs" placeholder="Observações relevantes sobre o utente..."></textarea>
-          </div>
-        </div>
-        <div class="frow" style="margin-top:20px;">
-          <button type="submit" class="btn btn-verde">💾 Guardar Utente</button>
+        <label>Nome completo *</label>
+        <input type="text" id="uNome" required placeholder="Nome completo do utente"/>
+        <label>Código PIM (ex: 64DRC26) *</label>
+        <input type="text" id="uCodigoPim" required placeholder="64DRC26"/>
+        <label>Farmacêutico responsável *</label>
+        <select id="uFarmaceutico" required><option value="">-- Selecionar --</option></select>
+        <label>Técnico responsável</label>
+        <select id="uTecnico"><option value="">-- Selecionar --</option></select>
+        <label>Periodicidade de preparação (dias)</label>
+        <input type="number" id="uPeriodicidade" placeholder="Ex: 30" min="1"/>
+        <label>Observações do utente</label>
+        <textarea id="uObs" placeholder="Observações relevantes sobre o utente..."></textarea>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button type="submit" class="btn btn-verde">💾 Guardar</button>
           <button type="button" class="btn btn-cinza" onclick="esconderFormUtente()">Cancelar</button>
         </div>
       </form>
       <div id="fbUtente" class="fb"></div>
     </div>
   </div>
-  <div id="listaUtentes"></div>
+  <div id="listaUtentes" style="margin-top:8px;"></div>
 </section>
 
-<!-- Mais secções seguem o mesmo padrão profissional... (mantive igual ao código anterior mas com classes atualizadas) -->
+<!-- ===== REGISTAR PIM ===== -->
+<section id="registarPim" class="sec hidden">
+  <h2>➕ Registar Nova PIM</h2>
+  <label>Selecionar Utente *</label>
+  <select id="selectUtenteRegisto" onchange="preencherDadosUtente()">
+    <option value="">-- Selecionar utente --</option>
+  </select>
+  <div id="dadosUtenteRegisto" class="hidden">
+    <div class="card" style="margin-top:14px;" id="cardUtenteRegisto"></div>
+    <form id="formPim">
+      <label>Código PIM base</label>
+      <input type="text" id="pCodigoPim" placeholder="64DRC26" readonly/>
+      <label>Farmacêutico responsável</label>
+      <input type="text" id="pFarmaceutico" placeholder="Farmacêutico"/>
+      <label>Técnico responsável</label>
+      <input type="text" id="pTecnico" placeholder="Técnico"/>
+      <label>Observações internas</label>
+      <textarea id="pObsInternas" placeholder="Notas internas..."></textarea>
+      <label>Observações para entrega (visíveis na dispensa)</label>
+      <textarea id="pObsEntrega" placeholder="Ex: Tem pickup. Entregar saco com dinheiro..."></textarea>
+      <label>Prazo de preparação</label>
+      <input type="date" id="pPrazo"/>
+      <label>Código do Farmacêutico (confirmação obrigatória) *</label>
+      <input type="text" id="pCodigoFarmaceutico" placeholder="Código do farmacêutico" autocomplete="off"/>
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:18px;">✅ Registar PIM</button>
+    </form>
+    <div id="fbPim" class="fb"></div>
+  </div>
+</section>
+
+<!-- ===== CONSULTAR ===== -->
+<section id="consultarPim" class="sec hidden">
+  <h2>🔍 Consultar PIMs</h2>
+  <div class="frow">
+    <div class="f1">
+      <label>Pesquisar por código PIM</label>
+      <input type="text" id="pesquisaQ" placeholder="Ex: 64DRC26" onkeydown="if(event.key==='Enter')pesquisarPims()"/>
+    </div>
+    <button class="btn btn-primary" onclick="pesquisarPims()">🔍 Pesquisar</button>
+    <button class="btn btn-cinza" onclick="carregarTodasPims('resultadosPesquisa')">Ver Todas</button>
+  </div>
+  <div id="resultadosPesquisa" style="margin-top:16px;"></div>
+</section>
+
+<!-- ===== DISPENSAR ===== -->
+<section id="dispensarPim" class="sec hidden">
+  <h2>💊 Dispensar PIM</h2>
+  <div class="frow">
+    <div class="f1">
+      <label>Código PIM (ex: 64DRC26)</label>
+      <input type="text" id="codDispensa" placeholder="64DRC26" onkeydown="if(event.key==='Enter')carregarParaDispensa()"/>
+    </div>
+    <button class="btn btn-primary" onclick="carregarParaDispensa()">🔎 Carregar PIM</button>
+  </div>
+  <div id="detalhesDispensa" style="margin-top:18px;"></div>
+</section>
+
+<!-- ===== GESTÃO PIMs ===== -->
+<section id="gestaoPims" class="sec hidden">
+  <h2>📋 Gestão de PIMs</h2>
+  <div class="frow" style="margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+    <button class="btn btn-sm btn-outline" onclick="filtrarEstado('Registada')">Registadas</button>
+    <button class="btn btn-sm" style="background:#1565c0;color:#fff;" onclick="filtrarEstado('Aguarda preparacao')">Aguarda Prep.</button>
+    <button class="btn btn-sm btn-laranja" onclick="filtrarEstado('Em preparacao')">Em Prep.</button>
+    <button class="btn btn-sm btn-verde" onclick="filtrarEstado('Preparada')">Preparadas</button>
+    <button class="btn btn-sm" style="background:#6a1b9a;color:#fff;" onclick="filtrarEstado('Dispensada')">Dispensadas</button>
+    <button class="btn btn-sm btn-red" onclick="filtrarEstado('Anulada')">Anuladas</button>
+    <button class="btn btn-sm btn-cinza" onclick="carregarTodasPims('listaPims')">Todas</button>
+  </div>
+  <div class="frow" style="margin-bottom:16px;">
+    <div class="f1">
+      <label style="margin-top:0;">Filtrar por Farmacêutico</label>
+      <select id="filtroPorFarmaceutico" onchange="filtrarPorFarmaceutico()">
+        <option value="">-- Todos --</option>
+      </select>
+    </div>
+    <button class="btn btn-verde btn-sm" onclick="exportarCSV()" style="align-self:flex-end;">📥 Exportar Excel</button>
+  </div>
+  <div id="listaPims"></div>
+</section>
+
+<!-- ===== MINHAS PIMs ===== -->
+<section id="minhaPims" class="sec hidden">
+  <h2>⭐ As Minhas PIMs</h2>
+  <p style="color:var(--muted);font-size:.87em;margin-bottom:14px;">PIMs associadas ao seu utilizador.</p>
+  <div class="frow" style="margin-bottom:14px;gap:8px;">
+    <button class="btn btn-sm btn-outline" onclick="carregarMinhasPims('todas')">Todas</button>
+    <button class="btn btn-sm btn-laranja" onclick="carregarMinhasPims('pendentes')">Pendentes</button>
+    <button class="btn btn-sm btn-verde" onclick="carregarMinhasPims('preparadas')">Preparadas</button>
+    <button class="btn btn-sm btn-cinza" onclick="carregarMinhasPims('dispensadas')">Dispensadas</button>
+  </div>
+  <div id="listaMinhasPims"></div>
+</section>
+
+<!-- ===== COLABORADORES ===== -->
+<section id="criarColaborador" class="sec hidden">
+  <h2>👨‍⚕️ Gestão de Colaboradores</h2>
+  <div class="frow" style="margin-bottom:16px;">
+    <button class="btn btn-verde" onclick="mostrarFormColaborador()">➕ Novo Colaborador</button>
+    <button class="btn btn-outline" onclick="carregarColaboradores()">👁 Ver Todos</button>
+  </div>
+  <div id="formColaboradorArea" class="hidden">
+    <div class="card" style="background:var(--paa);border-color:var(--pa);margin-bottom:16px;">
+      <form id="formColaborador">
+        <label>Código (ex: 002) *</label>
+        <input type="text" id="colCodigo" required placeholder="002"/>
+        <label>Nome completo *</label>
+        <input type="text" id="colNome" required/>
+        <label>Função *</label>
+        <select id="colFuncao" required>
+          <option value="">-- Selecionar --</option>
+          <option value="farmaceutico">Farmacêutico</option>
+          <option value="tecnico">Técnico</option>
+          <option value="operador">Operador</option>
+          <option value="admin">Administrador</option>
+        </select>
+        <label>Password *</label>
+        <input type="password" id="colPass" required/>
+        <label>Confirmar Password *</label>
+        <input type="password" id="colPassConf" required/>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button type="submit" class="btn btn-verde">✅ Criar Colaborador</button>
+          <button type="button" class="btn btn-cinza" onclick="esconderFormColaborador()">Cancelar</button>
+        </div>
+      </form>
+      <div id="fbColaborador" class="fb"></div>
+    </div>
+  </div>
+  <div id="listaColaboradores" style="margin-top:8px;"></div>
+</section>
 
 </main>
 
-<footer style="text-align:center;padding:32px 24px;font-size:.85em;color:var(--muted);border-top:1px solid var(--line);margin-top:40px;">
-  <div style="max-width:800px;margin:0 auto;">
-    <div style="font-weight:500;margin-bottom:4px;">Farmácia da Liga</div>
-    <div>Gestão de Preparações Individuais de Medicação | © 2026</div>
-  </div>
+<footer style="text-align:center;padding:20px;font-size:.8em;color:var(--muted);margin-top:16px;border-top:1px solid var(--line);">
+  &copy; 2026 Farmácia da Liga &mdash; Gestão de PIMs v2.0 🌿
 </footer>
 
-<!-- Toast e Modal mantidos iguais -->
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL CONFIRM (substitui alert/prompt) -->
+<div class="modal-bg hidden" id="modalConfirm">
+  <div class="modal-caixa">
+    <h2 id="modalConfirmTitle">Confirmar</h2>
+    <p id="modalConfirmMsg"></p>
+    <div id="modalConfirmInput" class="hidden" style="margin-top:14px;">
+      <label id="modalConfirmLabel">Código:</label>
+      <input type="text" id="modalConfirmField" autocomplete="off"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="modalConfirmOk">Confirmar</button>
+      <button class="btn btn-cinza" id="modalConfirmCancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
 <script>
-// Todo o código JavaScript igual ao anterior mas com textos em PT-PT corrigidos
-// (ex: "Iniciar Sessão", "Terminar Sessão", "Palavra-passe", etc.)
-</script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBa6pjv7czSYaQ2ecShefFeLXAsxsd4Dnc",
+  authDomain:"pims-84362.firebaseapp.com",
+  projectId:"pims-84362",
+  storageBucket:"pims-84362.firebasestorage.app",
+  messagingSenderId:"21232070010",
+  appId:"1:21232070010:web:330d2f68be460632753ac3"
+});
+var auth=firebase.auth();
+var db=firebase.firestore();
+var utilizadorAtual=null,dadosUtilizador=null,mapaUtilizadores={},todosColaboradores=[];
 
+/* ---- UTILS ---- */
+function gerarEmail(c){return"user_"+c+"@farmacialiga.pt";}
+function formatarData(iso){if(!iso)return"---";try{return new Date(iso).toLocaleString("pt-PT");}catch(e){return iso;}}
+function formatarDataSimples(iso){if(!iso)return"---";try{return new Date(iso).toLocaleDateString("pt-PT");}catch(e){return iso;}}
+function criarBadge(s){var m={"Registada":"b-azul","Aguarda preparacao":"b-amarelo","Em preparacao":"b-amarelo","Preparada":"b-verde","Pronta para levantamento":"b-verde","Dispensada":"b-cinza","Anulada":"b-red"};return"<span class='badge "+(m[s]||"b-cinza")+"'>"+(s||"--")+"</span>";}
+function mostrarFb(id,msg,ok){var el=document.getElementById(id);if(!el)return;el.className="fb vis "+(ok?"fb-ok":"fb-err");el.innerText=msg;}
+function esconderFb(id){var el=document.getElementById(id);if(el){el.className="fb";el.innerText="";}}
+function traduzirFuncao(f){return{"farmaceutico":"Farmacêutico","tecnico":"Técnico","operador":"Operador","admin":"Administrador"}[f]||f;}
+function toast(msg,dur){var t=document.getElementById("toast");t.innerText=msg;t.style.display="block";clearTimeout(t._t);t._t=setTimeout(function(){t.style.display="none";},dur||2500);}
+
+/* MODAL CONFIRM – substitui alert/prompt/confirm */
+function showModal(opts){
+  var el=document.getElementById("modalConfirm");
+  document.getElementById("modalConfirmTitle").innerText=opts.title||"Confirmar";
+  document.getElementById("modalConfirmMsg").innerText=opts.msg||"";
+  var inp=document.getElementById("modalConfirmInput");
+  var fld=document.getElementById("modalConfirmField");
+  var lbl=document.getElementById("modalConfirmLabel");
+  if(opts.inputLabel){inp.classList.remove("hidden");lbl.innerText=opts.inputLabel;fld.value="";}
+  else{inp.classList.add("hidden");}
+  el.classList.remove("hidden");
+  return new Promise(function(resolve){
+    function ok(){
+      el.classList.add("hidden");
+      resolve(opts.inputLabel?fld.value.trim():true);
+    }
+    function cancel(){el.classList.add("hidden");resolve(null);}
+    document.getElementById("modalConfirmOk").onclick=ok;
+    document.getElementById("modalConfirmCancel").onclick=cancel;
+    fld.onkeydown=function(e){if(e.key==="Enter")ok();};
+  });
+}
+
+/* ---- NAVEGAÇÃO ---- */
+function mostrarSec(id){
+  document.querySelectorAll(".sec").forEach(function(s){s.classList.add("hidden");});
+  var el=document.getElementById(id);if(el)el.classList.remove("hidden");
+  document.querySelectorAll("nav a").forEach(function(a){a.classList.remove("ativa");});
+  document.querySelectorAll(".nav-logged").forEach(function(a){a.classList.toggle("vis",!!utilizadorAtual);});
+  var navEntrar=document.getElementById("navEntrar");
+  if(navEntrar)navEntrar.style.display=utilizadorAtual?"none":"inline-flex";
+  if(id==="gestaoPims")preencherFiltroPorFarmaceutico();
+  if(id==="minhaPims")carregarMinhasPims("todas");
+  if(id==="utentes")carregarUtentes();
+  if(id==="painel")carregarEstatisticas();
+}
+
+/* ---- AUTH ---- */
+auth.onAuthStateChanged(function(user){
+  if(user){
+    db.collection("utilizadores").doc(user.uid).get().then(function(doc){
+      utilizadorAtual=user;
+      dadosUtilizador=doc.exists?doc.data():{nome:user.email,funcao:"operador",codigo:"000"};
+      var ui=document.getElementById("userInfo");
+      ui.style.display="flex";
+      document.getElementById("nomeUtilizador").innerText=dadosUtilizador.nome||user.email;
+      document.getElementById("funcaoUtilizador").innerText=traduzirFuncao(dadosUtilizador.funcao||"");
+      mostrarSec("painel");
+      verificarAvisos();
+      toast("Bem-vindo, "+(dadosUtilizador.nome||"")+"! 🌿");
+    }).catch(function(){fazerLogout();});
+  }else{
+    utilizadorAtual=null;dadosUtilizador=null;
+    var ui=document.getElementById("userInfo");ui.style.display="none";
+    mostrarSec("login");
+  }
+});
+
+/* ---- MAPA UTILIZADORES ---- */
+function carregarMapaUtilizadores(){
+  db.collection("utilizadores").get().then(function(snap){
+    mapaUtilizadores={};todosColaboradores=[];
+    snap.forEach(function(doc){
+      var d=doc.data();
+      if(d.codigo&&d.email)mapaUtilizadores[String(d.codigo).trim()]=d.email;
+      todosColaboradores.push(Object.assign({id:doc.id},d));
+    });
+  }).catch(function(e){console.warn("Erro mapa:",e.message);});
+}
+carregarMapaUtilizadores();
+
+/* ---- LOGIN ---- */
+function entrar(){
+  var cod=document.getElementById("loginCodigo").value.trim();
+  var pass=document.getElementById("loginPass").value;
+  esconderFb("fbLogin");
+  if(!cod||!pass){mostrarFb("fbLogin","Preencha o código e a password.",false);return;}
+  var email=mapaUtilizadores[cod];
+  if(!email){mostrarFb("fbLogin","Código de utilizador inválido.",false);return;}
+  mostrarFb("fbLogin","A entrar...",true);
+  auth.signInWithEmailAndPassword(email,pass).then(function(){
+    esconderFb("fbLogin");
+  }).catch(function(e){
+    var msg="Erro ao entrar.";
+    if(e.code==="auth/wrong-password"||e.code==="auth/invalid-credential")msg="Password incorrecta.";
+    else if(e.code==="auth/user-not-found")msg="Utilizador não encontrado.";
+    mostrarFb("fbLogin",msg,false);
+  });
+}
+document.getElementById("loginPass").addEventListener("keydown",function(e){if(e.key==="Enter")entrar();});
+document.getElementById("btnEntrar").addEventListener("click",entrar);
+function fazerLogout(){auth.signOut();toast("Logout efetuado.");}
+
+/* ---- PAINEL ---- */
+function carregarEstatisticas(){
+  var div=document.getElementById("estatisticas");
+  div.innerHTML="<div class='stat-box'><h3>⏳</h3><p>Carregando...</p></div>";
+  db.collection("pims").get().then(function(snap){
+    var t=0,a=0,p=0,d=0;
+    snap.forEach(function(x){t++;var s=x.data().estado||"";
+      if(s==="Aguarda preparacao"||s==="Registada"||s==="Em preparacao")a++;
+      if(s==="Preparada"||s==="Pronta para levantamento")p++;
+      if(s==="Dispensada")d++;
+    });
+    div.innerHTML=
+      "<div class='stat-box'><h3>"+t+"</h3><p>Total PIMs</p></div>"+
+      "<div class='stat-box' style='background:#fff8e1;border-color:#ffe082;'><h3 style='color:#f57f17;'>"+a+"</h3><p>Pendentes</p></div>"+
+      "<div class='stat-box'><h3 style='color:var(--p);'>"+p+"</h3><p>Preparadas</p></div>"+
+      "<div class='stat-box' style='background:#eceff1;border-color:#cfd8dc;'><h3 style='color:#546e7a;'>"+d+"</h3><p>Dispensadas</p></div>";
+  }).catch(function(){div.innerHTML="";});
+}
+
+function verificarAvisos(){
+  var em3=new Date();em3.setDate(em3.getDate()+3);
+  db.collection("utentes").get().then(function(snap){
+    var av=[];
+    snap.forEach(function(doc){var u=doc.data();if(u.proximaPreparacao&&new Date(u.proximaPreparacao)<=em3)av.push({nome:u.nome,data:u.proximaPreparacao});});
+    var badge=document.getElementById("badgeAvisos");
+    badge.innerText=av.length;badge.classList.toggle("hidden",av.length===0);
+    var div=document.getElementById("avisosPrep");
+    if(!av.length){div.innerHTML="<p style='color:var(--p);'>✅ Sem avisos de preparação.</p>";return;}
+    var h="<h3 style='color:var(--danger);margin-bottom:10px;'>⚠️ Avisos de Preparação ("+av.length+")</h3>";
+    av.forEach(function(a){h+="<div class='aviso-item'><span style='font-size:1.4rem;'>⚠️</span><div><strong>"+a.nome+"</strong><br><small>Prevista: "+formatarDataSimples(a.data)+"</small></div></div>";});
+    div.innerHTML=h;
+  }).catch(function(){});
+}
+
+/* ---- UTENTES ---- */
+function mostrarFormUtente(){document.getElementById("formUtenteArea").classList.remove("hidden");document.getElementById("tituloFormUtente").innerText="Novo Utente";document.getElementById("formUtente").reset();document.getElementById("utenteIdEdicao").value="";preencherSelectsFarmaceuticos();}
+function esconderFormUtente(){document.getElementById("formUtenteArea").classList.add("hidden");}
+function preencherSelectsFarmaceuticos(){
+  var sf=document.getElementById("uFarmaceutico"),st=document.getElementById("uTecnico");
+  sf.innerHTML="<option value=''>-- Selecionar --</option>";
+  st.innerHTML="<option value=''>-- Selecionar --</option>";
+  todosColaboradores.forEach(function(c){
+    if(c.funcao==="farmaceutico"||c.funcao==="admin")sf.innerHTML+="<option value='"+c.nome+"'>"+c.nome+" ("+c.codigo+")</option>";
+    if(c.funcao==="tecnico")st.innerHTML+="<option value='"+c.nome+"'>"+c.nome+" ("+c.codigo+")</option>";
+  });
+}
+document.getElementById("formUtente").addEventListener("submit",function(e){
+  e.preventDefault();
+  var id=document.getElementById("utenteIdEdicao").value;
+  var nome=document.getElementById("uNome").value.trim();
+  var codPim=document.getElementById("uCodigoPim").value.trim().toUpperCase();
+  var farm=document.getElementById("uFarmaceutico").value;
+  var tec=document.getElementById("uTecnico").value;
+  var periodo=parseInt(document.getElementById("uPeriodicidade").value)||0;
+  var obs=document.getElementById("uObs").value.trim();
+  if(!nome||!codPim||!farm){mostrarFb("fbUtente","Preencha os campos obrigatórios.",false);return;}
+  var proxPrep="";if(periodo>0){var dd=new Date();dd.setDate(dd.getDate()+periodo);proxPrep=dd.toISOString();}
+  var dados={nome:nome,codigoPim:codPim,farmaceuticoNome:farm,tecnicoNome:tec,periodicidade:periodo,observacoes:obs,proximaPreparacao:proxPrep,atualizadoEm:new Date().toISOString()};
+  var ref=id?db.collection("utentes").doc(id):db.collection("utentes").doc();
+  if(!id)dados.criadoEm=new Date().toISOString();
+  ref.set(dados,{merge:true}).then(function(){
+    mostrarFb("fbUtente",id?"Utente atualizado!":"Utente criado com sucesso!",true);
+    document.getElementById("formUtente").reset();document.getElementById("utenteIdEdicao").value="";
+    carregarUtentes();toast("Utente guardado ✅");
+    setTimeout(function(){esconderFb("fbUtente");esconderFormUtente();},1800);
+  }).catch(function(er){mostrarFb("fbUtente","Erro: "+er.message,false);});
+});
+function carregarUtentes(){
+  var div=document.getElementById("listaUtentes");div.innerHTML="<p>A carregar...</p>";
+  db.collection("utentes").orderBy("nome").get().then(function(snap){
+    if(snap.empty){div.innerHTML="<p>Nenhum utente registado.</p>";return;}
+    var h="<table><thead><tr><th>Nome</th><th>Cód. PIM</th><th>Farmacêutico</th><th>Técnico</th><th>Próx. Prep.</th><th>Ações</th></tr></thead><tbody>";
+    snap.forEach(function(doc){
+      var u=doc.data(),uid=doc.id;
+      var dp=u.proximaPreparacao?formatarDataSimples(u.proximaPreparacao):"---";
+      var venc=u.proximaPreparacao&&new Date(u.proximaPreparacao)<new Date();
+      h+="<tr><td><strong>"+u.nome+"</strong></td><td>"+u.codigoPim+"</td><td>"+(u.farmaceuticoNome||"---")+"</td><td>"+(u.tecnicoNome||"---")+"</td><td style='"+(venc?"color:var(--danger);font-weight:700;":"")+"'>"+dp+"</td><td><button class='btn btn-xs btn-outline' data-uid='"+uid+"' onclick='editarUtente(this.dataset.uid)'>✏️ Editar</button> <button class='btn btn-xs btn-verde' data-uid='"+uid+"' onclick='selecionarUtenteParaPim(this.dataset.uid)'>➕ PIM</button></td></tr>";
+    });
+    h+="</tbody></table>";div.innerHTML=h;
+  }).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
+}
+function editarUtente(id){
+  db.collection("utentes").doc(id).get().then(function(doc){
+    var u=doc.data();
+    document.getElementById("utenteIdEdicao").value=id;
+    document.getElementById("uNome").value=u.nome||"";
+    document.getElementById("uCodigoPim").value=u.codigoPim||"";
+    document.getElementById("uPeriodicidade").value=u.periodicidade||"";
+    document.getElementById("uObs").value=u.observacoes||"";
+    document.getElementById("tituloFormUtente").innerText="Editar Utente";
+    document.getElementById("formUtenteArea").classList.remove("hidden");
+    preencherSelectsFarmaceuticos();
+    setTimeout(function(){document.getElementById("uFarmaceutico").value=u.farmaceuticoNome||"";document.getElementById("uTecnico").value=u.tecnicoNome||"";},200);
+    window.scrollTo(0,0);
+  });
+}
+function selecionarUtenteParaPim(uid){mostrarSec("registarPim");carregarSelectUtentes(uid);}
+function abrirRegistoNovaPim(){mostrarSec("registarPim");carregarSelectUtentes(null);document.getElementById("dadosUtenteRegisto").classList.add("hidden");document.getElementById("cardUtenteRegisto").innerHTML="";var f=document.getElementById("formPim");if(f)f.reset();}
+
+/* ---- REGISTAR PIM ---- */
+function carregarSelectUtentes(selecionarId){
+  var sel=document.getElementById("selectUtenteRegisto");
+  sel.innerHTML="<option value=''>-- Selecionar utente --</option>";
+  db.collection("utentes").orderBy("nome").get().then(function(snap){
+    snap.forEach(function(doc){var u=doc.data();var o=document.createElement("option");o.value=doc.id;o.innerText=u.nome+" ("+u.codigoPim+")";sel.appendChild(o);});
+    if(selecionarId){sel.value=selecionarId;setTimeout(function(){preencherDadosUtente();},50);}
+  }).catch(function(e){console.error("Erro:",e);});
+}
+function preencherDadosUtente(){
+  var uid=document.getElementById("selectUtenteRegisto").value;
+  var area=document.getElementById("dadosUtenteRegisto");
+  if(!uid){area.classList.add("hidden");return;}
+  db.collection("utentes").doc(uid).get().then(function(doc){
+    if(!doc.exists){area.classList.add("hidden");return;}
+    var u=doc.data();
+    document.getElementById("cardUtenteRegisto").innerHTML="<p><strong>Utente:</strong> "+u.nome+"</p><p style='margin-top:5px;'><strong>Cód. PIM:</strong> "+u.codigoPim+"</p>"+(u.observacoes?"<div class='obs-aviso' style='margin-top:10px;'><strong>Obs. do utente:</strong><br>"+u.observacoes+"</div>":"");
+    document.getElementById("pCodigoPim").value=u.codigoPim||"";
+    document.getElementById("pFarmaceutico").value=u.farmaceuticoNome||"";
+    document.getElementById("pTecnico").value=u.tecnicoNome||"";
+    document.getElementById("pObsInternas").value=u.observacoes||"";
+    area.classList.remove("hidden");
+  });
+}
+document.getElementById("formPim").addEventListener("submit",function(e){
+  e.preventDefault();
+  if(!utilizadorAtual){mostrarFb("fbPim","Faça login primeiro.",false);return;}
+  var uid=document.getElementById("selectUtenteRegisto").value;
+  var codBase=document.getElementById("pCodigoPim").value.trim().toUpperCase();
+  var farm=document.getElementById("pFarmaceutico").value.trim();
+  var tec=document.getElementById("pTecnico").value.trim();
+  var obsInt=document.getElementById("pObsInternas").value.trim();
+  var obsEnt=document.getElementById("pObsEntrega").value.trim();
+  var prazo=document.getElementById("pPrazo").value;
+  var codF=document.getElementById("pCodigoFarmaceutico").value.trim();
+  if(!uid||!codBase){mostrarFb("fbPim","Selecione um utente.",false);return;}
+  if(!codF){mostrarFb("fbPim","Introduza o código do farmacêutico.",false);return;}
+  if(!mapaUtilizadores[codF]){mostrarFb("fbPim","Código do farmacêutico inválido.",false);return;}
+  mostrarFb("fbPim","A registar...",true);
+  db.collection("utentes").doc(uid).get().then(function(uDoc){
+    var u=uDoc.data();
+    return db.collection("pims").where("codigoPim","==",codBase).get().then(function(snap){
+      var num=snap.size+1;
+      var codPrep=codBase+"."+("00"+num).slice(-3);
+      var ref=db.collection("pims").doc();
+      return ref.set({pimId:ref.id,utenteId:uid,codigoPim:codBase,codigoPreparacao:codPrep,nomeUtente:u.nome,codigoUtente:u.codigoPim,farmaceuticoNome:farm,tecnicoNome:tec,farmaceuticoId:utilizadorAtual.uid,estado:"Registada",historicoEstado:[{estado:"Registada",data:new Date().toISOString(),por:farm||(dadosUtilizador?dadosUtilizador.nome:"")}],numeroPreparacao:num,obsInternas:obsInt,obsEntrega:obsEnt,prazo:prazo||"",autoRenovar:false,criadoEm:new Date().toISOString(),atualizadoEm:new Date().toISOString()});
+    });
+  }).then(function(){
+    mostrarFb("fbPim","PIM registada com sucesso! ✅",true);
+    document.getElementById("formPim").reset();
+    document.getElementById("selectUtenteRegisto").value="";
+    document.getElementById("dadosUtenteRegisto").classList.add("hidden");
+    carregarEstatisticas();toast("PIM criada ✅");
+  }).catch(function(er){mostrarFb("fbPim","Erro: "+er.message,false);});
+});
+
+/* ---- TABELA PIMs ---- */
+function renderTabela(snap,cid){
+  var div=document.getElementById(cid);if(!div)return;
+  if(snap.empty){div.innerHTML="<p style='margin-top:12px;color:var(--muted);'>Nenhuma PIM encontrada.</p>";return;}
+  var h="<table><thead><tr><th>Cód. Prep.</th><th>Utente</th><th>Farmacêutico</th><th>Estado</th><th>Data</th><th>Ações</th></tr></thead><tbody>";
+  snap.forEach(function(d){
+    var p=d.data(),pid=d.id;
+    var pode=p.estado!=="Anulada"&&p.estado!=="Dispensada";
+    h+="<tr><td><strong>"+(p.codigoPreparacao||p.codigoPim||"--")+"</strong></td><td>"+(p.nomeUtente||"--")+"</td><td>"+(p.farmaceuticoNome||"--")+"</td><td>"+criarBadge(p.estado)+"</td><td><small>"+formatarData(p.criadoEm)+"</small></td><td style='white-space:nowrap;'><button class='btn btn-xs btn-outline' data-pid='"+pid+"' onclick='verDetalhe(this.dataset.pid)'>👁 Ver</button> "+(pode?"<button class='btn btn-xs btn-laranja' data-pid='"+pid+"' data-estado='"+(p.estado||"")+"' onclick='avancarEstado(this.dataset.pid,this.dataset.estado)'>⬆️</button> ":"")+(pode?"<button class='btn btn-xs btn-red' data-pid='"+pid+"' onclick='anularPim(this.dataset.pid)'>🚫</button>":"")+"</td></tr>";
+  });
+  h+="</tbody></table>";div.innerHTML=h;
+}
+function carregarTodasPims(cid){
+  var div=document.getElementById(cid);if(div)div.innerHTML="<p>A carregar...</p>";
+  db.collection("pims").orderBy("criadoEm","desc").limit(100).get().then(function(s){renderTabela(s,cid);}).catch(function(e){if(div)div.innerHTML="<p>Erro: "+e.message+"</p>";});
+}
+function filtrarEstado(estado){
+  var div=document.getElementById("listaPims");if(div)div.innerHTML="<p>A carregar...</p>";
+  db.collection("pims").where("estado","==",estado).get().then(function(s){renderTabela(s,"listaPims");}).catch(function(e){if(div)div.innerHTML="<p>Erro: "+e.message+"</p>";});
+}
+function preencherFiltroPorFarmaceutico(){
+  var sel=document.getElementById("filtroPorFarmaceutico");
+  sel.innerHTML="<option value=''>-- Todos --</option>";
+  todosColaboradores.forEach(function(c){if(c.funcao==="farmaceutico"||c.funcao==="admin")sel.innerHTML+="<option value='"+c.nome+"'>"+c.nome+"</option>";});
+}
+function filtrarPorFarmaceutico(){
+  var farm=document.getElementById("filtroPorFarmaceutico").value;
+  var div=document.getElementById("listaPims");
+  if(!farm){carregarTodasPims("listaPims");return;}
+  if(div)div.innerHTML="<p>A carregar...</p>";
+  db.collection("pims").where("farmaceuticoNome","==",farm).get().then(function(s){renderTabela(s,"listaPims");}).catch(function(e){if(div)div.innerHTML="<p>Erro: "+e.message+"</p>";});
+}
+function pesquisarPims(){
+  var q=document.getElementById("pesquisaQ").value.trim().toUpperCase();
+  var div=document.getElementById("resultadosPesquisa");div.innerHTML="<p>A pesquisar...</p>";
+  db.collection("pims").where("codigoPim","==",q).get().then(function(s){renderTabela(s,"resultadosPesquisa");}).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
+}
+
+/* ---- DETALHE ---- */
+function verDetalhe(pimId){
+  db.collection("pims").doc(pimId).get().then(function(doc){
+    if(!doc.exists){toast("PIM não encontrada.");return;}
+    var p=doc.data();
+    var hist=(p.historicoEstado||[]).map(function(h){return"<li style='margin:5px 0;'><strong>"+h.estado+"</strong> — "+formatarData(h.data)+" por <em>"+(h.por||"--")+"</em></li>";}).join("");
+    var bg=document.createElement("div");bg.className="modal-bg";
+    bg.addEventListener("click",function(ev){if(ev.target===bg)bg.remove();});
+    var caixa=document.createElement("div");caixa.className="modal-caixa";
+    caixa.innerHTML=
+      "<h2>"+criarBadge(p.estado)+" "+(p.codigoPreparacao||p.codigoPim)+"</h2>"+
+      "<p><strong>Utente:</strong> "+(p.nomeUtente||"--")+"</p>"+
+      "<p style='margin-top:6px;'><strong>Farmacêutico:</strong> "+(p.farmaceuticoNome||"--")+"</p>"+
+      "<p style='margin-top:6px;'><strong>Técnico:</strong> "+(p.tecnicoNome||"--")+"</p>"+
+      "<p style='margin-top:6px;'><strong>Criada:</strong> "+formatarData(p.criadoEm)+"</p>"+
+      (p.prazo?"<p style='margin-top:6px;'><strong>Prazo:</strong> "+p.prazo+"</p>":"")+
+      (p.obsInternas?"<div class='obs-aviso' style='margin-top:12px;'><strong>Obs. internas:</strong><br>"+p.obsInternas+"</div>":"")+
+      (p.obsEntrega?"<div class='obs-red' style='margin-top:10px;'><strong>⚠️ Obs. entrega:</strong><br>"+p.obsEntrega+"</div>":"")+
+      "<h3 style='margin-top:16px;'>Histórico</h3>"+
+      "<ul style='font-size:.85em;color:var(--muted);padding-left:16px;'>"+hist+"</ul>"+
+      "<div class='modal-footer'><button class='btn btn-cinza btn-fechar-modal'>✕ Fechar</button></div>";
+    bg.appendChild(caixa);document.body.appendChild(bg);
+  });
+}
+
+/* ---- AVANÇAR ESTADO ---- */
+var fluxo=["Registada","Aguarda preparacao","Em preparacao","Preparada","Pronta para levantamento"];
+function avancarEstado(pimId,estadoAtual){
+  var idx=fluxo.indexOf(estadoAtual);
+  if(idx<0||idx>=fluxo.length-1){toast("Não é possível avançar este estado.");return;}
+  var prox=fluxo[idx+1];
+  showModal({title:"Avançar Estado",msg:"Avançar para: "+prox+"?",inputLabel:"Código do operador:"}).then(function(codOp){
+    if(!codOp)return;
+    if(!mapaUtilizadores[codOp]){toast("Código inválido.");return;}
+    var por=dadosUtilizador?dadosUtilizador.nome:codOp;
+    db.collection("pims").doc(pimId).get().then(function(doc){
+      var hist=doc.data().historicoEstado||[];
+      hist.push({estado:prox,data:new Date().toISOString(),por:por});
+      return db.collection("pims").doc(pimId).update({estado:prox,historicoEstado:hist,atualizadoEm:new Date().toISOString()});
+    }).then(function(){toast("Estado atualizado: "+prox+" ✅");carregarTodasPims("listaPims");carregarEstatisticas();}).catch(function(e){toast("Erro: "+e.message);});
+  });
+}
+
+/* ---- ANULAR PIM ---- */
+function anularPim(pimId){
+  showModal({title:"Anular PIM",msg:"Introduza o código de anulação:",inputLabel:"Código de anulação:"}).then(function(cod){
+    if(!cod)return;
+    if(cod.trim()!=="F03573"){toast("Código inválido.");return;}
+    var por=dadosUtilizador?dadosUtilizador.nome:"---";
+    db.collection("pims").doc(pimId).get().then(function(doc){
+      var hist=doc.data().historicoEstado||[];
+      hist.push({estado:"Anulada",data:new Date().toISOString(),por:por});
+      return db.collection("pims").doc(pimId).update({estado:"Anulada",historicoEstado:hist,anuladoEm:new Date().toISOString(),anuladoPor:por,atualizadoEm:new Date().toISOString()});
+    }).then(function(){toast("PIM anulada.");carregarTodasPims("listaPims");carregarEstatisticas();}).catch(function(e){toast("Erro: "+e.message);});
+  });
+}
+
+/* ---- DISPENSAR ---- */
+function carregarParaDispensa(){
+  var cod=document.getElementById("codDispensa").value.trim().toUpperCase();
+  var div=document.getElementById("detalhesDispensa");
+  if(!cod){toast("Introduza um código PIM.");return;}
+  div.innerHTML="<p>A pesquisar...</p>";
+  db.collection("pims").where("codigoPim","==",cod).where("estado","in",["Preparada","Pronta para levantamento"]).get().then(function(snap){
+    if(snap.empty){div.innerHTML="<div class='fb vis fb-err'>Nenhuma PIM pronta com esse código.</div>";return;}
+    var doc=snap.docs[0],p=doc.data(),pid=doc.id;
+    var temObs=!!(p.obsEntrega&&p.obsEntrega.trim());
+    var html="<div class='card'><p><strong>PIM:</strong> "+(p.codigoPreparacao||p.codigoPim)+" "+criarBadge(p.estado)+"</p><p style='margin-top:5px;'><strong>Utente:</strong> "+p.nomeUtente+"</p><p style='margin-top:5px;'><strong>Farmacêutico:</strong> "+(p.farmaceuticoNome||"--")+"</p></div>";
+    if(temObs)html+="<div class='obs-red'><strong>⚠️ ATENÇÃO — Observações de entrega:</strong><br>"+p.obsEntrega+"</div><div class='chk-row'><input type='checkbox' id='chkObsLidas'/><label for='chkObsLidas'>Li as observações e agi em conformidade.</label></div>";
+    html+="<label>Nome de quem levantou *</label><input type='text' id='nomeQuemLevantou' placeholder='Nome completo'/><label>Código do operador *</label><input type='text' id='codOperador' placeholder='Ex: 003'/><label>Observações da entrega</label><textarea id='obsDispensa' placeholder='Observações...' rows='2'></textarea><button class='btn btn-verde btn-block btn-confirmar-dispensa' data-pid='"+pid+"' data-temobs='"+temObs+"' style='margin-top:16px;'>✅ Confirmar Dispensa</button><div id='fbDispensa' class='fb'></div>";
+    div.innerHTML=html;
+  }).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
+}
+function confirmarDispensa(pimId,temObs){
+  if(temObs){var chk=document.getElementById("chkObsLidas");if(!chk||!chk.checked){toast("Confirme que leu as observações.");return;}}
+  var nomeQ=document.getElementById("nomeQuemLevantou")?document.getElementById("nomeQuemLevantou").value.trim():"";
+  var codOp=document.getElementById("codOperador")?document.getElementById("codOperador").value.trim():"";
+  var obsD=document.getElementById("obsDispensa")?document.getElementById("obsDispensa").value.trim():"";
+  if(!nomeQ){toast("Indique o nome de quem levantou.");return;}
+  if(!codOp){toast("Indique o código do operador.");return;}
+  var por=dadosUtilizador?dadosUtilizador.nome:codOp;
+  db.collection("pims").doc(pimId).get().then(function(doc){
+    var p=doc.data(),hist=p.historicoEstado||[];
+    hist.push({estado:"Dispensada",data:new Date().toISOString(),por:por});
+    return db.collection("pims").doc(pimId).update({estado:"Dispensada",historicoEstado:hist,dispensadoEm:new Date().toISOString(),dispensadoPor:por,codigoOperador:codOp,nomeQuemLevantou:nomeQ,obsDispensa:obsD,atualizadoEm:new Date().toISOString()}).then(function(){
+      return db.collection("dispensas").add({pimId:pimId,codigoPreparacao:p.codigoPreparacao||p.codigoPim,nomeUtente:p.nomeUtente,nomeQuemLevantou:nomeQ,codigoOperador:codOp,obs:obsD,dispensadoEm:new Date().toISOString(),dispensadoPor:por});
+    }).then(function(){return p;});
+  }).then(function(p){
+    document.getElementById("detalhesDispensa").innerHTML="<div class='fb vis fb-ok'>✅ PIM dispensada com sucesso.</div>";
+    document.getElementById("codDispensa").value="";
+    imprimirTalao(pimId);carregarEstatisticas();toast("PIM dispensada ✅");
+  }).catch(function(e){toast("Erro: "+e.message);});
+}
+
+/* ---- IMPRIMIR TALÃO ---- */
+function imprimirTalao(pimId){
+  db.collection("pims").doc(pimId).get().then(function(doc){
+    var p=doc.data();
+    var w=window.open("","_blank","width=420,height=560");
+    w.document.write("<!DOCTYPE html><html><head><meta charset='UTF-8'><style>body{font-family:Arial,sans-serif;font-size:13px;padding:18px;max-width:300px;}h2{font-size:14px;text-align:center;margin-bottom:3px;}.sub{text-align:center;font-size:11px;color:#666;margin-bottom:8px;}.ln{border-top:1px dashed #000;margin:9px 0;}.row{margin:5px 0;}.sig{margin-top:28px;border-top:1px solid #000;padding-top:7px;font-size:12px;}.ctr{text-align:center;}</style></head><body><h2>Farmácia da Liga</h2><p class='sub'>Preparação Individualizada da Medicação</p><div class='ln'></div><p class='row'><strong>PIM:</strong> "+(p.codigoPreparacao||p.codigoPim)+"</p><p class='row'><strong>Utente:</strong> "+p.nomeUtente+"</p><p class='row'><strong>Levantou:</strong> "+(p.nomeQuemLevantou||"---")+"</p><p class='row'><strong>Data:</strong> "+formatarData(p.dispensadoEm||new Date().toISOString())+"</p><p class='row'><strong>Operador:</strong> "+(p.codigoOperador||"---")+"</p>"+(p.obsDispensa?"<p class='row'><strong>Obs:</strong> "+p.obsDispensa+"</p>":"")+"<div class='ln'></div><p>Confirmo que foi entregue a preparação individualizada da medicação acima identificada.</p><div class='sig'>Assinatura: ____________________________</div><p class='ctr' style='margin-top:14px;font-size:11px;color:#999;'>Farmácia da Liga &copy; "+new Date().getFullYear()+"</p></body></html>");
+    w.document.close();w.focus();w.print();
+  });
+}
+
+/* ---- MINHAS PIMs ---- */
+function carregarMinhasPims(filtro){
+  if(!dadosUtilizador)return;
+  var nome=dadosUtilizador.nome;
+  var div=document.getElementById("listaMinhasPims");div.innerHTML="<p>A carregar...</p>";
+  var ef={pendentes:["Registada","Aguarda preparacao","Em preparacao"],preparadas:["Preparada","Pronta para levantamento"],dispensadas:["Dispensada"]};
+  db.collection("pims").where("farmaceuticoNome","==",nome).get().then(function(snap){
+    var docs=[];
+    snap.forEach(function(d){var p=d.data();if(filtro==="todas"||(ef[filtro]&&ef[filtro].indexOf(p.estado)>=0))docs.push({id:d.id,data:p});});
+    if(!docs.length){div.innerHTML="<p>Nenhuma PIM encontrada.</p>";return;}
+    var h="<table><thead><tr><th>Cód. Prep.</th><th>Utente</th><th>Estado</th><th>Prazo</th><th>Data</th><th>Ver</th></tr></thead><tbody>";
+    docs.forEach(function(item){var p=item.data;h+="<tr><td><strong>"+(p.codigoPreparacao||p.codigoPim||"--")+"</strong></td><td>"+(p.nomeUtente||"--")+"</td><td>"+criarBadge(p.estado||"--")+"</td><td><small>"+(p.prazo?formatarDataSimples(p.prazo):"---")+"</small></td><td><small>"+formatarData(p.criadoEm)+"</small></td><td><button class='btn btn-xs btn-outline' data-pid='"+item.id+"' onclick='verDetalhe(this.dataset.pid)'>👁 Ver</button></td></tr>";});
+    h+="</tbody></table>";div.innerHTML=h;
+  }).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
+}
+
+/* ---- EXPORTAR CSV ---- */
+function exportarCSV(){
+  db.collection("pims").orderBy("criadoEm","desc").get().then(function(snap){
+    var rows=["Cód. PIM;Cód. Prep.;Utente;Cód. Utente;Farmacêutico;Técnico;Estado;Criada em;Prazo;Obs. Internas;Obs. Entrega"];
+    snap.forEach(function(doc){
+      var p=doc.data();
+      var lp=function(s){return(s||"").replace(/;/g,",").replace(/\n/g," ");};
+      rows.push([lp(p.codigoPim),lp(p.codigoPreparacao),lp(p.nomeUtente),lp(p.codigoUtente),lp(p.farmaceuticoNome),lp(p.tecnicoNome),lp(p.estado),formatarData(p.criadoEm),lp(p.prazo),lp(p.obsInternas),lp(p.obsEntrega)].join(";"));
+    });
+    var blob=new Blob(["\uFEFF"+rows.join("\r\n")],{type:"text/csv;charset=utf-8;"});
+    var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="pims_"+new Date().toISOString().slice(0,10)+".csv";document.body.appendChild(a);a.click();document.body.removeChild(a);
+    toast("CSV exportado 📥");
+  });
+}
+
+/* ---- COLABORADORES ---- */
+function mostrarFormColaborador(){document.getElementById("formColaboradorArea").classList.remove("hidden");}
+function esconderFormColaborador(){document.getElementById("formColaboradorArea").classList.add("hidden");}
+document.getElementById("formColaborador").addEventListener("submit",function(e){
+  e.preventDefault();
+  var cod=document.getElementById("colCodigo").value.trim();
+  var nome=document.getElementById("colNome").value.trim();
+  var func=document.getElementById("colFuncao").value;
+  var pass=document.getElementById("colPass").value;
+  var conf=document.getElementById("colPassConf").value;
+  if(!cod||!nome||!func||!pass){mostrarFb("fbColaborador","Preencha todos os campos.",false);return;}
+  if(pass!==conf){mostrarFb("fbColaborador","As passwords não coincidem.",false);return;}
+  if(pass.length<6){mostrarFb("fbColaborador","Password: mínimo 6 caracteres.",false);return;}
+  var email=gerarEmail(cod);
+  mostrarFb("fbColaborador","A criar...",true);
+  auth.createUserWithEmailAndPassword(email,pass).then(function(cred){
+    return db.collection("utilizadores").doc(cred.user.uid).set({codigo:cod,nome:nome,funcao:func,email:email,criadoEm:new Date().toISOString()});
+  }).then(function(){
+    mapaUtilizadores[cod]=email;
+    mostrarFb("fbColaborador","Colaborador "+nome+" criado! Código: "+cod,true);
+    document.getElementById("formColaborador").reset();
+    carregarColaboradores();carregarMapaUtilizadores();toast("Colaborador criado ✅");
+  }).catch(function(e){mostrarFb("fbColaborador",e.code==="auth/email-already-in-use"?"Código já existe.":"Erro: "+e.message,false);});
+});
+function carregarColaboradores(){
+  var div=document.getElementById("listaColaboradores");div.innerHTML="<p>A carregar...</p>";
+  db.collection("utilizadores").orderBy("nome").get().then(function(snap){
+    if(snap.empty){div.innerHTML="<p>Nenhum colaborador.</p>";return;}
+    var h="<table><thead><tr><th>Código</th><th>Nome</th><th>Função</th><th>Criado em</th></tr></thead><tbody>";
+    snap.forEach(function(doc){var c=doc.data();h+="<tr><td>"+c.codigo+"</td><td><strong>"+c.nome+"</strong></td><td>"+traduzirFuncao(c.funcao||"")+"</td><td><small>"+formatarData(c.criadoEm)+"</small></td></tr>";});
+    h+="</tbody></table>";div.innerHTML=h;
+  }).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
+}
+
+/* ---- EVENT DELEGATION ---- */
+document.addEventListener("click",function(e){
+  if(e.target.classList.contains("btn-fechar-modal")){var m=e.target.closest(".modal-bg");if(m)m.remove();}
+  if(e.target.classList.contains("btn-confirmar-dispensa")){var pid=e.target.dataset.pid;var temObs=e.target.dataset.temobs==="true";confirmarDispensa(pid,temObs);}
+});
+
+mostrarSec("login");
+</script>
 </body>
 </html>
