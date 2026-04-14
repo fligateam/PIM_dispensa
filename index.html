@@ -1,4 +1,4 @@
-html = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8"/>
@@ -74,7 +74,7 @@ html = """<!DOCTYPE html>
   <a onclick="mostrarSec('login')">Entrar</a>
   <a onclick="mostrarSec('painel')" class="nav-logged">Painel <span id="badgeAvisos" class="aviso-badge hidden">0</span></a>
   <a onclick="mostrarSec('utentes')" class="nav-logged">Utentes</a>
-  <a onclick="mostrarSec('registarPim')" class="nav-logged">Registar PIM</a>
+  <a onclick="abrirRegistoNovaPim()" class="nav-logged">Registar PIM</a>
   <a onclick="mostrarSec('consultarPim')" class="nav-logged">Consultar PIMs</a>
   <a onclick="mostrarSec('dispensarPim')" class="nav-logged">Dispensar PIM</a>
   <a onclick="mostrarSec('gestaoPims')" class="nav-logged">Gestao PIMs</a>
@@ -566,8 +566,8 @@ function carregarUtentes(){
         "<td>" + (u.tecnicoNome||"---") + "</td>" +
         "<td style='" + (vencido?"color:#c0392b;font-weight:700;":"") + "'>" + dataPrep + "</td>" +
         "<td>" +
-          "<button class='btn btn-sm' onclick='editarUtente(\"" + uid + "\")'>Editar</button> " +
-          "<button class='btn btn-sm btn-verde' onclick='selecionarUtenteParaPim(\"" + uid + "\")'>+ PIM</button>" +
+          "<button class='btn btn-sm' onclick='editarUtente("" + uid + "")'>Editar</button> " +
+          "<button class='btn btn-sm btn-verde' onclick='selecionarUtenteParaPim("" + uid + "")'>+ PIM</button>" +
         "</td></tr>";
     });
     h += "</tbody></table>";
@@ -597,6 +597,15 @@ function editarUtente(id){
 function selecionarUtenteParaPim(uid){
   mostrarSec("registarPim");
   carregarSelectUtentes(uid);
+}
+
+function abrirRegistoNovaPim(){
+  mostrarSec("registarPim");
+  carregarSelectUtentes(null);
+  document.getElementById("dadosUtenteRegisto").classList.add("hidden");
+  document.getElementById("cardUtenteRegisto").innerHTML = "";
+  var form = document.getElementById("formPim");
+  if(form) form.reset();
 }
 
 // ==============================================
@@ -714,11 +723,11 @@ function renderTabela(snap, containerId){
       "<td>" + criarBadge(p.estado||"--") + "</td>" +
       "<td><small>" + formatarData(p.criadoEm) + "</small></td>" +
       "<td>" +
-        "<button class='btn btn-sm' onclick='verDetalhe(\"" + pid + "\")'>Ver</button> " +
+        "<button class='btn btn-sm' onclick='verDetalhe("" + pid + "")'>Ver</button> " +
         (p.estado !== "Anulada" && p.estado !== "Dispensada"
-          ? "<button class='btn btn-sm btn-laranja' onclick='avancarEstado(\"" + pid + "\",\"" + (p.estado||"") + "\")'>Avancar</button> " : "") +
+          ? "<button class='btn btn-sm btn-laranja' onclick='avancarEstado("" + pid + "","" + (p.estado||"") + "")'>Avancar</button> " : "") +
         (p.estado !== "Anulada" && p.estado !== "Dispensada"
-          ? "<button class='btn btn-sm btn-red' onclick='anularPim(\"" + pid + "\")'>Anular</button>" : "") +
+          ? "<button class='btn btn-sm btn-red' onclick='anularPim("" + pid + "")'>Anular</button>" : "") +
       "</td></tr>";
   });
   h += "</tbody></table>";
@@ -793,7 +802,7 @@ function verDetalhe(pimId){
       (p.obsEntrega ? "<div class='obs-red' style='margin-top:10px;'><strong>Obs. entrega:</strong><br>" + p.obsEntrega + "</div>" : "") +
       "<h3 style='margin-top:14px;margin-bottom:7px;'>Historico de Estados</h3>" +
       "<ul style='font-size:.85em;color:#555;padding-left:16px;'>" + hist + "</ul>" +
-      "<button class='btn' style='margin-top:14px;' onclick='this.closest(\".modal-bg\").remove()'>Fechar</button>" +
+      "<button class='btn' style='margin-top:14px;' onclick='this.closest(".modal-bg").remove()'>Fechar</button>" +
       "</div>";
     document.body.appendChild(bg);
   });
@@ -881,7 +890,7 @@ function carregarParaDispensa(){
         "<label>Nome de quem levantou</label><input type='text' id='nomeQuemLevantou' placeholder='Nome completo'/>" +
         "<label>Codigo do operador</label><input type='text' id='codOperador' placeholder='Ex: 003'/>" +
         "<label>Observacoes da entrega</label><textarea id='obsDispensa' placeholder='Observacoes...' rows='2'></textarea>" +
-        "<button class='btn btn-verde btn-block' onclick='confirmarDispensa(\"" + pid + "\"," + temObs + ")'>Confirmar Dispensa</button>" +
+        "<button class='btn btn-verde btn-block' onclick='confirmarDispensa("" + pid + ""," + temObs + ")'>Confirmar Dispensa</button>" +
         "<div id='fbDispensa' class='fb'></div>";
       div.innerHTML = html;
     }).catch(function(e){ div.innerHTML="<p>Erro: "+e.message+"</p>"; });
@@ -994,7 +1003,7 @@ function carregarMinhasPims(filtro){
         "<td>" + criarBadge(p.estado||"--") + "</td>" +
         "<td><small>" + (p.prazo ? formatarDataSimples(p.prazo) : "---") + "</small></td>" +
         "<td><small>" + formatarData(p.criadoEm) + "</small></td>" +
-        "<td><button class='btn btn-sm' onclick='verDetalhe(\"" + item.id + "\")'>Ver</button></td></tr>";
+        "<td><button class='btn btn-sm' onclick='verDetalhe("" + item.id + "")'>Ver</button></td></tr>";
     });
     h += "</tbody></table>";
     div.innerHTML = h;
@@ -1009,14 +1018,17 @@ function exportarCSV(){
     var rows = ["Cod. PIM;Cod. Prep.;Utente;Cod. Utente;Farmaceutico;Tecnico;Estado;Criada em;Prazo;Obs. Internas;Obs. Entrega"];
     snap.forEach(function(doc){
       var p = doc.data();
-      var lp = function(s){ return (s||"").replace(/;/g,",").replace(/\r?\n/g," "); };
+      var lp = function(s){ return (s||"").replace(/;/g,",").replace(/
+?
+/g," "); };
       rows.push([
         lp(p.codigoPim), lp(p.codigoPreparacao), lp(p.nomeUtente), lp(p.codigoUtente),
         lp(p.farmaceuticoNome), lp(p.tecnicoNome), lp(p.estado),
         formatarData(p.criadoEm), lp(p.prazo), lp(p.obsInternas), lp(p.obsEntrega)
       ].join(";"));
     });
-    var blob = new Blob(["\uFEFF" + rows.join("\r\n")], { type:"text/csv;charset=utf-8;" });
+    var blob = new Blob(["﻿" + rows.join("
+")], { type:"text/csv;charset=utf-8;" });
     var a    = document.createElement("a");
     a.href   = URL.createObjectURL(blob);
     a.download = "pims_" + new Date().toISOString().slice(0,10) + ".csv";
@@ -1085,9 +1097,7 @@ function carregarColaboradores(){
 }
 
 // Carregar selects ao entrar nas seccoes
-document.getElementById("registarPim").addEventListener("click", function(){ carregarSelectUtentes(null); }, { once: false });
 mostrarSec("login");
 </script>
 </body>
 </html>
-
