@@ -166,7 +166,12 @@
         <label>Técnico responsável</label>
         <select id="uTecnico"><option value="">-- Selecionar --</option></select>
         <label>Periodicidade de preparação (dias)</label>
-        <input type="number" id="uPeriodicidade" placeholder="Ex: 30" min="1"/>
+        <input type="number" id="uPeriodicidade" placeholder="Ex: 30" min="1" oninput="calcularProximaPrep()"/>
+        <label>Data de início da periodicidade</label>
+        <input type="date" id="uDataInicio" onchange="calcularProximaPrep()"/>
+        <div id="previewProxPrep" style="font-size:.82em;color:var(--p);margin-top:6px;display:none;">
+          Próxima preparação prevista: <strong id="previewProxPrepVal"></strong>
+        </div>
         <label>Observações do utente</label>
         <textarea id="uObs" placeholder="Observações relevantes sobre o utente..."></textarea>
         <div style="display:flex;gap:10px;margin-top:16px;">
@@ -496,7 +501,12 @@ function verificarAvisos(){
     if(!av.length){div.innerHTML="<p style='color:var(--p);'>Sem avisos de preparacao nos proximos 3 dias uteis.</p>";return;}
     var h="<h3 style='color:var(--danger);margin-bottom:10px;'>Avisos de Preparacao ("+av.length+")</h3>";
     av.forEach(function(a){
-      h+="<div class='aviso-item'><div><strong>Necessario preparar PIM para: "+a.nome+"</strong> ("+a.cod+")<br><small>Farmaceutico responsavel: <strong>"+(a.farm||"---")+"</strong> &mdash; Data prevista: "+formatarDataSimples(a.data)+"</small></div></div>";
+      var uid=a.uid||"";var per=a.periodo||0;
+      h+="<div class='aviso-item' style='justify-content:space-between;align-items:center;'>"
+        +"<div><strong>Necessario preparar PIM para: "+a.nome+"</strong> ("+a.cod+")<br>"
+        +"<small>Farmaceutico responsavel: <strong>"+(a.farm||"---")+"</strong> &mdash; Data prevista: "+formatarDataSimples(a.data)+"</small></div>"
+        +"<button class='btn btn-xs btn-cinza' style='min-width:90px;flex-shrink:0;' "
+        +"onclick='dispensarAviso(&quot;"+uid+"&quot;,"+per+")'>Dispensar Aviso</button></div>";
     });
     div.innerHTML=h;
   }).catch(function(){});
@@ -521,14 +531,15 @@ function carregarAvisosMinhasPims(){
       // Mostrar a farmaceutico responsavel OU a tecnicos (todos)
       var eResponsavel=(u.farmaceuticoNome===nome)||(funcao==="tecnico"||funcao==="admin");
       if(eResponsavel&&u.proximaPreparacao&&new Date(u.proximaPreparacao)<=limite){
-        av.push({nome:u.nome,cod:u.codigoPim,farm:u.farmaceuticoNome,data:u.proximaPreparacao});
+        av.push({uid:doc.id,nome:u.nome,cod:u.codigoPim,farm:u.farmaceuticoNome,data:u.proximaPreparacao,periodo:u.periodicidade||0});
       }
     });
     if(!av.length){div.innerHTML="";return;}
     var h="<div style='background:var(--dangera);border-left:4px solid var(--danger);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;'>";
     h+="<strong style='color:var(--danger);'>Avisos — PIMs a preparar (proximos 3 dias uteis):</strong><ul style='margin-top:8px;padding-left:16px;font-size:.88em;'>";
     av.forEach(function(a){
-      h+="<li style='margin:5px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;'>Necessario preparar PIM para <strong>"+a.nome+"</strong> ("+a.cod+") — <strong>"+(a.farm||"---")+"</strong> — prevista: "+formatarDataSimples(a.data)+" <button class='btn btn-xs btn-cinza' data-uid='"+a.uid+"' data-periodo='"+a.periodo+"' onclick='dispensarAviso(this.dataset.uid,this.dataset.periodo)'>Dispensar</button></li>";
+      var uid=a.uid||"";var per=a.periodo||0;
+      h+="<li style='margin:5px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;'>Necessario preparar PIM para <strong>"+a.nome+"</strong> ("+a.cod+") — <strong>"+(a.farm||"---")+"</strong> — prevista: "+formatarDataSimples(a.data)+" <button class='btn btn-xs btn-cinza' onclick='dispensarAviso(\""+uid+"\","+per+")'>Dispensar</button></li>";
     });
     h+="</ul></div>";
     div.innerHTML=h;
@@ -536,7 +547,7 @@ function carregarAvisosMinhasPims(){
 }
 
 /* ---- UTENTES ---- */
-function mostrarFormUtente(){document.getElementById("formUtenteArea").classList.remove("hidden");document.getElementById("tituloFormUtente").innerText="Novo Utente";document.getElementById("formUtente").reset();document.getElementById("utenteIdEdicao").value="";preencherSelectsFarmaceuticos();}
+function mostrarFormUtente(){document.getElementById("formUtenteArea").classList.remove("hidden");document.getElementById("tituloFormUtente").innerText="Novo Utente";document.getElementById("formUtente").reset();document.getElementById("utenteIdEdicao").value="";var pr=document.getElementById("previewProxPrep");if(pr)pr.style.display="none";preencherSelectsFarmaceuticos();}
 function esconderFormUtente(){document.getElementById("formUtenteArea").classList.add("hidden");}
 function preencherSelectsFarmaceuticos(){
   var sf=document.getElementById("uFarmaceutico"),st=document.getElementById("uTecnico");
@@ -547,6 +558,23 @@ function preencherSelectsFarmaceuticos(){
     if(c.funcao==="tecnico")st.innerHTML+="<option value='"+c.nome+"'>"+c.nome+" ("+c.codigo+")</option>";
   });
 }
+/* ---- PREVIEW PRÓXIMA PREPARAÇÃO ---- */
+function calcularProximaPrep(){
+  var periodo=parseInt(document.getElementById("uPeriodicidade").value)||0;
+  var dataInicio=document.getElementById("uDataInicio").value;
+  var preview=document.getElementById("previewProxPrep");
+  var previewVal=document.getElementById("previewProxPrepVal");
+  if(!preview||!previewVal)return;
+  if(periodo>0){
+    var base=dataInicio?new Date(dataInicio+"T12:00:00"):new Date();
+    base.setDate(base.getDate()+periodo);
+    previewVal.innerText=base.toLocaleDateString("pt-PT");
+    preview.style.display="block";
+  } else {
+    preview.style.display="none";
+  }
+}
+
 document.getElementById("formUtente").addEventListener("submit",function(e){
   e.preventDefault();
   var id=document.getElementById("utenteIdEdicao").value;
@@ -557,8 +585,14 @@ document.getElementById("formUtente").addEventListener("submit",function(e){
   var periodo=parseInt(document.getElementById("uPeriodicidade").value)||0;
   var obs=document.getElementById("uObs").value.trim();
   if(!nome||!codPim||!farm){mostrarFb("fbUtente","Preencha os campos obrigatorios.",false);return;}
-  var proxPrep="";if(periodo>0){var dd=new Date();dd.setDate(dd.getDate()+periodo);proxPrep=dd.toISOString();}
-  var dados={nome:nome,codigoPim:codPim,farmaceuticoNome:farm,tecnicoNome:tec,periodicidade:periodo,observacoes:obs,proximaPreparacao:proxPrep,atualizadoEm:new Date().toISOString()};
+  var dataInicio=document.getElementById("uDataInicio").value;
+  var proxPrep="";
+  if(periodo>0){
+    var base=dataInicio?new Date(dataInicio+"T12:00:00"):new Date();
+    base.setDate(base.getDate()+periodo);
+    proxPrep=base.toISOString();
+  }
+  var dados={nome:nome,codigoPim:codPim,farmaceuticoNome:farm,tecnicoNome:tec,periodicidade:periodo,dataInicioPeriodicidade:dataInicio||"",observacoes:obs,proximaPreparacao:proxPrep,atualizadoEm:new Date().toISOString()};
   var ref=id?db.collection("utentes").doc(id):db.collection("utentes").doc();
   if(!id)dados.criadoEm=new Date().toISOString();
   ref.set(dados,{merge:true}).then(function(){
@@ -589,7 +623,9 @@ function editarUtente(id){
     document.getElementById("uNome").value=u.nome||"";
     document.getElementById("uCodigoPim").value=u.codigoPim||"";
     document.getElementById("uPeriodicidade").value=u.periodicidade||"";
+    document.getElementById("uDataInicio").value=u.dataInicioPeriodicidade||"";
     document.getElementById("uObs").value=u.observacoes||"";
+    calcularProximaPrep();
     document.getElementById("tituloFormUtente").innerText="Editar Utente";
     document.getElementById("formUtenteArea").classList.remove("hidden");
     preencherSelectsFarmaceuticos();
