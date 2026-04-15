@@ -790,7 +790,7 @@ document.getElementById("formPim").addEventListener("submit",function(e){
     var u=uDoc.data();
     return db.collection("pims").where("codigoPim","==",codBase).get().then(function(snap){
       var num=snap.size+1;
-      var codPrep=codBase+"."+"00"+num).slice(-3);
+      var codPrep = codBase + "." + ("00" + num).slice(-3); 
       var ref=db.collection("pims").doc();
       return ref.set({pimId:ref.id,utenteId:uid,codigoPim:codBase,codigoPreparacao:codPrep,nomeUtente:u.nome,codigoUtente:u.codigoPim,farmaceuticoNome:farm,tecnicoNome:tec,farmaceuticoId:utilizadorAtual.uid,estado:"Registada",historicoEstado:[{estado:"Registada",data:new Date().toISOString(),por:farm||(dadosUtilizador?dadosUtilizador.nome:"")}],numeroPreparacao:num,obsInternas:obsInt,obsEntrega:obsEnt,prazo:prazo||"",autoRenovar:false,criadoEm:new Date().toISOString(),atualizadoEm:new Date().toISOString()});
     });
