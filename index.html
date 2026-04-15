@@ -407,8 +407,11 @@ function mostrarSec(id){
 auth.onAuthStateChanged(function(user){
   if(user){
     db.collection("utilizadores").doc(user.uid).get().then(function(doc){
+      var dados=doc.exists?doc.data():null;
+      if(!dados){auth.signOut();mostrarFb("fbLogin","Utilizador sem dados. Contacte o administrador.",false);return;}
+      if(dados.ativo===false){auth.signOut();mostrarFb("fbLogin","Conta desativada. Contacte o administrador.",false);return;}
       utilizadorAtual=user;
-      dadosUtilizador=doc.exists?doc.data():{nome:user.email,funcao:"operador",codigo:"000"};
+      dadosUtilizador=dados;
       var ui=document.getElementById("userInfo");
       ui.style.display="flex";
       document.getElementById("nomeUtilizador").innerText=dadosUtilizador.nome||user.email;
@@ -933,7 +936,7 @@ document.getElementById("formColaborador").addEventListener("submit",function(e)
   var email=gerarEmail(cod);
   mostrarFb("fbColaborador","A criar...",true);
   auth.createUserWithEmailAndPassword(email,pass).then(function(cred){
-    return db.collection("utilizadores").doc(cred.user.uid).set({codigo:cod,nome:nome,funcao:func,email:email,criadoEm:new Date().toISOString()});
+    return db.collection("utilizadores").doc(cred.user.uid).set({codigo:cod,nome:nome,funcao:func,email:email,ativo:true,criadoEm:new Date().toISOString()});
   }).then(function(){
     mapaUtilizadores[cod]=email;
     mostrarFb("fbColaborador","Colaborador "+nome+" criado! Codigo: "+cod,true);
@@ -951,6 +954,20 @@ function editarColaborador(id,cod,nome,func){
   document.getElementById("colPassConf").placeholder="Deixe vazio para manter";
   document.getElementById("formColaboradorArea").classList.remove("hidden");
   window.colIdEdicao=id;
+}
+
+
+/* ---- ATIVAR / DESATIVAR COLABORADOR ---- */
+function toggleAtivo(userId,nome,novoEstado){
+  var msg=novoEstado?"Reativar conta de "+nome+"?":"Desativar conta de "+nome+"? O colaborador nao conseguira fazer login.";
+  showModal({title:novoEstado?"Ativar Colaborador":"Desativar Colaborador",msg:msg}).then(function(ok){
+    if(!ok)return;
+    db.collection("utilizadores").doc(userId).update({ativo:novoEstado,atualizadoEm:new Date().toISOString()}).then(function(){
+      toast(nome+(novoEstado?" ativado":" desativado")+".");
+      carregarColaboradores();
+      carregarMapaUtilizadores();
+    }).catch(function(e){toast("Erro: "+e.message);});
+  });
 }
 
 /* ---- APAGAR COLABORADOR ---- */
@@ -986,7 +1003,7 @@ function carregarColaboradores(){
   var div=document.getElementById("listaColaboradores");div.innerHTML="<p>A carregar...</p>";
   db.collection("utilizadores").orderBy("nome").get().then(function(snap){
     if(snap.empty){div.innerHTML="<p>Nenhum colaborador.</p>";return;}
-    var h="<table><thead><tr><th>Codigo</th><th>Nome</th><th>Funcao</th><th>Criado em</th><th>Acoes</th></tr></thead><tbody>";
+    var h="<table><thead><tr><th>Codigo</th><th>Nome</th><th>Funcao</th><th>Estado</th><th>Criado em</th><th>Acoes</th></tr></thead><tbody>";
     snap.forEach(function(doc){var c=doc.data();h+="<tr><td>"+c.codigo+"</td><td><strong>"+c.nome+"</strong></td><td>"+traduzirFuncao(c.funcao||"")+"</td><td><small>"+formatarData(c.criadoEm)+"</small></td></tr>";});
     h+="</tbody></table>";div.innerHTML=h;
   }).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
