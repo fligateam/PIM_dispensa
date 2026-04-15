@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PIMs – Farmácia da Liga</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>😊</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E😊%3C/text%3E%3C/svg%3E">
   <style>
     :root{
       --p:#1b5e20;--p2:#2e7d32;--p3:#388e3c;--p4:#43a047;--pa:#c8e6c9;--paa:#e8f5e9;
@@ -163,8 +163,8 @@
         <input type="text" id="uCodigoPim" required placeholder="64DRC26"/>
         <label>Farmacêutico responsável *</label>
         <select id="uFarmaceutico" required><option value="">-- Selecionar --</option></select>
-<label>Profissional Responsável Complementar <span style="font-weight:400;color:var(--muted);">(farmacêutico ou técnico)</span></label>
-<select id="uSubstituto"><option value="">-- Nenhum --</option></select>
+        <label>Profissional Responsável Complementar <span style="font-weight:400;color:var(--muted);">(farmacêutico ou técnico)</span></label>
+        <select id="uSubstituto"><option value="">-- Nenhum --</option></select>
         <label>Periodicidade de preparação (dias)</label>
         <input type="number" id="uPeriodicidade" placeholder="Ex: 30" min="1" oninput="calcularProximaPrep()"/>
         <label>Data de início da periodicidade</label>
@@ -247,17 +247,27 @@
   <h2>Gestão de PIMs</h2>
   <div class="frow" style="margin-bottom:14px;flex-wrap:wrap;gap:8px;">
     <button class="btn btn-sm btn-outline" onclick="filtrarEstado('Registada')">Registadas</button>
-    <button class="btn btn-sm" style="background:#1565c0;color:#fff;" onclick="filtrarEstado('Aguarda preparacao')">Aguarda Prep.</button>
     <button class="btn btn-sm btn-verde" onclick="filtrarEstado('Pronto para levantamento')">Pronto p/ Levantamento</button>
     <button class="btn btn-sm" style="background:#6a1b9a;color:#fff;" onclick="filtrarEstado('Dispensada')">Dispensadas</button>
     <button class="btn btn-sm btn-red" onclick="filtrarEstado('Anulada')">Anuladas</button>
     <button class="btn btn-sm btn-cinza" onclick="carregarTodasPims('listaPims')">Todas</button>
   </div>
-  <div class="frow" style="margin-bottom:16px;">
+  <div class="frow" style="margin-bottom:10px;flex-wrap:wrap;gap:8px;align-items:flex-end;">
     <div class="f1">
       <label style="margin-top:0;">Filtrar por Farmacêutico</label>
       <select id="filtroPorFarmaceutico" onchange="filtrarPorFarmaceutico()">
         <option value="">-- Todos --</option>
+      </select>
+    </div>
+    <div class="f1">
+      <label style="margin-top:0;">Ordenar por</label>
+      <select id="sortPims" onchange="aplicarOrdenacao()">
+        <option value="criadoEm_desc">Data (mais recente)</option>
+        <option value="criadoEm_asc">Data (mais antiga)</option>
+        <option value="codigoPreparacao_asc">Nº PIM (A→Z)</option>
+        <option value="codigoPreparacao_desc">Nº PIM (Z→A)</option>
+        <option value="estado_asc">Estado (A→Z)</option>
+        <option value="nomeUtente_asc">Utente (A→Z)</option>
       </select>
     </div>
     <button class="btn btn-verde btn-sm" onclick="exportarCSV()" style="align-self:flex-end;">Exportar Excel</button>
@@ -272,7 +282,6 @@
   <div id="avisosMinhasPims" style="margin-bottom:16px;"></div>
   <div class="frow" style="margin-bottom:14px;gap:8px;">
     <button class="btn btn-sm btn-outline" onclick="carregarMinhasPims('todas')">Todas</button>
-    <button class="btn btn-sm" style="background:#1565c0;color:#fff;" onclick="carregarMinhasPims('aguarda')">Aguarda Prep.</button>
     <button class="btn btn-sm btn-verde" onclick="carregarMinhasPims('prontas')">Prontas</button>
     <button class="btn btn-sm btn-cinza" onclick="carregarMinhasPims('dispensadas')">Dispensadas</button>
   </div>
@@ -319,7 +328,7 @@
 </main>
 
 <footer style="text-align:center;padding:20px;font-size:.8em;color:var(--muted);margin-top:16px;border-top:1px solid var(--line);">
-  &copy; 2026 Farmácia da Liga &mdash; Gestão de PIMs v2.1
+  &copy; 2026 Farmácia da Liga &mdash; Gestão de PIMs v2.2
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -357,6 +366,40 @@ var auth = firebase.auth();
 var db = firebase.firestore();
 var utilizadorAtual = null, dadosUtilizador = null, mapaUtilizadores = {}, todosColaboradores = [];
 
+// ---- LISTENERS REALTIME (alteração 5) ----
+var _unsubPims = null, _unsubUtentes = null, _autoRefreshTimer = null;
+var _secAtiva = "login";
+
+function iniciarListenersRealtime() {
+  pararListenersRealtime();
+  // Listener PIMs - atualiza tabela e estatísticas em tempo real
+  _unsubPims = db.collection("pims").onSnapshot(function() {
+    if(_secAtiva === "gestaoPims") { aplicarOrdenacao(); carregarEstatisticas(); }
+    if(_secAtiva === "minhaPims") { carregarMinhasPims("todas"); }
+    if(_secAtiva === "consultarPim") { /* não recarrega automaticamente para não interferir pesquisa */ }
+    if(_secAtiva === "painel") carregarEstatisticas();
+  }, function(e){ console.warn("Snapshot pims:", e.message); });
+
+  // Listener Utentes - atualiza avisos em tempo real
+  _unsubUtentes = db.collection("utentes").onSnapshot(function() {
+    if(_secAtiva === "painel") verificarAvisos();
+    if(_secAtiva === "minhaPims") carregarAvisosMinhasPims();
+  }, function(e){ console.warn("Snapshot utentes:", e.message); });
+
+  // Fallback polling a 30s
+  _autoRefreshTimer = setInterval(function() {
+    if(_secAtiva === "painel") { carregarEstatisticas(); verificarAvisos(); }
+    if(_secAtiva === "gestaoPims") aplicarOrdenacao();
+    if(_secAtiva === "minhaPims") { carregarMinhasPims("todas"); carregarAvisosMinhasPims(); }
+  }, 30000);
+}
+
+function pararListenersRealtime() {
+  if(_unsubPims){ _unsubPims(); _unsubPims = null; }
+  if(_unsubUtentes){ _unsubUtentes(); _unsubUtentes = null; }
+  if(_autoRefreshTimer){ clearInterval(_autoRefreshTimer); _autoRefreshTimer = null; }
+}
+
 /* ---- UTILS ---- */
 function gerarEmail(c){return"user_"+c+"@farmacialiga.pt";}
 function formatarData(iso){if(!iso)return"---";try{return new Date(iso).toLocaleString("pt-PT");}catch(e){return iso;}}
@@ -392,16 +435,17 @@ function showModal(opts){
 
 /* ---- NAVEGAÇÃO ---- */
 function mostrarSec(id){
+  _secAtiva = id;
   document.querySelectorAll(".sec").forEach(function(s){s.classList.add("hidden");});
   var el=document.getElementById(id);if(el)el.classList.remove("hidden");
   document.querySelectorAll("nav a").forEach(function(a){a.classList.remove("ativa");});
   document.querySelectorAll(".nav-logged").forEach(function(a){a.classList.toggle("vis",!!utilizadorAtual);});
   var navEntrar=document.getElementById("navEntrar");
   if(navEntrar)navEntrar.style.display=utilizadorAtual?"none":"inline-flex";
-  if(id==="gestaoPims")preencherFiltroPorFarmaceutico();
+  if(id==="gestaoPims"){preencherFiltroPorFarmaceutico();carregarTodasPims("listaPims");}
   if(id==="minhaPims"){carregarMinhasPims("todas");carregarAvisosMinhasPims();}
   if(id==="utentes")carregarUtentes();
-  if(id==="painel")carregarEstatisticas();
+  if(id==="painel"){carregarEstatisticas();verificarAvisos();}
   if(id==="criarColaborador")carregarColaboradores();
 }
 
@@ -418,12 +462,14 @@ auth.onAuthStateChanged(function(user){
       ui.style.display="flex";
       document.getElementById("nomeUtilizador").innerText=dadosUtilizador.nome||user.email;
       document.getElementById("funcaoUtilizador").innerText=traduzirFuncao(dadosUtilizador.funcao||"");
+      iniciarListenersRealtime();
       mostrarSec("painel");
       verificarAvisos();
       toast("Bem-vindo, "+(dadosUtilizador.nome||""));
     }).catch(function(){fazerLogout();});
   }else{
     utilizadorAtual=null;dadosUtilizador=null;
+    pararListenersRealtime();
     var ui=document.getElementById("userInfo");ui.style.display="none";
     mostrarSec("login");
   }
@@ -471,19 +517,19 @@ function carregarEstatisticas(){
   db.collection("pims").get().then(function(snap){
     var t=0,a=0,p=0,d=0;
     snap.forEach(function(x){t++;var s=x.data().estado||"";
-      if(s==="Aguarda preparacao"||s==="Registada")a++;
+      if(s==="Registada")a++;
       if(s==="Pronto para levantamento")p++;
       if(s==="Dispensada")d++;
     });
     div.innerHTML=
       "<div class='stat-box'><h3>"+t+"</h3><p>Total PIMs</p></div>"+
-      "<div class='stat-box' style='background:#fff8e1;border-color:#ffe082;'><h3 style='color:#f57f17;'>"+a+"</h3><p>Aguarda Prep.</p></div>"+
+      "<div class='stat-box' style='background:#fff8e1;border-color:#ffe082;'><h3 style='color:#f57f17;'>"+a+"</h3><p>Registadas</p></div>"+
       "<div class='stat-box'><h3 style='color:var(--p);'>"+p+"</h3><p>Prontas</p></div>"+
       "<div class='stat-box' style='background:#eceff1;border-color:#cfd8dc;'><h3 style='color:#546e7a;'>"+d+"</h3><p>Dispensadas</p></div>";
   }).catch(function(){div.innerHTML="";});
 }
 
-/* ---- VERIFICAR AVISOS (painel) ---- */
+/* ---- VERIFICAR AVISOS (painel) — alteração 4 ---- */
 function verificarAvisos(){
   function add3DiasUteis(d){
     var dt=new Date(d);var count=0;
@@ -491,32 +537,58 @@ function verificarAvisos(){
     return dt;
   }
   var limite=add3DiasUteis(new Date());
+  var hoje=new Date().toISOString().slice(0,10);
+
   db.collection("utentes").get().then(function(snap){
-    var av=[];
+    var utentesComAviso=[];
     snap.forEach(function(doc){
       var u=doc.data();
       if(u.proximaPreparacao&&new Date(u.proximaPreparacao)<=limite){
-        av.push({uid:doc.id,nome:u.nome,cod:u.codigoPim,farm:u.farmaceuticoNome,data:u.proximaPreparacao,periodo:u.periodicidade||0});
+        // Se aviso foi cancelado hoje, verificar se já existe PIM registada hoje
+        if(u.avisoDispensadoEm===hoje){
+          // Não mostrar — só volta amanhã. Será limpo pelo próximo ciclo.
+          return;
+        }
+        utentesComAviso.push({uid:doc.id,nome:u.nome,cod:u.codigoPim,farm:u.farmaceuticoNome,data:u.proximaPreparacao,periodo:u.periodicidade||0});
       }
     });
-    var badge=document.getElementById("badgeAvisos");
-    badge.innerText=av.length;badge.classList.toggle("hidden",av.length===0);
-    var div=document.getElementById("avisosPrep");
-    if(!av.length){div.innerHTML="<p style='color:var(--p);'>Sem avisos de preparação nos próximos 3 dias úteis.</p>";return;}
-    var h="<h3 style='color:var(--danger);margin-bottom:10px;'>Avisos de Preparação ("+av.length+")</h3>";
-    av.forEach(function(a){
-      var uid=a.uid||"";var per=a.periodo||0;
-      h+="<div class='aviso-item' style='justify-content:space-between;align-items:center;'>"
-        +"<div><strong>Necessário preparar PIM para: "+a.nome+"</strong> ("+a.cod+")<br>"
-        +"<small>Farmacêutico: <strong>"+(a.farm||"---")+"</strong> &mdash; Data prevista: "+formatarDataSimples(a.data)+"</small></div>"
-        +"<button class='btn btn-xs btn-cinza' style='min-width:90px;flex-shrink:0;' "
-        +"onclick='dispensarAviso(\""+uid+"\","+per+")'>Dispensar Aviso</button></div>";
+
+    // Para cada utente com aviso, verificar se já foi registada PIM hoje
+    var promises=utentesComAviso.map(function(a){
+      var inicioDia=new Date(hoje+"T00:00:00").toISOString();
+      var fimDia=new Date(hoje+"T23:59:59").toISOString();
+      return db.collection("pims")
+        .where("codigoPim","==",a.cod)
+        .where("criadoEm",">=",inicioDia)
+        .where("criadoEm","<=",fimDia)
+        .get().then(function(snap){
+          // Se existe PIM registada hoje, não mostrar aviso
+          if(!snap.empty) return null;
+          return a;
+        });
     });
-    div.innerHTML=h;
+
+    Promise.all(promises).then(function(results){
+      var av=results.filter(function(r){return r!==null;});
+      var badge=document.getElementById("badgeAvisos");
+      badge.innerText=av.length;badge.classList.toggle("hidden",av.length===0);
+      var div=document.getElementById("avisosPrep");
+      if(!av.length){div.innerHTML="<p style='color:var(--p);'>Sem avisos de preparação nos próximos 3 dias úteis.</p>";return;}
+      var h="<h3 style='color:var(--danger);margin-bottom:10px;'>Avisos de Preparação ("+av.length+")</h3>";
+      av.forEach(function(a){
+        var uid=a.uid||"";var per=a.periodo||0;
+        h+="<div class='aviso-item' style='justify-content:space-between;align-items:center;'>"
+          +"<div><strong>Necessário preparar PIM para: "+a.nome+"</strong> ("+a.cod+")<br>"
+          +"<small>Farmacêutico: <strong>"+(a.farm||"---")+"</strong> &mdash; Data prevista: "+formatarDataSimples(a.data)+"</small></div>"
+          +"<button class='btn btn-xs btn-cinza' style='min-width:90px;flex-shrink:0;' "
+          +"onclick='dispensarAviso(\""+uid+"\","+per+")'>Cancelar Aviso</button></div>";
+      });
+      div.innerHTML=h;
+    });
   }).catch(function(){});
 }
 
-/* ---- AVISOS NAS MINHAS PIMs ---- */
+/* ---- AVISOS NAS MINHAS PIMs — alteração 4 ---- */
 function carregarAvisosMinhasPims(){
   if(!dadosUtilizador)return;
   var nome=dadosUtilizador.nome;
@@ -528,24 +600,44 @@ function carregarAvisosMinhasPims(){
     return dt;
   }
   var limite=add3DiasUteis(new Date());
+  var hoje=new Date().toISOString().slice(0,10);
+
   db.collection("utentes").get().then(function(snap){
-    var av=[];
+    var utentesComAviso=[];
     snap.forEach(function(doc){
       var u=doc.data();
       var eResponsavel=(u.farmaceuticoNome===nome)||(funcao==="tecnico"||funcao==="admin");
       if(eResponsavel&&u.proximaPreparacao&&new Date(u.proximaPreparacao)<=limite){
-        av.push({uid:doc.id,nome:u.nome,cod:u.codigoPim,farm:u.farmaceuticoNome,data:u.proximaPreparacao,periodo:u.periodicidade||0});
+        if(u.avisoDispensadoEm===hoje) return;
+        utentesComAviso.push({uid:doc.id,nome:u.nome,cod:u.codigoPim,farm:u.farmaceuticoNome,data:u.proximaPreparacao,periodo:u.periodicidade||0});
       }
     });
-    if(!av.length){div.innerHTML="";return;}
-    var h="<div style='background:var(--dangera);border-left:4px solid var(--danger);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;'>";
-    h+="<strong style='color:var(--danger);'>Avisos — PIMs a preparar (próximos 3 dias úteis):</strong><ul style='margin-top:8px;padding-left:16px;font-size:.88em;'>";
-    av.forEach(function(a){
-      var uid=a.uid||"";var per=a.periodo||0;
-      h+="<li style='margin:5px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;'>Necessário preparar PIM para <strong>"+a.nome+"</strong> ("+a.cod+") — <strong>"+(a.farm||"---")+"</strong> — prevista: "+formatarDataSimples(a.data)+" <button class='btn btn-xs btn-cinza' onclick='dispensarAviso(\""+uid+"\","+per+")'>Dispensar</button></li>";
+
+    var promises=utentesComAviso.map(function(a){
+      var inicioDia=new Date(hoje+"T00:00:00").toISOString();
+      var fimDia=new Date(hoje+"T23:59:59").toISOString();
+      return db.collection("pims")
+        .where("codigoPim","==",a.cod)
+        .where("criadoEm",">=",inicioDia)
+        .where("criadoEm","<=",fimDia)
+        .get().then(function(snap){
+          if(!snap.empty) return null;
+          return a;
+        });
     });
-    h+="</ul></div>";
-    div.innerHTML=h;
+
+    Promise.all(promises).then(function(results){
+      var av=results.filter(function(r){return r!==null;});
+      if(!av.length){div.innerHTML="";return;}
+      var h="<div style='background:var(--dangera);border-left:4px solid var(--danger);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;'>";
+      h+="<strong style='color:var(--danger);'>Avisos — PIMs a preparar (próximos 3 dias úteis):</strong><ul style='margin-top:8px;padding-left:16px;font-size:.88em;'>";
+      av.forEach(function(a){
+        var uid=a.uid||"";var per=a.periodo||0;
+        h+="<li style='margin:5px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;'>Necessário preparar PIM para <strong>"+a.nome+"</strong> ("+a.cod+") — <strong>"+(a.farm||"---")+"</strong> — prevista: "+formatarDataSimples(a.data)+" <button class='btn btn-xs btn-cinza' onclick='dispensarAviso(\""+uid+"\","+per+")'>Cancelar Aviso</button></li>";
+      });
+      h+="</ul></div>";
+      div.innerHTML=h;
+    });
   });
 }
 
@@ -582,11 +674,9 @@ function preencherSelectsFarmaceuticos(){
   ss.innerHTML="<option value=''>-- Nenhum --</option>";
   todosColaboradores.forEach(function(c){
     if(c.ativo===false)return;
-    // Farmacêutico responsável: só farmacêuticos + admin
     if(c.funcao==="farmaceutico"||c.funcao==="admin"){
       sf.innerHTML+="<option value='"+c.nome+"'>"+c.nome+" ("+c.codigo+") — Farmacêutico</option>";
     }
-    // Complementar: farmacêuticos + técnicos + admin
     if(c.funcao==="farmaceutico"||c.funcao==="admin"||c.funcao==="tecnico"){
       ss.innerHTML+="<option value='"+c.nome+"'>"+c.nome+" ("+c.codigo+") — "+traduzirFuncao(c.funcao)+"</option>";
     }
@@ -647,8 +737,10 @@ function editarUtente(id){
     document.getElementById("tituloFormUtente").innerText="Editar Utente";
     document.getElementById("formUtenteArea").classList.remove("hidden");
     preencherSelectsFarmaceuticos();
-    setTimeout(function(){document.getElementById("uFarmaceutico").value=u.farmaceuticoNome||"";document.getElementById("uSubstituto").value=u.substitutoNome||u.tecnicoNome||"";
-},200);
+    setTimeout(function(){
+      document.getElementById("uFarmaceutico").value=u.farmaceuticoNome||"";
+      document.getElementById("uSubstituto").value=u.substitutoNome||u.tecnicoNome||"";
+    },200);
     window.scrollTo(0,0);
   });
 }
@@ -698,7 +790,7 @@ document.getElementById("formPim").addEventListener("submit",function(e){
     var u=uDoc.data();
     return db.collection("pims").where("codigoPim","==",codBase).get().then(function(snap){
       var num=snap.size+1;
-      var codPrep=codBase+"."+("00"+num).slice(-3);
+      var codPrep=codBase+"."+"00"+num).slice(-3);
       var ref=db.collection("pims").doc();
       return ref.set({pimId:ref.id,utenteId:uid,codigoPim:codBase,codigoPreparacao:codPrep,nomeUtente:u.nome,codigoUtente:u.codigoPim,farmaceuticoNome:farm,tecnicoNome:tec,farmaceuticoId:utilizadorAtual.uid,estado:"Registada",historicoEstado:[{estado:"Registada",data:new Date().toISOString(),por:farm||(dadosUtilizador?dadosUtilizador.nome:"")}],numeroPreparacao:num,obsInternas:obsInt,obsEntrega:obsEnt,prazo:prazo||"",autoRenovar:false,criadoEm:new Date().toISOString(),atualizadoEm:new Date().toISOString()});
     });
@@ -711,13 +803,15 @@ document.getElementById("formPim").addEventListener("submit",function(e){
   }).catch(function(er){mostrarFb("fbPim","Erro: "+er.message,false);});
 });
 
-/* ---- TABELA PIMs ---- */
-function renderTabela(snap,cid){
+/* ---- TABELA PIMs — alteração 2 (ordenação) ---- */
+var _ultimoSnapPims = null; // guarda último snapshot para reordenar sem ir ao Firebase
+
+function renderTabela(docs, cid){
   var div=document.getElementById(cid);if(!div)return;
-  if(snap.empty){div.innerHTML="<p style='margin-top:12px;color:var(--muted);'>Nenhuma PIM encontrada.</p>";return;}
+  if(!docs||!docs.length){div.innerHTML="<p style='margin-top:12px;color:var(--muted);'>Nenhuma PIM encontrada.</p>";return;}
   var h="<table><thead><tr><th>Cód. Prep.</th><th>Utente</th><th>Farmacêutico</th><th>Estado</th><th>Data</th><th>Ações</th></tr></thead><tbody>";
-  snap.forEach(function(d){
-    var p=d.data(),pid=d.id;
+  docs.forEach(function(item){
+    var p=item.data, pid=item.id;
     var pode=p.estado!=="Anulada"&&p.estado!=="Dispensada";
     h+="<tr><td><strong>"+(p.codigoPreparacao||p.codigoPim||"--")+"</strong></td><td>"+(p.nomeUtente||"--")+"</td><td>"+(p.farmaceuticoNome||"--")+"</td><td>"+criarBadge(p.estado)+"</td><td><small>"+formatarData(p.criadoEm)+"</small></td><td style='white-space:nowrap;'>"
       +"<button class='btn btn-xs btn-outline' data-pid='"+pid+"' onclick='verDetalhe(this.dataset.pid)'>Ver</button> "
@@ -728,30 +822,82 @@ function renderTabela(snap,cid){
   });
   h+="</tbody></table>";div.innerHTML=h;
 }
+
+function snapParaArray(snap){
+  var arr=[];
+  snap.forEach(function(d){arr.push({id:d.id,data:d.data()});});
+  return arr;
+}
+
+function ordenarDocs(docs, sortVal){
+  var parts=sortVal.split("_");
+  var campo=parts[0], dir=parts[1];
+  docs.sort(function(a,b){
+    var va=a.data[campo]||"", vb=b.data[campo]||"";
+    if(va<vb)return dir==="asc"?-1:1;
+    if(va>vb)return dir==="asc"?1:-1;
+    return 0;
+  });
+  return docs;
+}
+
+function aplicarOrdenacao(){
+  if(!_ultimoSnapPims)return;
+  var sortVal=(document.getElementById("sortPims")||{}).value||"criadoEm_desc";
+  var docs=ordenarDocs(_ultimoSnapPims.slice(), sortVal);
+  renderTabela(docs,"listaPims");
+}
+
 function carregarTodasPims(cid){
   var div=document.getElementById(cid);if(div)div.innerHTML="<p>A carregar...</p>";
-  db.collection("pims").orderBy("criadoEm","desc").limit(100).get().then(function(s){renderTabela(s,cid);}).catch(function(e){if(div)div.innerHTML="<p>Erro: "+e.message+"</p>";});
+  db.collection("pims").orderBy("criadoEm","desc").limit(200).get().then(function(s){
+    var docs=snapParaArray(s);
+    if(cid==="listaPims"){
+      _ultimoSnapPims=docs;
+      var sortVal=(document.getElementById("sortPims")||{}).value||"criadoEm_desc";
+      docs=ordenarDocs(docs.slice(),sortVal);
+    }
+    renderTabela(docs,cid);
+  }).catch(function(e){if(div)div.innerHTML="<p>Erro: "+e.message+"</p>";});
 }
+
 function filtrarEstado(estado){
   var div=document.getElementById("listaPims");if(div)div.innerHTML="<p>A carregar...</p>";
-  db.collection("pims").where("estado","==",estado).get().then(function(s){renderTabela(s,"listaPims");}).catch(function(e){if(div)div.innerHTML="<p>Erro: "+e.message+"</p>";});
+  db.collection("pims").where("estado","==",estado).get().then(function(s){
+    var docs=snapParaArray(s);
+    _ultimoSnapPims=docs;
+    var sortVal=(document.getElementById("sortPims")||{}).value||"criadoEm_desc";
+    docs=ordenarDocs(docs.slice(),sortVal);
+    renderTabela(docs,"listaPims");
+  }).catch(function(e){if(div)div.innerHTML="<p>Erro: "+e.message+"</p>";});
 }
+
 function preencherFiltroPorFarmaceutico(){
   var sel=document.getElementById("filtroPorFarmaceutico");
   sel.innerHTML="<option value=''>-- Todos --</option>";
   todosColaboradores.forEach(function(c){if(c.funcao==="farmaceutico"||c.funcao==="admin")sel.innerHTML+="<option value='"+c.nome+"'>"+c.nome+"</option>";});
 }
+
 function filtrarPorFarmaceutico(){
   var farm=document.getElementById("filtroPorFarmaceutico").value;
   var div=document.getElementById("listaPims");
   if(!farm){carregarTodasPims("listaPims");return;}
   if(div)div.innerHTML="<p>A carregar...</p>";
-  db.collection("pims").where("farmaceuticoNome","==",farm).get().then(function(s){renderTabela(s,"listaPims");}).catch(function(e){if(div)div.innerHTML="<p>Erro: "+e.message+"</p>";});
+  db.collection("pims").where("farmaceuticoNome","==",farm).get().then(function(s){
+    var docs=snapParaArray(s);
+    _ultimoSnapPims=docs;
+    var sortVal=(document.getElementById("sortPims")||{}).value||"criadoEm_desc";
+    docs=ordenarDocs(docs.slice(),sortVal);
+    renderTabela(docs,"listaPims");
+  }).catch(function(e){if(div)div.innerHTML="<p>Erro: "+e.message+"</p>";});
 }
+
 function pesquisarPims(){
   var q=document.getElementById("pesquisaQ").value.trim().toUpperCase();
   var div=document.getElementById("resultadosPesquisa");div.innerHTML="<p>A pesquisar...</p>";
-  db.collection("pims").where("codigoPim","==",q).get().then(function(s){renderTabela(s,"resultadosPesquisa");}).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
+  db.collection("pims").where("codigoPim","==",q).get().then(function(s){
+    renderTabela(snapParaArray(s),"resultadosPesquisa");
+  }).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
 }
 
 /* ---- DETALHE ---- */
@@ -779,8 +925,9 @@ function verDetalhe(pimId){
   });
 }
 
-/* ---- AVANÇAR ESTADO ---- */
-var fluxo=["Registada","Aguarda preparacao","Pronto para levantamento"];
+/* ---- AVANÇAR ESTADO — alteração 3 (sem Aguarda preparacao) ---- */
+var fluxo=["Registada","Pronto para levantamento"];
+
 function avancarEstado(pimId,estadoAtual){
   var idx=fluxo.indexOf(estadoAtual);
   if(idx<0||idx>=fluxo.length-1){toast("Não é possível avançar este estado.");return;}
@@ -803,10 +950,10 @@ function avancarEstado(pimId,estadoAtual){
           var periodo=parseInt(u.periodicidade)||0;
           if(periodo>0){
             var novaData=new Date();novaData.setDate(novaData.getDate()+periodo);
-            return db.collection("utentes").doc(pimData.utenteId).update({proximaPreparacao:novaData.toISOString(),atualizadoEm:new Date().toISOString()});
+            return db.collection("utentes").doc(pimData.utenteId).update({proximaPreparacao:novaData.toISOString(),avisoDispensadoEm:"",atualizadoEm:new Date().toISOString()});
           } else {
             var futuro=new Date();futuro.setFullYear(futuro.getFullYear()+10);
-            return db.collection("utentes").doc(pimData.utenteId).update({proximaPreparacao:futuro.toISOString(),atualizadoEm:new Date().toISOString()});
+            return db.collection("utentes").doc(pimData.utenteId).update({proximaPreparacao:futuro.toISOString(),avisoDispensadoEm:"",atualizadoEm:new Date().toISOString()});
           }
         });
       }
@@ -870,6 +1017,8 @@ function carregarParaDispensa(){
     div.innerHTML=html;
   }).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
 }
+
+/* ---- CONFIRMAR DISPENSA — alteração 1 (sem talão) ---- */
 function confirmarDispensa(pimId,temObs){
   if(temObs){var chk=document.getElementById("chkObsLidas");if(!chk||!chk.checked){toast("Confirme que leu as observações.");return;}}
   var nomeQ=document.getElementById("nomeQuemLevantou")?document.getElementById("nomeQuemLevantou").value.trim():"";
@@ -881,23 +1030,42 @@ function confirmarDispensa(pimId,temObs){
   db.collection("pims").doc(pimId).get().then(function(doc){
     var p=doc.data(),hist=p.historicoEstado||[];
     hist.push({estado:"Dispensada",data:new Date().toISOString(),por:por});
-    return db.collection("pims").doc(pimId).update({estado:"Dispensada",historicoEstado:hist,dispensadoEm:new Date().toISOString(),dispensadoPor:por,codigoOperador:codOp,nomeQuemLevantou:nomeQ,obsDispensa:obsD,atualizadoEm:new Date().toISOString()}).then(function(){
-      return db.collection("dispensas").add({pimId:pimId,codigoPreparacao:p.codigoPreparacao||p.codigoPim,nomeUtente:p.nomeUtente,nomeQuemLevantou:nomeQ,codigoOperador:codOp,obs:obsD,dispensadoEm:new Date().toISOString(),dispensadoPor:por});
-    }).then(function(){return p;});
-  }).then(function(p){
-    document.getElementById("detalhesDispensa").innerHTML="<div class='fb vis fb-ok'>PIM dispensada com sucesso.</div>";
+    return db.collection("pims").doc(pimId).update({
+      estado:"Dispensada",historicoEstado:hist,
+      dispensadoEm:new Date().toISOString(),dispensadoPor:por,
+      codigoOperador:codOp,nomeQuemLevantou:nomeQ,obsDispensa:obsD,
+      atualizadoEm:new Date().toISOString()
+    }).then(function(){
+      return db.collection("dispensas").add({
+        pimId:pimId,codigoPreparacao:p.codigoPreparacao||p.codigoPim,
+        nomeUtente:p.nomeUtente,nomeQuemLevantou:nomeQ,
+        codigoOperador:codOp,obs:obsD,
+        dispensadoEm:new Date().toISOString(),dispensadoPor:por
+      });
+    });
+  }).then(function(){
+    document.getElementById("detalhesDispensa").innerHTML="<div class='fb vis fb-ok'>✅ PIM dispensada com sucesso.</div>";
     document.getElementById("codDispensa").value="";
-    imprimirTalao(pimId);carregarEstatisticas();toast("PIM dispensada");
+    // SEM imprimirTalao — alteração 1
+    carregarEstatisticas();
+    toast("PIM dispensada");
   }).catch(function(e){toast("Erro: "+e.message);});
 }
 
-/* ---- IMPRIMIR TALÃO ---- */
-function imprimirTalao(pimId){
-  db.collection("pims").doc(pimId).get().then(function(doc){
-    var p=doc.data();
-    var w=window.open("","_blank","width=420,height=560");
-    w.document.write("<!DOCTYPE html><html><head><meta charset='UTF-8'><style>body{font-family:Arial,sans-serif;font-size:13px;padding:18px;max-width:300px;}h2{font-size:14px;text-align:center;margin-bottom:3px;}.sub{text-align:center;font-size:11px;color:#666;margin-bottom:8px;}.ln{border-top:1px dashed #000;margin:9px 0;}.row{margin:5px 0;}.sig{margin-top:28px;border-top:1px solid #000;padding-top:7px;font-size:12px;}.ctr{text-align:center;}</style></head><body><h2>Farmácia da Liga</h2><p class='sub'>Preparação Individualizada da Medicação</p><div class='ln'></div><p class='row'><strong>PIM:</strong> "+(p.codigoPreparacao||p.codigoPim)+"</p><p class='row'><strong>Utente:</strong> "+p.nomeUtente+"</p><p class='row'><strong>Levantou:</strong> "+(p.nomeQuemLevantou||"---")+"</p><p class='row'><strong>Data:</strong> "+formatarData(p.dispensadoEm||new Date().toISOString())+"</p><p class='row'><strong>Operador:</strong> "+(p.codigoOperador||"---")+"</p>"+(p.obsDispensa?"<p class='row'><strong>Obs:</strong> "+p.obsDispensa+"</p>":"")+"<div class='ln'></div><p>Confirmo que foi entregue a preparação individualizada da medicação acima identificada.</p><div class='sig'>Assinatura: ____________________________</div><p class='ctr' style='margin-top:14px;font-size:11px;color:#999;'>Farmácia da Liga &copy; "+new Date().getFullYear()+"</p></body></html>");
-    w.document.close();w.focus();w.print();
+/* ---- DISPENSAR AVISO MANUAL — alteração 4 ---- */
+function dispensarAviso(utenteId,periodo){
+  showModal({title:"Cancelar Aviso",msg:"Cancelar este aviso hoje? O aviso voltará amanhã se a PIM não for registada."}).then(function(ok){
+    if(!ok)return;
+    var hoje=new Date().toISOString().slice(0,10);
+    // Apenas regista a data de cancelamento — NÃO altera proximaPreparacao
+    db.collection("utentes").doc(utenteId).update({
+      avisoDispensadoEm:hoje,
+      atualizadoEm:new Date().toISOString()
+    }).then(function(){
+      toast("Aviso cancelado para hoje.");
+      verificarAvisos();
+      carregarAvisosMinhasPims();
+    }).catch(function(e){toast("Erro: "+e.message);});
   });
 }
 
@@ -908,7 +1076,7 @@ function carregarMinhasPims(filtro){
   var funcao=dadosUtilizador.funcao;
   var div=document.getElementById("listaMinhasPims");div.innerHTML="<p>A carregar...</p>";
   var campo=(funcao==="tecnico")?"tecnicoNome":"farmaceuticoNome";
-  var ef={aguarda:["Registada","Aguarda preparacao"],prontas:["Pronto para levantamento"],dispensadas:["Dispensada"]};
+  var ef={prontas:["Pronto para levantamento"],dispensadas:["Dispensada"]};
   db.collection("pims").where(campo,"==",nome).get().then(function(snap){
     var docs=[];
     snap.forEach(function(d){
@@ -942,20 +1110,6 @@ function exportarCSV(){
   });
 }
 
-/* ---- DISPENSAR AVISO MANUAL ---- */
-function dispensarAviso(utenteId,periodo){
-  showModal({title:"Dispensar Aviso",msg:"Marcar este aviso como tratado? A próxima preparação será recalculada."}).then(function(ok){
-    if(!ok)return;
-    var p=parseInt(periodo)||0;
-    var novaData=new Date();
-    if(p>0){novaData.setDate(novaData.getDate()+p);}
-    else{novaData.setFullYear(novaData.getFullYear()+10);}
-    db.collection("utentes").doc(utenteId).update({proximaPreparacao:novaData.toISOString(),atualizadoEm:new Date().toISOString()}).then(function(){
-      toast("Aviso dispensado.");verificarAvisos();carregarAvisosMinhasPims();
-    }).catch(function(e){toast("Erro: "+e.message);});
-  });
-}
-
 /* ---- COLABORADORES ---- */
 function mostrarFormColaborador(){
   document.getElementById("formColaboradorArea").classList.remove("hidden");
@@ -969,7 +1123,6 @@ function esconderFormColaborador(){
   document.getElementById("formColaboradorArea").classList.add("hidden");
   window.colIdEdicao=null;
 }
-
 document.getElementById("formColaborador").addEventListener("submit",function(e){
   e.preventDefault();
   var id=window.colIdEdicao||"";
@@ -1028,8 +1181,7 @@ function toggleAtivo(userId,nome,novoEstado){
     if(!ok)return;
     db.collection("utilizadores").doc(userId).update({ativo:novoEstado,atualizadoEm:new Date().toISOString()}).then(function(){
       toast(nome+(novoEstado?" ativado":" desativado")+".");
-      carregarColaboradores();
-      carregarMapaUtilizadores();
+      carregarColaboradores();carregarMapaUtilizadores();
     }).catch(function(e){toast("Erro: "+e.message);});
   });
 }
@@ -1038,21 +1190,18 @@ function toggleAtivo(userId,nome,novoEstado){
 function apagarColaborador(userId,nome){
   showModal({
     title:"Apagar Colaborador",
-    msg:"Tem a certeza que quer apagar "+nome+"? Esta ação é irreversível. O utilizador será removido do Firestore."
+    msg:"Tem a certeza que quer apagar "+nome+"? Esta ação é irreversível."
   }).then(function(ok){
     if(!ok)return;
     db.collection("utilizadores").doc(userId).delete().then(function(){
       mapaUtilizadores={};todosColaboradores=[];
-      carregarColaboradores();
-      carregarMapaUtilizadores();
+      carregarColaboradores();carregarMapaUtilizadores();
       toast(nome+" removido com sucesso.");
-    }).catch(function(e){
-      toast("Erro: "+e.message);
-    });
+    }).catch(function(e){toast("Erro: "+e.message);});
   });
 }
 
-/* ---- CARREGAR COLABORADORES (com botões) ---- */
+/* ---- CARREGAR COLABORADORES ---- */
 function carregarColaboradores(){
   var div=document.getElementById("listaColaboradores");div.innerHTML="<p>A carregar...</p>";
   db.collection("utilizadores").orderBy("nome").get().then(function(snap){
