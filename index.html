@@ -284,7 +284,7 @@
   <h2>Gestão de Colaboradores</h2>
   <div class="frow" style="margin-bottom:16px;">
     <button class="btn btn-verde" onclick="mostrarFormColaborador()">+ Novo Colaborador</button>
-    <button class="btn btn-outline" onclick="carregarColaboradores()">Ver Todos</button>
+    <button class="btn btn-outline" onclick="carregarColaboradores()">Ver Todos</button> <button class="btn btn-sm btn-red" onclick="limparTodosCaches()">Apagar Todos Caches</button>
   </div>
   <div id="formColaboradorArea" class="hidden">
     <div class="card" style="background:var(--paa);border-color:var(--pa);margin-bottom:16px;">
@@ -420,7 +420,7 @@ auth.onAuthStateChanged(function(user){
   }else{
     utilizadorAtual=null;dadosUtilizador=null;
     var ui=document.getElementById("userInfo");ui.style.display="none";
-    mostrarSec("login");
+    
   }
 });
 
@@ -700,7 +700,8 @@ function renderTabela(snap,cid){
   snap.forEach(function(d){
     var p=d.data(),pid=d.id;
     var pode=p.estado!=="Anulada"&&p.estado!=="Dispensada";
-    h+="<tr><td><strong>"+(p.codigoPreparacao||p.codigoPim||"--")+"</strong></td><td>"+(p.nomeUtente||"--")+"</td><td>"+(p.farmaceuticoNome||"--")+"</td><td>"+criarBadge(p.estado)+"</td><td><small>"+formatarData(p.criadoEm)+"</small></td><td style='white-space:nowrap;'><button class='btn btn-xs btn-outline' data-pid='"+pid+"' onclick='verDetalhe(this.dataset.pid)'>Ver</button> "+(pode?"<button class='btn btn-xs btn-laranja' data-pid='"+pid+"' data-estado='"+(p.estado||"")+"' onclick='avancarEstado(this.dataset.pid,this.dataset.estado)'>Avancar</button> ":"")+(pode?"<button class='btn btn-xs btn-red' data-pid='"+pid+"' onclick='anularPim(this.dataset.pid)'>Anular</button>":"")+"</td></tr>";
+    h+="<tr><td><strong>"+(p.codigoPreparacao||p.codigoPim||"--")+"</strong></td><td>"+(p.nomeUtente||"--")+"</td><td>"+(p.farmaceuticoNome||"--")+"</td><td>"+criarBadge(p.estado)+"</td><td><small>"+formatarData(p.criadoEm)+"</small></td><td style='white-space:nowrap;'><button class='btn btn-xs btn-outline' data-pid='"+pid+"' onclick='verDetalhe(this.dataset.pid)'>Ver</button> "+(pode?"<button class='btn btn-xs btn-laranja' data-pid='"+pid+"' data-estado='"+(p.estado||"")+"' onclick='avancarEstado(this.dataset.pid,this.dataset.estado)'>Avancar</button> ":"")+(pode?"<button class='btn btn-xs btn-red' data-pid='"+pid+"' onclick='anularPim(this.dataset.pid)'>Anular</button> ":"")+
+      "<button class='btn btn-xs' style='background:#4a148c;color:#fff;' data-pid='"+pid+"' data-cod='"+(p.codigoPreparacao||p.codigoPim||"--")+"' onclick='apagarPim(this.dataset.pid,this.dataset.cod)'>Apagar</button>"+"</td></tr>";
   });
   h+="</tbody></table>";div.innerHTML=h;
 }
@@ -899,15 +900,33 @@ function exportarCSV(){
 }
 
 /* ---- COLABORADORES ---- */
-function mostrarFormColaborador(){document.getElementById("formColaboradorArea").classList.remove("hidden");}
+function mostrarFormColaborador(){document.getElementById("formColaboradorArea").classList.remove("hidden");window.colIdEdicao=null;document.getElementById("colPass").placeholder="";document.getElementById("colPassConf").placeholder="";}
 function esconderFormColaborador(){document.getElementById("formColaboradorArea").classList.add("hidden");}
 document.getElementById("formColaborador").addEventListener("submit",function(e){
   e.preventDefault();
+  var id=window.colIdEdicao||"";
   var cod=document.getElementById("colCodigo").value.trim();
   var nome=document.getElementById("colNome").value.trim();
   var func=document.getElementById("colFuncao").value;
   var pass=document.getElementById("colPass").value;
   var conf=document.getElementById("colPassConf").value;
+  if(id){ // Edição
+    if(pass&&pass!==conf){mostrarFb("fbColaborador","Passwords nao coincidem.",false);return;}
+    var updates={codigo:cod,nome:nome,funcao:func,atualizadoEm:new Date().toISOString()};
+    if(pass)updates.password=pass; // Só se preenchida
+    db.collection("utilizadores").doc(id).update(updates).then(function(){
+      if(pass){
+        // Re-autenticar com nova password (complexo, por agora só atualizar dados)
+        toast("Colaborador atualizado (password requer novo login)");
+      }
+      mostrarFb("fbColaborador","Colaborador atualizado!",true);
+      document.getElementById("formColaborador").reset();
+      window.colIdEdicao=null;
+      carregarColaboradores();carregarMapaUtilizadores();
+    }).catch(function(e){mostrarFb("fbColaborador","Erro: "+e.message,false);});
+    return;
+  }
+  var cod=document.getElementById("colCodigo").value.trim();
   if(!cod||!nome||!func||!pass){mostrarFb("fbColaborador","Preencha todos os campos.",false);return;}
   if(pass!==conf){mostrarFb("fbColaborador","As passwords nao coincidem.",false);return;}
   if(pass.length<6){mostrarFb("fbColaborador","Password: minimo 6 caracteres.",false);return;}
@@ -922,11 +941,52 @@ document.getElementById("formColaborador").addEventListener("submit",function(e)
     carregarColaboradores();carregarMapaUtilizadores();toast("Colaborador criado");
   }).catch(function(e){mostrarFb("fbColaborador",e.code==="auth/email-already-in-use"?"Codigo ja existe.":"Erro: "+e.message,false);});
 });
+/* ---- EDITAR COLABORADOR ---- */
+function editarColaborador(id,cod,nome,func){
+  document.getElementById("colCodigo").value=cod;
+  document.getElementById("colNome").value=nome;
+  document.getElementById("colFuncao").value=func;
+  // Preencher password com **** para indicar edição
+  document.getElementById("colPass").placeholder="Deixe vazio para manter";
+  document.getElementById("colPassConf").placeholder="Deixe vazio para manter";
+  document.getElementById("formColaboradorArea").classList.remove("hidden");
+  window.colIdEdicao=id;
+}
+
+/* ---- APAGAR COLABORADOR ---- */
+function apagarColaborador(userId,nome){
+  showModal({
+    title:"Apagar Colaborador",
+    msg:"Tem a certeza que quer apagar "+nome+"? Esta acao e irreversivel."
+  }).then(function(ok){
+    if(!ok)return;
+    // Primeiro apagar do Firestore
+    db.collection("utilizadores").doc(userId).delete().then(function(){
+      // Depois apagar da Auth
+      auth.fetchSignInMethodsForEmail(gerarEmail(cod)).then(function(methods){
+        if(methods.length>0){
+          auth.currentUser?auth.signOut():null;
+          // Apagar user da Auth (precisa custom token ou admin SDK, aqui só logout)
+          toast("Colaborador apagado do Firestore. Para remover da Auth, contacte suporte.");
+        }
+        // Limpar caches e reload
+        mapaUtilizadores={};todosColaboradores=[];
+        carregarColaboradores();
+        carregarMapaUtilizadores();
+        toast(nome+" removido com sucesso");
+        esconderFormColaborador();
+      });
+    }).catch(function(e){
+      toast("Erro: "+e.message);
+    });
+  });
+}
+
 function carregarColaboradores(){
   var div=document.getElementById("listaColaboradores");div.innerHTML="<p>A carregar...</p>";
   db.collection("utilizadores").orderBy("nome").get().then(function(snap){
     if(snap.empty){div.innerHTML="<p>Nenhum colaborador.</p>";return;}
-    var h="<table><thead><tr><th>Codigo</th><th>Nome</th><th>Funcao</th><th>Criado em</th></tr></thead><tbody>";
+    var h="<table><thead><tr><th>Codigo</th><th>Nome</th><th>Funcao</th><th>Criado em</th><th>Acoes</th></tr></thead><tbody>";
     snap.forEach(function(doc){var c=doc.data();h+="<tr><td>"+c.codigo+"</td><td><strong>"+c.nome+"</strong></td><td>"+traduzirFuncao(c.funcao||"")+"</td><td><small>"+formatarData(c.criadoEm)+"</small></td></tr>";});
     h+="</tbody></table>";div.innerHTML=h;
   }).catch(function(e){div.innerHTML="<p>Erro: "+e.message+"</p>";});
@@ -953,6 +1013,43 @@ document.addEventListener("click",function(e){
 });
 
 mostrarSec("login");
+
+
+/* ---- APAGAR PIM ---- */
+function apagarPim(pimId,codPrep){
+  showModal({
+    title:"Apagar PIM "+codPrep,
+    msg:"Esta acao e irreversivel. A PIM sera eliminada permanentemente.",
+    inputLabel:"Codigo de quem autoriza:"
+  }).then(function(cod){
+    if(!cod)return;
+    if(!mapaUtilizadores[cod]){toast("Codigo invalido. Operacao cancelada.");return;}
+    var por=dadosUtilizador?dadosUtilizador.nome:cod;
+    // Guardar registo de auditoria antes de apagar
+    db.collection("pims_apagadas").add({
+      pimId:pimId,codigoPreparacao:codPrep,
+      apagadoPor:por,codigoAutorizador:cod,
+      apagadoEm:new Date().toISOString()
+    }).then(function(){
+      return db.collection("pims").doc(pimId).delete();
+    }).then(function(){
+      toast("PIM "+codPrep+" apagada.");
+      carregarTodasPims("listaPims");
+      carregarTodasPims("resultadosPesquisa");
+      carregarEstatisticas();
+    }).catch(function(e){toast("Erro: "+e.message);});
+  });
+}
+
+function limparTodosCaches(){
+  mapaUtilizadores={};todosColaboradores=[];
+  localStorage.clear();
+  carregarColaboradores();
+  carregarMapaUtilizadores();
+  carregarUtentes();
+  toast("Todos os caches limpos");
+}
+
 </script>
 </body>
 </html>
